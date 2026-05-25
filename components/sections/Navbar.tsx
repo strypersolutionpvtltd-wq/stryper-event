@@ -90,7 +90,7 @@ const Navbar = () => {
       >
         <Container>
           <div className="flex h-20 items-center justify-between">
-            {/* Logo - only show in navbar when scrolled */}
+            {/* Logo */}
             <motion.a
               href="#home"
               className="flex items-center"
@@ -100,12 +100,12 @@ const Navbar = () => {
               <img
                 src="/images/logo.jpg"
                 alt="Stryper Events"
-                className="h-14 w-auto max-w-[180px] object-contain"
+                className="h-10 w-auto sm:h-12 md:h-14 max-w-[150px] sm:max-w-[180px] object-contain"
               />
             </motion.a>
 
             {/* Desktop Nav Links */}
-            <div className="hidden items-center space-x-1 md:flex">
+            <div className="hidden items-center space-x-1 lg:flex">
               {NAV_ITEMS.map((item, index) => (
                 <motion.a
                   key={item.name}
@@ -113,7 +113,7 @@ const Navbar = () => {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="transition-smooth animated-underline px-4 py-2 text-white/80 hover:text-accent-yellow"
+                  className="transition-smooth animated-underline px-4 py-2 text-white/80 hover:text-accent-yellow text-sm font-medium"
                 >
                   {item.name}
                 </motion.a>
@@ -121,7 +121,7 @@ const Navbar = () => {
             </div>
 
             {/* CTA Button */}
-            <div className="hidden md:block">
+            <div className="hidden sm:block">
               <Button size="sm" variant="primary" onClick={onOpen}>
                 Get Started
               </Button>
@@ -131,7 +131,7 @@ const Navbar = () => {
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="transition-smooth p-2 text-white hover:text-accent-yellow md:hidden"
+              className="transition-smooth p-2 text-white hover:text-accent-yellow lg:hidden"
             >
               {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </motion.button>
@@ -142,42 +142,69 @@ const Navbar = () => {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="glass border-t border-white/10 md:hidden"
+              initial={{ opacity: 0, x: "100%" }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed inset-0 z-[60] flex flex-col bg-primary-black lg:hidden"
             >
-              <Container>
-                <div className="space-y-4 py-6">
-                  {NAV_ITEMS.map((item, index) => (
-                    <motion.a
-                      key={item.name}
-                      href={item.href}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="transition-smooth block rounded-lg px-4 py-3 text-white/80 hover:bg-white/5 hover:text-accent-yellow"
-                    >
-                      {item.name}
-                    </motion.a>
-                  ))}
-                  <div className="pt-4">
-                    <Button
-                      size="md"
-                      variant="primary"
-                      className="w-full"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        onOpen();
-                      }}
-                    >
-                      Get Started
-                    </Button>
-                  </div>
+              <div className="flex h-20 items-center justify-between px-4 sm:px-6">
+                <img
+                  src="/images/logo.jpg"
+                  alt="Stryper Events"
+                  className="h-10 w-auto object-contain"
+                />
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 text-white"
+                >
+                  <X size={28} />
+                </button>
+              </div>
+
+              <div className="flex flex-1 flex-col justify-center space-y-8 px-8 text-center">
+                {NAV_ITEMS.map((item, index) => (
+                  <motion.a
+                    key={item.name}
+                    href={item.href}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-3xl font-bold text-white transition-colors hover:text-accent-yellow"
+                  >
+                    {item.name}
+                  </motion.a>
+                ))}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: NAV_ITEMS.length * 0.1 }}
+                  className="pt-8"
+                >
+                  <Button
+                    size="lg"
+                    variant="primary"
+                    className="w-full max-w-xs"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      onOpen();
+                    }}
+                  >
+                    Get Started
+                  </Button>
+                </motion.div>
+              </div>
+
+              {/* Mobile Menu Socials */}
+              <div className="border-t border-white/10 p-8">
+                <div className="flex justify-center gap-6">
+                  <Facebook className="text-white/50 hover:text-white" />
+                  <Twitter className="text-white/50 hover:text-white" />
+                  <Instagram className="text-white/50 hover:text-white" />
+                  <Youtube className="text-white/50 hover:text-white" />
                 </div>
-              </Container>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

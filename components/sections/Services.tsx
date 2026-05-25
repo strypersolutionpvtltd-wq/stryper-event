@@ -42,13 +42,14 @@ const Services = () => {
         </motion.p>
 
         {/* Services Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+        <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((service, index) => (
             <ServiceCard
               key={index}
               title={service.title}
               description={service.description}
               icon={service.icon}
+              image={service.image}
               delay={index * 0.1}
             />
           ))}

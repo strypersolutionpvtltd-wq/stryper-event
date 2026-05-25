@@ -14,7 +14,7 @@ const WhatsAppButton = () => {
       transition={{ delay: 1, type: "spring" }}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
-      className="fixed bottom-6 right-6 z-50 w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] transition-shadow group"
+      className="fixed bottom-6 right-6 z-50 hidden md:flex w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] transition-shadow group"
       aria-label="Contact us on WhatsApp"
     >
       {/* Pulse animation */}

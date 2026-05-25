@@ -25,10 +25,10 @@ const EventProcess = () => {
         {/* Timeline */}
         <div className="relative mx-auto max-w-5xl">
           {/* Connecting line */}
-          <div className="absolute bottom-0 left-8 top-0 w-px bg-gradient-to-b from-accent-yellow/20 via-accent-yellow/50 to-accent-yellow/20 md:left-1/2" />
+          <div className="absolute bottom-0 left-4 sm:left-6 top-0 w-px bg-gradient-to-b from-accent-yellow/20 via-accent-yellow/50 to-accent-yellow/20 md:left-1/2" />
 
           {/* Process Steps */}
-          <div className="space-y-12 md:space-y-16">
+          <div className="space-y-8 md:space-y-16">
             {EVENT_PROCESS.map((process, index) => {
               const isEven = index % 2 === 0;
 
@@ -51,7 +51,7 @@ const EventProcess = () => {
                   <div
                     className={`flex-1 ${
                       isEven ? "md:text-right" : "md:text-left"
-                    } pl-20 text-left md:pl-0`}
+                    } pl-12 sm:pl-16 md:pl-0 text-left`}
                   >
                     <motion.div
                       whileHover={{ scale: 1.02 }}
@@ -68,19 +68,19 @@ const EventProcess = () => {
                       </div>
 
                       {/* Title */}
-                      <h3 className="mb-3 text-2xl font-bold text-white transition-colors group-hover:text-accent-yellow">
+                      <h3 className="mb-3 text-xl md:text-2xl font-bold text-white transition-colors group-hover:text-accent-yellow">
                         {process.title}
                       </h3>
 
                       {/* Description */}
-                      <p className="leading-relaxed text-white/70">
+                      <p className="text-sm md:text-base leading-relaxed text-white/70">
                         {process.description}
                       </p>
                     </motion.div>
                   </div>
 
                   {/* Center dot */}
-                  <div className="absolute left-8 z-10 h-4 w-4 rounded-full border-4 border-primary-black bg-accent-yellow md:left-1/2 md:-translate-x-1/2" />
+                  <div className="absolute left-4 sm:left-6 md:left-1/2 z-10 h-4 w-4 rounded-full border-4 border-primary-black bg-accent-yellow md:-translate-x-1/2" />
 
                   {/* Spacer for even layout */}
                   <div className="hidden flex-1 md:block" />
@@ -90,7 +90,7 @@ const EventProcess = () => {
           </div>
 
           {/* End marker */}
-          <div className="absolute bottom-0 left-8 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-accent-yellow to-accent-gold md:left-1/2 md:-translate-x-1/2">
+          <div className="absolute bottom-0 left-4 sm:left-6 md:left-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-accent-yellow to-accent-gold md:-translate-x-1/2">
             <div className="h-4 w-4 rounded-full border-2 border-primary-black" />
           </div>
         </div>

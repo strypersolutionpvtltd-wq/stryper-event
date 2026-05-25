@@ -31,19 +31,19 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <Container className="relative z-10 pt-[116px]">
+      <Container className="relative z-10 pt-32 md:pt-40 lg:pt-48 pb-20 md:pb-32">
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="mx-auto max-w-5xl space-y-8 text-center"
+          className="mx-auto max-w-5xl space-y-6 md:space-y-8 text-center"
         >
          
 
           {/* Main Heading */}
           <motion.h1
             variants={fadeInUp}
-            className="text-display leading-[1.1] tracking-tight"
+            className="text-display leading-[1.1] tracking-tight px-4 sm:px-0"
           >
             <span className="block text-white">We Plan Events</span>
             <span className="text-gradient block">People Remember</span>
@@ -52,7 +52,7 @@ const Hero = () => {
           {/* Subheading */}
           <motion.p
             variants={fadeInUp}
-            className="text-body-lg mx-auto max-w-3xl text-white/70"
+            className="text-body-lg mx-auto max-w-2xl text-white/70 px-6 sm:px-0"
           >
             From corporate events to weddings, we handle everything so your event runs smoothly and looks great. Based in Jaipur, serving clients across India.
           </motion.p>
@@ -60,15 +60,15 @@ const Hero = () => {
           {/* CTA Buttons */}
           <motion.div
             variants={fadeInUp}
-            className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row"
+            className="flex flex-col items-center justify-center gap-4 pt-6 sm:flex-row px-4 sm:px-0"
           >
-            <a href="#gallery">
-              <Button size="lg" variant="primary" className="group">
+            <a href="#gallery" className="w-full sm:w-auto">
+              <Button size="lg" variant="primary" className="group w-full sm:w-auto">
                 See Our Work
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </a>
-            <Button size="lg" variant="outline" onClick={onOpen}>
+            <Button size="lg" variant="outline" onClick={onOpen} className="w-full sm:w-auto">
               Talk to Us
             </Button>
           </motion.div>
@@ -76,7 +76,7 @@ const Hero = () => {
           {/* Stats */}
           <motion.div
             variants={fadeInUp}
-            className="grid grid-cols-2 gap-8 pt-16 md:grid-cols-4"
+            className="grid grid-cols-2 gap-y-10 gap-x-4 pt-16 md:grid-cols-4 md:gap-8"
           >
             {COMPANY_STATS.map((stat, index) => (
               <motion.div

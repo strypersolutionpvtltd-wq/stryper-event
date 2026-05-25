@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import ClientProviders from "@/components/providers/ClientProviders";
+import MobileBottomBar from "@/components/ui/MobileBottomBar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -83,7 +84,10 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="antialiased">
         <ClientProviders>
-          <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          <SmoothScrollProvider>
+            {children}
+            <MobileBottomBar />
+          </SmoothScrollProvider>
         </ClientProviders>
       </body>
     </html>

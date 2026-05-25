@@ -30,54 +30,63 @@ export const SERVICES = [
     description:
       "We handle your business events, conferences, and meetings. Everything runs on time and looks professional.",
     icon: "briefcase",
+    image: "/images/dealer.jpg",
   },
   {
     title: "Wedding Events",
     description:
       "Your special day deserves special care. We plan weddings that you and your guests will remember.",
     icon: "heart",
+    image: "/images/family.jpg",
   },
   {
     title: "Event Production",
     description:
       "From planning to setup, we take care of everything. You get a complete event solution.",
     icon: "video",
+    image: "/images/gallery/1120880-ambiance-concert.jpg.jpeg",
   },
   {
     title: "Sports Events",
     description:
       "Tournaments, marathons, or sports days — we manage all types of sports events smoothly.",
     icon: "trophy",
+    image: "/images/sports.jpg",
   },
   {
     title: "Award Shows",
     description:
       "Make your award ceremony special. We create events that honor achievements in style.",
     icon: "award",
+    image: "/images/gallery/Award-shows-Host.jpg.jpeg",
   },
   {
     title: "Brand Promotion",
     description:
       "Launch your brand or product with events that get people talking and create real impact.",
     icon: "target",
+    image: "/images/brand.jpg",
   },
   {
     title: "Exhibition Setup",
     description:
       "Trade shows and exhibitions need great setups. We design booths that attract attention.",
     icon: "layout",
+    image: "/images/product.jpg",
   },
   {
     title: "Event Fabrication",
     description:
       "Need custom stages, structures, or setups? We build exactly what your event needs.",
     icon: "box",
+    image: "/images/gallery/w5-1024x782.jpg.jpeg",
   },
   {
     title: "Event Staff",
     description:
       "Our trained team makes sure your event runs smoothly and your guests are well taken care of.",
     icon: "users",
+    image: "/images/gallery/IMG_1850.JPG.jpeg",
   },
 ] as const;
 
@@ -235,6 +244,7 @@ export const ANIMATION_DURATION = {
 export const COMPANY_CONTACT = {
   phone: "+91 84485 90303",
   phoneRaw: "8448590303",
+  whatsapp: "918448590303",
   email: "strypersolutionpvtltd@gmail.com",
   address: "Jaipur, Rajasthan, India",
   instagram: "https://www.instagram.com/stryperevent",
