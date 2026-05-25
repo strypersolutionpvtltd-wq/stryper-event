@@ -1,0 +1,35 @@
+{
+  "recommendations": [
+    // Essential
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    
+    // TypeScript & React
+    "dsznajder.es7-react-js-snippets",
+    "styled-components.vscode-styled-components",
+    
+    // Path & Import
+    "christian-kohler.path-intellisense",
+    "christian-kohler.npm-intellisense",
+    
+    // Error Detection
+    "usernamehw.errorlens",
+    
+    // Git
+    "eamodio.gitlens",
+    
+    // Productivity
+    "formulahendry.auto-rename-tag",
+    "formulahendry.auto-close-tag",
+    "naumovs.color-highlight",
+    "PKief.material-icon-theme",
+    
+    // Code Quality
+    "streetsidesoftware.code-spell-checker",
+    "wayou.vscode-todo-highlight",
+    
+    // Next.js specific
+    "PulkitGangwar.nextjs-snippets"
+  ]
+}

@@ -1,0 +1,189 @@
+"use client";
+
+import { AnimatePresence, motion } from "framer-motion";
+import { Facebook, Instagram, Mail, Menu, Phone, Twitter, X, Youtube } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import Button from "@/components/ui/Button";
+import Container from "@/components/ui/Container";
+import { NAV_ITEMS, COMPANY_CONTACT } from "@/constants";
+import { cn } from "@/lib/utils";
+import { useGetStartedModal } from "@/hooks/useModal";
+
+const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { onOpen } = useGetStartedModal();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 40);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <div className="fixed left-0 right-0 top-0 z-50">
+      {/* Top Bar - hides on scroll */}
+      <AnimatePresence>
+        {!isScrolled && (
+          <motion.div
+            initial={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden bg-[#111] border-b border-white/[0.08]"
+          >
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="flex h-9 items-center justify-between">
+
+                {/* Left - Email + Call with divider */}
+                <div className="flex items-center text-[11px] text-white/50">
+                  <a href={`mailto:${COMPANY_CONTACT.email}`} className="flex items-center gap-1.5 hover:text-white transition-colors pr-3">
+                    <Mail size={12} strokeWidth={1.5} />
+                    <span>{COMPANY_CONTACT.email}</span>
+                  </a>
+                  <span className="h-3 w-px bg-white/20 mx-1" />
+                  <a href={`tel:${COMPANY_CONTACT.phoneRaw}`} className="flex items-center gap-1.5 hover:text-white transition-colors pl-3">
+                    <Phone size={12} strokeWidth={1.5} />
+                    <span>{COMPANY_CONTACT.phone}</span>
+                  </a>
+                </div>
+
+                {/* Right - Social icons with dividers */}
+                <div className="flex items-center gap-0 text-white/50">
+                  {[
+                    { icon: <Facebook size={13} strokeWidth={1.5} />, label: "Facebook", href: COMPANY_CONTACT.facebook },
+                    { icon: <Twitter size={13} strokeWidth={1.5} />, label: "Twitter", href: COMPANY_CONTACT.twitter },
+                    { icon: <Instagram size={13} strokeWidth={1.5} />, label: "Instagram", href: COMPANY_CONTACT.instagram },
+                    { icon: <Youtube size={13} strokeWidth={1.5} />, label: "YouTube", href: "#" },
+                  ].map((s, i) => (
+                    <a
+                      key={i}
+                      href={s.href}
+                      aria-label={s.label}
+                      className="flex items-center gap-1.5 px-3 h-9 hover:text-white transition-colors border-l border-white/[0.08] text-[11px]"
+                    >
+                      {s.icon}
+                      <span>{s.label}</span>
+                    </a>
+                  ))}
+                </div>
+
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Navbar */}
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className={cn(
+          "transition-all duration-300",
+          isScrolled
+            ? "glass border-b border-white/10 shadow-lg"
+            : "bg-black/80 backdrop-blur-sm"
+        )}
+      >
+        <Container>
+          <div className="flex h-20 items-center justify-between">
+            {/* Logo - only show in navbar when scrolled */}
+            <motion.a
+              href="#home"
+              className="flex items-center"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <img
+                src="/images/logo.jpg"
+                alt="Stryper Events"
+                className="h-14 w-auto max-w-[180px] object-contain"
+              />
+            </motion.a>
+
+            {/* Desktop Nav Links */}
+            <div className="hidden items-center space-x-1 md:flex">
+              {NAV_ITEMS.map((item, index) => (
+                <motion.a
+                  key={item.name}
+                  href={item.href}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="transition-smooth animated-underline px-4 py-2 text-white/80 hover:text-accent-yellow"
+                >
+                  {item.name}
+                </motion.a>
+              ))}
+            </div>
+
+            {/* CTA Button */}
+            <div className="hidden md:block">
+              <Button size="sm" variant="primary" onClick={onOpen}>
+                Get Started
+              </Button>
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="transition-smooth p-2 text-white hover:text-accent-yellow md:hidden"
+            >
+              {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            </motion.button>
+          </div>
+        </Container>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="glass border-t border-white/10 md:hidden"
+            >
+              <Container>
+                <div className="space-y-4 py-6">
+                  {NAV_ITEMS.map((item, index) => (
+                    <motion.a
+                      key={item.name}
+                      href={item.href}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="transition-smooth block rounded-lg px-4 py-3 text-white/80 hover:bg-white/5 hover:text-accent-yellow"
+                    >
+                      {item.name}
+                    </motion.a>
+                  ))}
+                  <div className="pt-4">
+                    <Button
+                      size="md"
+                      variant="primary"
+                      className="w-full"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        onOpen();
+                      }}
+                    >
+                      Get Started
+                    </Button>
+                  </div>
+                </div>
+              </Container>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
+    </div>
+  );
+};
+
+export default Navbar;
