@@ -33,7 +33,7 @@ const PageLoader = () => {
               className="flex justify-center"
             >
               <img
-                src="/images/logo.jpg"
+                src="/images/gallery/logo.jpeg"
                 alt="Stryper Events"
                 className="h-24 w-auto object-contain drop-shadow-[0_0_20px_rgba(250,204,21,0.4)]"
               />

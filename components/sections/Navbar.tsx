@@ -98,7 +98,7 @@ const Navbar = () => {
               whileTap={{ scale: 0.95 }}
             >
               <img
-                src="/images/logo.jpg"
+                src="/images/gallery/logo.jpeg"
                 alt="Stryper Events"
                 className="h-10 w-auto sm:h-12 md:h-14 max-w-[150px] sm:max-w-[180px] object-contain"
               />
@@ -150,7 +150,7 @@ const Navbar = () => {
             >
               <div className="flex h-20 items-center justify-between px-4 sm:px-6">
                 <img
-                  src="/images/logo.jpg"
+                  src="/images/gallery/logo.jpeg"
                   alt="Stryper Events"
                   className="h-10 w-auto object-contain"
                 />
