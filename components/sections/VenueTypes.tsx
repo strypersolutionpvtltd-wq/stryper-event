@@ -50,7 +50,6 @@ const TOP_JAIPUR_VENUES = [
   { name: "Jai Mahal Palace", link: "https://maps.app.goo.gl/Z9K4J" },
   { name: "Birla Auditorium", link: "https://maps.app.goo.gl/P2M9L" },
   { name: "Clarks Amer", link: "https://maps.app.goo.gl/Q5W1M" },
-  { name: "Rambagh Palace", link: "https://maps.app.goo.gl/R7V3K" },
 ];
 
 const VenueTypes = () => {

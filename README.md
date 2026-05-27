@@ -247,7 +247,7 @@ This project is proprietary and confidential.
 
 ## 🤝 Support
 
-For support, email info@stryperevent.com or contact via WhatsApp.
+For support, email deepak.shah@stryperevent.com or contact via WhatsApp.
 
 ## 🎯 Future Enhancements
 

@@ -6,7 +6,7 @@ import React from "react";
 const WhatsAppButton = () => {
   return (
     <motion.a
-      href="https://wa.me/918448590303"
+      href="https://wa.me/919076773330"
       target="_blank"
       rel="noopener noreferrer"
       initial={{ scale: 0, opacity: 0 }}
