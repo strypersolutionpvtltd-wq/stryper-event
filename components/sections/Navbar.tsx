@@ -100,7 +100,7 @@ const Navbar = () => {
               <img
                 src="/images/gallery/logo.jpeg"
                 alt="Stryper Events"
-                className="h-10 w-auto sm:h-12 md:h-14 max-w-[150px] sm:max-w-[180px] object-contain"
+                className="h-14 w-auto sm:h-16 md:h-20 max-w-[200px] sm:max-w-[250px] md:max-w-[300px] object-contain"
               />
             </motion.a>
 
@@ -152,7 +152,7 @@ const Navbar = () => {
                 <img
                   src="/images/gallery/logo.jpeg"
                   alt="Stryper Events"
-                  className="h-10 w-auto object-contain"
+                  className="h-14 w-auto object-contain"
                 />
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
