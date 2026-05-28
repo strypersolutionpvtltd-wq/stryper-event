@@ -2,7 +2,9 @@
 
 import { motion } from "framer-motion";
 import { Send, CheckCircle } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import toast from "react-hot-toast";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import Button from "@/components/ui/Button";
 
@@ -22,6 +24,8 @@ interface GetStartedFormProps {
 }
 
 const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
     companyName: "",
@@ -67,8 +71,18 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
     });
   };
 
+  const handleCaptchaChange = (value: string | null) => {
+    setCaptchaValue(value);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!captchaValue) {
+      toast.error("Please complete the reCAPTCHA verification.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -77,19 +91,19 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, captcha: captchaValue }),
       });
 
       if (response.ok) {
         setIsSuccess(true);
+        toast.success("Message sent successfully!");
         if (onSuccess) {
           onSuccess();
         }
 
-        // Optional: Send WhatsApp notification from client side
-        
-        // This won't automatically send but we could provide a link
-        // window.open(`https://wa.me/91XXXXXXXXXX?text=${waMessage}`, '_blank');
+        // Reset reCAPTCHA
+        recaptchaRef.current?.reset();
+        setCaptchaValue(null);
 
         setTimeout(() => {
           setIsSuccess(false);
@@ -104,9 +118,13 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
             message: "",
           });
         }, 3000);
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to send message.");
       }
     } catch (error) {
       console.error("Network error:", error);
+      toast.error("Network error. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -318,6 +336,16 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
           >
             Message *
           </label>
+        </div>
+
+        {/* reCAPTCHA */}
+        <div className="flex justify-center md:justify-start">
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            theme="dark"
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "YOUR_SITE_KEY_HERE"}
+            onChange={handleCaptchaChange}
+          />
         </div>
 
         {/* Submit Button */}
