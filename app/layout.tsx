@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
 import "./globals.css";
-import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import ClientProviders from "@/components/providers/ClientProviders";
 import MobileBottomBar from "@/components/ui/MobileBottomBar";
 
@@ -76,7 +75,6 @@ export const metadata: Metadata = {
 };
 
 import PageLoader from "@/components/ui/PageLoader";
-import PageTransition from "@/components/providers/PageTransition";
 import Navbar from "@/components/sections/Navbar";
 import Footer from "@/components/sections/Footer";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
@@ -88,7 +86,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="antialiased">
+      <body className={`${inter.variable} antialiased`}>
         <ClientProviders>
           <PageLoader />
           <Navbar />

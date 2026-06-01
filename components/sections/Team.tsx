@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Briefcase, Quote } from "lucide-react";
+import { Briefcase } from "lucide-react";
 import React from "react";
 
 import Container from "@/components/ui/Container";

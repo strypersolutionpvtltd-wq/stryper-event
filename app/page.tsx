@@ -8,7 +8,6 @@ import Services from "@/components/sections/Services";
 import Testimonials from "@/components/sections/Testimonials";
 import VideoTestimonials from "@/components/sections/VideoTestimonials";
 import SectionDivider from "@/components/ui/SectionDivider";
-import WhatsAppButton from "@/components/ui/WhatsAppButton";
 
 export default function Home() {
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone, Menu, X, Facebook, Instagram, Twitter } from "lucide-react";
+import { Mail, Phone, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NAV_ITEMS, COMPANY_CONTACT } from "@/constants";
 import { cn } from "@/lib/utils";
