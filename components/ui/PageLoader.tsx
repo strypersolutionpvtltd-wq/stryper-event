@@ -31,7 +31,7 @@ const PageLoader = () => {
               className="relative w-full flex justify-center"
             >
               <img
-                src="/images/logo.jpeg"
+                src="/images/logo.png"
                 alt="Stryper Events"
                 className="h-24 md:h-32 w-auto object-contain drop-shadow-[0_0_30px_rgba(250,204,21,0.5)] mix-blend-screen"
               />

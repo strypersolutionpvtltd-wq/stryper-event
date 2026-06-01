@@ -56,7 +56,7 @@ const Navbar = () => {
             {/* Logo */}
             <Link href="/" className="relative z-[110] flex items-center">
               <img
-                src="/images/logo.jpeg"
+                src="/images/logo.png"
                 alt="Stryper Events"
                 className="h-8 md:h-12 w-auto object-contain mix-blend-screen"
               />
