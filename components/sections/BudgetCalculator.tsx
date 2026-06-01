@@ -17,16 +17,25 @@ const BudgetCalculator = () => {
     let basePerGuest = 0;
     
     // Adjusted lower base rates per guest
-    if (eventType === "corporate") basePerGuest = 800;
-    else if (eventType === "wedding") basePerGuest = 1200;
-    else if (eventType === "brand") basePerGuest = 1000;
-    else if (eventType === "social") basePerGuest = 500;
+    if (eventType === "corporate") {
+      basePerGuest = 800;
+    } else if (eventType === "wedding") {
+      basePerGuest = 1200;
+    } else if (eventType === "brand") {
+      basePerGuest = 1000;
+    } else if (eventType === "social") {
+      basePerGuest = 500;
+    }
 
     // Quality Multipliers
     let multiplier = 1;
-    if (quality === "standard") multiplier = 1;
-    else if (quality === "premium") multiplier = 1.3;
-    else if (quality === "luxury") multiplier = 1.8;
+    if (quality === "standard") {
+      multiplier = 1;
+    } else if (quality === "premium") {
+      multiplier = 1.3;
+    } else if (quality === "luxury") {
+      multiplier = 1.8;
+    }
 
     const total = guests * basePerGuest * multiplier;
     setEstimate(total);

@@ -3,7 +3,11 @@ import { Inter } from "next/font/google";
 
 import "./globals.css";
 import ClientProviders from "@/components/providers/ClientProviders";
+import Footer from "@/components/sections/Footer";
+import Navbar from "@/components/sections/Navbar";
 import MobileBottomBar from "@/components/ui/MobileBottomBar";
+import PageLoader from "@/components/ui/PageLoader";
+import WhatsAppButton from "@/components/ui/WhatsAppButton";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -73,11 +77,6 @@ export const metadata: Metadata = {
     // bing: "your-bing-verification-code",
   },
 };
-
-import PageLoader from "@/components/ui/PageLoader";
-import Navbar from "@/components/sections/Navbar";
-import Footer from "@/components/sections/Footer";
-import WhatsAppButton from "@/components/ui/WhatsAppButton";
 
 export default function RootLayout({
   children,

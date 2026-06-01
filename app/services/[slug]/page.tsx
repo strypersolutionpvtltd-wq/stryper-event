@@ -9,7 +9,9 @@ import Contact from "@/components/sections/Contact";
 // Since it's a server component by default in app router, we can use this for SEO
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const service = SERVICES.find((s) => s.slug === params.slug);
-  if (!service) return { title: "Service Not Found" };
+  if (!service) {
+    return { title: "Service Not Found" };
+  }
 
   return {
     title: `${service.title} | Stryper Event Management`,
