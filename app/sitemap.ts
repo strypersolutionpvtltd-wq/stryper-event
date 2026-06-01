@@ -1,7 +1,15 @@
 import { MetadataRoute } from "next";
+import { SERVICES } from "@/constants";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.stryperevent.com";
+
+  const serviceUrls = SERVICES.map((service) => ({
+    url: `${baseUrl}/services/${service.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
 
   return [
     {
@@ -10,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 1,
     },
+    ...serviceUrls,
     {
       url: `${baseUrl}#about`,
       lastModified: new Date(),

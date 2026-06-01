@@ -5,7 +5,8 @@ import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Twitter } from "luc
 import React from "react";
 
 import Container from "@/components/ui/Container";
-import { COMPANY_CONTACT, NAV_ITEMS } from "@/constants";
+import { COMPANY_CONTACT, NAV_ITEMS, SERVICES } from "@/constants";
+import Link from "next/link";
 
 const Footer = () => {
   const socialLinks = [
@@ -85,12 +86,12 @@ const Footer = () => {
             <ul className="space-y-3">
               {NAV_ITEMS.map((item, index) => (
                 <li key={index}>
-                  <a
+                  <Link
                     href={item.href}
                     className="inline-block text-sm text-white/60 transition-colors hover:text-accent-yellow"
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -105,15 +106,20 @@ const Footer = () => {
           >
             <h4 className="mb-6 font-semibold text-white">Services</h4>
             <ul className="space-y-3">
-              {[
+              {SERVICES.filter(s => [
                 "Corporate Events",
                 "Wedding Events",
                 "Event Production",
                 "Sports Management",
-                "Brand Promotion",
-              ].map((service, index) => (
+                "Brand Promotion"
+              ].includes(s.title)).map((service, index) => (
                 <li key={index}>
-                  <span className="text-sm text-white/60">{service}</span>
+                  <Link 
+                    href={`/services/${service.slug}`}
+                    className="text-sm text-white/60 hover:text-accent-yellow transition-colors"
+                  >
+                    {service.title}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -158,18 +164,18 @@ const Footer = () => {
             rights reserved.
           </p>
           <div className="flex gap-6 text-sm">
-            <a
-              href="#home"
+            <Link
+              href="/"
               className="text-white/40 transition-colors hover:text-accent-yellow"
             >
               Privacy Policy
-            </a>
-            <a
-              href="#home"
+            </Link>
+            <Link
+              href="/"
               className="text-white/40 transition-colors hover:text-accent-yellow"
             >
               Terms of Service
-            </a>
+            </Link>
           </div>
         </motion.div>
       </Container>

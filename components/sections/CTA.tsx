@@ -94,7 +94,7 @@ const CTA = () => {
             className="mt-10 pt-8 border-t border-white/10"
           >
             <p className="text-white/60 text-sm">
-              Trusted by 100+ companies • 500+ events completed • 15+ years
+              Trusted by 100+ companies • 500+ events completed • 5+ years
               experience
             </p>
           </motion.div>

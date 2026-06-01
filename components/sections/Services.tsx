@@ -47,6 +47,7 @@ const Services = () => {
             <ServiceCard
               key={index}
               title={service.title}
+              slug={service.slug}
               description={service.description}
               icon={service.icon}
               image={service.image}

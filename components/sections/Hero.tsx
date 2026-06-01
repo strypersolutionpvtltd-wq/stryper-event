@@ -8,6 +8,7 @@ import Container from "@/components/ui/Container";
 import { COMPANY_STATS } from "@/constants";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 import { useGetStartedModal } from "@/hooks/useModal";
+import Link from "next/link";
 
 const Hero = () => {
   const { onOpen } = useGetStartedModal();
@@ -23,8 +24,8 @@ const Hero = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-primary-black via-primary-black to-primary-black" />
 
         {/* Simple glow */}
-        <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-accent-yellow/10 blur-[120px]" />
-        <div className="absolute bottom-1/4 right-1/4 h-[500px] w-[500px] rounded-full bg-accent-gold/10 blur-[120px]" />
+        <div className="absolute left-1/4 top-1/4 h-64 w-64 rounded-full bg-accent-yellow/10 blur-[80px]" />
+        <div className="absolute bottom-1/4 right-1/4 h-[400px] w-[400px] rounded-full bg-accent-gold/10 blur-[80px]" />
 
         {/* Grid overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(250,204,21,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(250,204,21,0.03)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
@@ -62,12 +63,12 @@ const Hero = () => {
             variants={fadeInUp}
             className="flex flex-col items-center justify-center gap-4 pt-6 sm:flex-row px-4 sm:px-0"
           >
-            <a href="#gallery" className="w-full sm:w-auto">
+            <Link href="/events" className="w-full sm:w-auto">
               <Button size="lg" variant="primary" className="group w-full sm:w-auto">
                 See Our Work
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
-            </a>
+            </Link>
             <Button size="lg" variant="outline" onClick={onOpen} className="w-full sm:w-auto">
               Talk to Us
             </Button>

@@ -7,83 +7,59 @@ import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 
 const ClientLogos = () => {
-  // Placeholder client logos - replace with actual client names
   const clients = [
-    "Tata Motors",
-    "Reliance",
-    "Infosys",
-    "Airtel",
-    "HDFC Bank",
-    "ICICI Bank",
-    "LIC India",
-    "Jaipur Rugs",
-    "AU Bank",
-    "Zomato",
+    { name: "Airtel", url: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Airtel_logo_2011.svg" },
+    { name: "Tata Motors", url: "https://upload.wikimedia.org/wikipedia/commons/8/8e/Tata_logo.svg" },
+    { name: "Reliance", url: "https://upload.wikimedia.org/wikipedia/en/9/99/Reliance_Industries_Logo.svg" },
+    { name: "HDFC Bank", url: "https://upload.wikimedia.org/wikipedia/commons/1/1a/HDFC_Bank_Logo.svg" },
+    { name: "UltraTech", url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/UltraTech_Cement_Logo.svg/2560px-UltraTech_Cement_Logo.svg.png" },
+    { name: "JK Cement", url: "https://www.jkcement.com/wp-content/uploads/2021/05/logo.png" },
+    { name: "AU Bank", url: "https://www.aubank.in/assets/images/au-logo.png" },
+    { name: "Jaipur Rugs", url: "https://www.jaipurrugs.com/pub/static/frontend/Magento/luma/en_US/images/logo.svg" },
+    { name: "Vivo", url: "https://upload.wikimedia.org/wikipedia/commons/e/e5/Vivo_mobile_logo.png" },
   ];
 
-  // Duplicate for seamless loop
-  const duplicatedClients = [...clients, ...clients];
+  const duplicatedClients = [...clients, ...clients, ...clients];
 
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden">
+    <section className="relative py-24 overflow-hidden bg-white/[0.01]">
       <Container className="relative z-10">
-        {/* Section Heading */}
         <SectionHeading
-          subtitle="OUR CLIENTS"
+          subtitle="TRUSTED BY"
           title="Companies We Work With"
           align="center"
           className="mb-16"
         />
 
-        {/* Infinite Scrolling Marquee */}
-        <div className="relative">
-          {/* Gradient Overlays */}
-          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-primary-black to-transparent z-10" />
-          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-primary-black to-transparent z-10" />
-
-          {/* Scrolling Container */}
+        <div className="relative group">
           <div className="overflow-hidden">
             <motion.div
               animate={{
-                x: [0, -100 * clients.length],
+                x: [0, -1200],
               }}
               transition={{
-                x: {
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  duration: 25,
-                  ease: "linear",
-                },
+                duration: 40,
+                repeat: Infinity,
+                ease: "linear",
               }}
-              className="flex gap-8 md:gap-12"
+              className="flex gap-12 md:gap-24 items-center"
             >
               {duplicatedClients.map((client, index) => (
-                <motion.div
+                <div
                   key={index}
-                  whileHover={{ scale: 1.1 }}
-                  className="flex-shrink-0 w-36 h-20 md:w-48 md:h-24 glass rounded-xl flex items-center justify-center group cursor-pointer transition-all hover:glow-border"
+                  className="flex-shrink-0 w-32 md:w-44 h-12 md:h-16 flex items-center justify-center grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
                 >
-                  <span className="text-white/40 group-hover:text-white font-bold text-center px-4 transition-colors">
-                    {client}
-                  </span>
-                </motion.div>
+                  <img
+                    src={client.url}
+                    alt={client.name}
+                    className="max-h-full max-w-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
               ))}
             </motion.div>
           </div>
         </div>
-
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mt-16"
-        >
-          <p className="text-white/60">
-            Trusted by <span className="text-accent-yellow font-bold">15+</span> happy clients
-            and many more companies across India
-          </p>
-        </motion.div>
       </Container>
     </section>
   );

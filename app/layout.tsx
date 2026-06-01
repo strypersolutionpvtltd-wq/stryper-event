@@ -15,7 +15,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Stryper Event Management | Event Planning Company in Jaipur",
   description:
-    "We plan and manage events across India. Corporate events, weddings, sports events, and more. Based in Jaipur with 15+ years experience.",
+    "We plan and manage events across India. Corporate events, weddings, sports events, and more. Based in Jaipur with 5+ years experience.",
   keywords: [
     "event management",
     "event planning",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     url: "/",
     title: "Stryper Event Management | Event Planning in Jaipur",
     description:
-      "We plan and manage events across India. Corporate events, weddings, sports events, and more. Based in Jaipur with 15+ years experience.",
+      "We plan and manage events across India. Corporate events, weddings, sports events, and more. Based in Jaipur with 5+ years experience.",
     siteName: "Stryper Event Management",
     images: [
       {
@@ -75,19 +75,27 @@ export const metadata: Metadata = {
   },
 };
 
+import PageLoader from "@/components/ui/PageLoader";
+import PageTransition from "@/components/providers/PageTransition";
+import Navbar from "@/components/sections/Navbar";
+import Footer from "@/components/sections/Footer";
+import WhatsAppButton from "@/components/ui/WhatsAppButton";
+
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className="dark">
       <body className="antialiased">
         <ClientProviders>
-          <SmoothScrollProvider>
-            {children}
-            <MobileBottomBar />
-          </SmoothScrollProvider>
+          <PageLoader />
+          <Navbar />
+          {children}
+          <Footer />
+          <WhatsAppButton />
+          <MobileBottomBar />
         </ClientProviders>
       </body>
     </html>

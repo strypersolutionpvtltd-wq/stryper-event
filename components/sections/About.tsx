@@ -12,7 +12,7 @@ const About = () => {
   const highlights = [
     "We have done more than 100 successful events",
     "A friendly team that takes care of every small thing",
-    "More than 5 years of real experience in जयपुर and India",
+    "More than 5 years of real experience in Jaipur and India",
     "We work within your budget to give you the best event",
   ];
 
