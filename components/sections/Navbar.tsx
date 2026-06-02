@@ -65,7 +65,7 @@ const Navbar = () => {
 
             {/* Desktop Menu */}
             <div className="hidden lg:flex items-center gap-1 relative z-[110]">
-              {NAV_ITEMS.map((item) => (
+              {NAV_ITEMS.map((item: any) => (
                 <div 
                   key={item.name} 
                   className="relative group"
@@ -138,7 +138,7 @@ const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="fixed inset-0 z-[105] bg-black flex flex-col items-center justify-center p-8 lg:hidden animate-in fade-in duration-300">
             <div className="flex flex-col gap-4 w-full max-w-xs text-center overflow-y-auto max-h-[70vh] py-8">
-              {NAV_ITEMS.map((item, index) => (
+              {NAV_ITEMS.map((item: any, index: number) => (
                 <div key={item.name}>
                   {item.isDropdown ? (
                     <div className="flex flex-col gap-4">

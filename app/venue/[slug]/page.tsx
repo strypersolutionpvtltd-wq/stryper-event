@@ -1,10 +1,9 @@
 "use client";
 
-import { usePathname, notFound } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import { notFound } from "next/navigation";
+import React, { useState } from "react";
 import { VENUES, COMPANY_CONTACT } from "@/constants";
 import Container from "@/components/ui/Container";
-import SectionHeading from "@/components/ui/SectionHeading";
 import { Star, MapPin, CheckCircle2, Image as ImageIcon, Video, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -16,6 +15,9 @@ export default function VenuePage({ params }: { params: { slug: string } }) {
   if (!venue) {
     notFound();
   }
+
+  // Define a type for venue to handle conditional properties safely
+  const typedVenue = venue as any;
 
   return (
     <main className="pt-24 min-h-screen bg-primary-black">
@@ -65,7 +67,7 @@ export default function VenuePage({ params }: { params: { slug: string } }) {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                {venue.features.map((feature, idx) => (
+                {venue.features.map((feature: string, idx: number) => (
                   <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-accent-yellow/30 transition-all group">
                     <CheckCircle2 size={20} className="text-accent-yellow shrink-0" />
                     <span className="font-bold text-white/80 uppercase text-[10px] tracking-widest">{feature}</span>
@@ -158,14 +160,14 @@ export default function VenuePage({ params }: { params: { slug: string } }) {
               className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
               {activeTab === "images" ? (
-                venue.images.map((img, idx) => (
+                venue.images.map((img: string, idx: number) => (
                   <div key={idx} className="relative aspect-[4/5] rounded-[2rem] overflow-hidden glass hover-glow transition-all duration-500 group">
                     <img src={img} alt={`${venue.name} view ${idx}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
                   </div>
                 ))
               ) : (
-                venue.videos.map((vid, idx) => (
+                typedVenue.videos && typedVenue.videos.map((vid: string, idx: number) => (
                   <div key={idx} className="relative aspect-video rounded-[2rem] overflow-hidden glass border border-white/10">
                     <video src={vid} controls className="w-full h-full object-cover" />
                   </div>
@@ -175,6 +177,18 @@ export default function VenuePage({ params }: { params: { slug: string } }) {
           </AnimatePresence>
         </Container>
       </section>
+
+      {/* Floating WhatsApp */}
+      <a 
+        href={`https://wa.me/${COMPANY_CONTACT.whatsapp}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-8 left-8 z-[60] w-16 h-16 bg-[#25D366] rounded-full flex items-center justify-center text-white shadow-2xl hover:scale-110 transition-all animate-bounce"
+      >
+        <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.347-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.05-.149-.471-1.135-.646-1.53-.17-.41-.35-.354-.471-.354-.121-.002-.26-.002-.399-.002s-.364.053-.554.26c-.19.206-.724.708-.724 1.727s.74 2.003.843 2.14c.103.137 1.455 2.22 3.526 3.21.493.236.879.378 1.179.474.497.157.949.135 1.305.083.397-.058 1.21-.495 1.38-.973.171-.478.171-.887.12-.973-.05-.086-.184-.137-.481-.286zM12 2c-5.523 0-10 4.477-10 10 0 1.834 1.503 3.52 1.503 3.52l-1.503 6.48 6.48-1.503s1.686 1.503 3.52 1.503c5.523 0 10-4.477 10-10s-4.477-10-10-10z" />
+        </svg>
+      </a>
     </main>
   );
 }

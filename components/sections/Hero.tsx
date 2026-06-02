@@ -1,15 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import React, { useState, useEffect } from "react";
-
-import Button from "@/components/ui/Button";
-import Container from "@/components/ui/Container";
-import { COMPANY_STATS } from "@/constants";
-import { fadeInUp, staggerContainer } from "@/lib/animations";
 import { useGetStartedModal } from "@/hooks/useModal";
-import Link from "next/link";
 
 const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1920&q=80", // Grand Gala
@@ -60,7 +53,7 @@ const Hero = () => {
       </div>
 
       {/* Content - Elegant & Non-Intrusive */}
-      <Container className="relative z-10">
+      <div className="container relative z-10 mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -87,7 +80,7 @@ const Hero = () => {
             </motion.button>
           </div>
         </motion.div>
-      </Container>
+      </div>
 
       {/* Elegant minimalist indicator */}
       <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-3 z-20">
