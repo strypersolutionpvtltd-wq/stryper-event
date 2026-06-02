@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Briefcase,
@@ -13,7 +14,7 @@ import {
   Users,
 } from "lucide-react";
 import React from "react";
-import Link from "next/link";
+import Image from "next/image";
 
 interface ServiceCardProps {
   title: string;
@@ -70,10 +71,12 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
           
           {/* Main Circle */}
           <div className="relative h-44 w-44 md:h-52 md:w-52 overflow-hidden rounded-full border-4 border-white/10 bg-white/5 transition-smooth group-hover:border-accent-yellow/50 group-hover:shadow-[0_0_40px_rgba(250,204,21,0.3)]">
-            <img
+            <Image
               src={image}
               alt={title}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
+              sizes="(max-width: 768px) 176px, 208px"
             />
             {/* Dark Overlay */}
             <div className="absolute inset-0 bg-black/40 transition-opacity duration-500 group-hover:opacity-20" />

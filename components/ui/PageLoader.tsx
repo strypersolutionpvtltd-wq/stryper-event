@@ -1,8 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 
 const PageLoader = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -13,7 +13,9 @@ const PageLoader = () => {
     const handleLoad = () => {
       if (isMounted) {
         setTimeout(() => {
-          if (isMounted) setIsLoading(false);
+          if (isMounted) {
+            setIsLoading(false);
+          }
         }, 800);
       }
     };
