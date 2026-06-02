@@ -1,10 +1,10 @@
 // Navigation items
 export const NAV_ITEMS = [
   { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
   { name: "Services", href: "/services" },
   { name: "Venue", href: "/venue", isDropdown: true },
   { name: "Events", href: "/events" },
+  { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ] as const;
 
@@ -187,7 +187,7 @@ export const VENUES = [
 // Company stats
 export const COMPANY_STATS = [
   { value: "100+", label: "Events Completed" },
-  { value: "5+", label: "Happy Clients" },
+  { value: "100+", label: "Happy Clients" },
   { value: "5+", label: "Years in Business" },
   { value: "150+", label: "Venues" },
 ] as const;
@@ -195,7 +195,7 @@ export const COMPANY_STATS = [
 // About stats
 export const ABOUT_STATS = [
   { value: "100+", label: "Events" },
-  { value: "5+", label: "Clients" },
+  { value: "100+", label: "Clients" },
   { value: "5+", label: "Years" },
   { value: "150+", label: "Venues" },
 ] as const;

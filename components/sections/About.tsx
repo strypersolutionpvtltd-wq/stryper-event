@@ -3,18 +3,36 @@
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import React from "react";
+import Image from "next/image";
 
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { fadeInLeft, fadeInRight } from "@/lib/animations";
 
 const About = () => {
   const highlights = [
-    "We have done more than 100 successful events",
-    "A friendly team that takes care of every small thing",
-    "More than 5 years of real experience in Jaipur and India",
-    "We work within your budget to give you the best event",
+    "Over 100+ successful events completed",
+    "Professional team that manages every small detail",
+    "5+ years of experience in Jaipur and all over India",
+    "Quality service that fits perfectly in your budget",
   ];
+
+  const fadeInLeft = {
+    hidden: { opacity: 0, x: -30 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
+
+  const fadeInRight = {
+    hidden: { opacity: 0, x: 30 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
 
   return (
     <section id="about" className="relative overflow-hidden py-24 md:py-32">
@@ -39,20 +57,20 @@ const About = () => {
             variants={fadeInLeft}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             className="space-y-6"
           >
             <h3 className="text-3xl font-bold leading-tight text-white md:text-4xl">
               We Make Your Events <br />
-              <span className="text-accent-yellow">Simple & Successful</span>
+              <span className="text-accent-yellow">Seamless & Memorable</span>
             </h3>
 
             <p className="text-body text-white/70">
-              Stryper Event Management is a real event planning team in Jaipur. We know that planning an event is stressful, so we handle everything for you. From start to finish, we make sure your guests are happy and everything looks perfect.
+              Stryper Event Management is a professional event planning team based in Jaipur. We have been creating beautiful events for over 5 years. Our goal is simple: to take the stress away from you and make your event perfect.
             </p>
 
             <p className="text-body text-white/70">
-              Whether you want a corporate meeting, a beautiful wedding, or a sports tournament, we take care of the venue, the decor, and the staff. You just focus on the moment.
+              From grand weddings in Jaipur to corporate meetings and sports events across India, we handle everything. We take care of the venue, the decor, the music, and the staff so you can just focus on your guests.
             </p>
 
             {/* Highlights */}
@@ -60,66 +78,53 @@ const About = () => {
               {highlights.map((highlight, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-start gap-3"
+                  transition={{ delay: 0.2 + index * 0.1 }}
+                  className="flex items-center gap-3"
                 >
-                  <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-accent-yellow" />
-                  <span className="text-white/80">{highlight}</span>
+                  <CheckCircle className="h-5 w-5 text-accent-yellow" />
+                  <span className="font-medium text-white/90">
+                    {highlight}
+                  </span>
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
-          {/* Right Content - Animated Card */}
+          {/* Right Content - Visual */}
           <motion.div
             variants={fadeInRight}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             className="relative"
           >
+            <div className="relative aspect-square overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">
+              <Image
+                src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80"
+                alt="Stryper Events Team Work"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary-black/60 via-transparent to-transparent" />
+            </div>
+
+            {/* Stats floating card */}
             <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.3 }}
-              className="glass glow-border relative overflow-hidden rounded-2xl p-8 md:p-12"
+              initial={{ scale: 0, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6, type: "spring" }}
+              className="absolute -bottom-6 -left-6 rounded-2xl bg-accent-yellow p-6 text-primary-black shadow-2xl md:p-8"
             >
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-glow-gradient opacity-50" />
-
-              {/* Content */}
-              <div className="relative z-10 space-y-8">
-                <div className="space-y-4">
-                  <h4 className="text-gradient text-2xl font-bold">
-                    Why Choose Us?
-                  </h4>
-                  <p className="text-white/70">
-                    Our clients trust us because we are honest. We don&apos;t have any hidden costs, and we are always available to talk. We have been doing this for 5 years, and we know how to fix problems quickly.
-                  </p>
-                </div>
-
-                {/* Decorative elements */}
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    "Honest Pricing",
-                    "Jaipur Based",
-                    "Pan India Team",
-                    "Always Ready",
-                  ].map((item, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.5 + index * 0.1 }}
-                      className="rounded-lg border border-white/10 bg-white/5 p-4 text-center"
-                    >
-                      <span className="text-sm text-white/80">{item}</span>
-                    </motion.div>
-                  ))}
-                </div>
+              <div className="text-center">
+                <p className="text-4xl font-black md:text-5xl">5+</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary-black/60">
+                  Years of Excellence
+                </p>
               </div>
             </motion.div>
           </motion.div>

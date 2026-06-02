@@ -2,26 +2,39 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 
 const PageLoader = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
+    // Shorter delay + check for document state
+    const handleLoad = () => {
+      setTimeout(() => setIsLoading(false), 800);
+    };
+
+    if (document.readyState === "complete") {
+      handleLoad();
+    } else {
+      window.addEventListener("load", handleLoad);
+      // Fallback timer
+      const timer = setTimeout(handleLoad, 2500);
+      return () => {
+        window.removeEventListener("load", handleLoad);
+        clearTimeout(timer);
+      };
+    }
   }, []);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isLoading ? (
         <motion.div
           key="loader"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-          className="fixed inset-0 z-[100] bg-primary-black flex flex-col items-center justify-center p-4"
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+          className="fixed inset-0 z-[100] bg-primary-black flex flex-col items-center justify-center p-4 touch-none overscroll-none"
         >
           <div className="flex flex-col items-center max-w-sm w-full space-y-12">
             <motion.div
@@ -30,11 +43,15 @@ const PageLoader = () => {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="relative w-full flex justify-center"
             >
-              <img
-                src="/images/logo.png"
-                alt="Stryper Events"
-                className="h-24 md:h-32 w-auto object-contain drop-shadow-[0_0_30px_rgba(250,204,21,0.5)] mix-blend-screen"
-              />
+              <div className="relative h-24 w-64 md:h-32 md:w-80">
+                <Image
+                  src="/images/logo.png"
+                  alt="Stryper Events"
+                  fill
+                  priority
+                  className="object-contain drop-shadow-[0_0_30px_rgba(250,204,21,0.5)] mix-blend-screen"
+                />
+              </div>
             </motion.div>
 
             <div className="w-full space-y-6 flex flex-col items-center">
@@ -43,7 +60,7 @@ const PageLoader = () => {
                   initial={{ x: "-100%" }}
                   animate={{ x: "100%" }}
                   transition={{
-                    duration: 1.8,
+                    duration: 1.5,
                     repeat: Infinity,
                     ease: "linear",
                   }}

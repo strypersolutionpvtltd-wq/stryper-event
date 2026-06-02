@@ -1,11 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Quote, Star } from "lucide-react";
+import { Quote, Star, MessageSquare } from "lucide-react";
 import React from "react";
 
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
+import { COMPANY_CONTACT } from "@/constants";
 
 const Testimonials = () => {
   const testimonials = [
@@ -109,12 +110,15 @@ const Testimonials = () => {
             happy clients
           </p>
           <motion.a
-            href="#contact"
+            href={`https://wa.me/${COMPANY_CONTACT.whatsapp.replace(/[^0-9]/g, "")}`}
+            target="_blank"
+            rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-block px-8 py-4 bg-accent-yellow text-primary-black font-semibold rounded-full hover:shadow-[0_0_30px_rgba(250,204,21,0.4)] transition-shadow"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-accent-yellow text-primary-black font-black uppercase tracking-widest rounded-full hover:shadow-[0_0_30px_rgba(250,204,21,0.4)] transition-shadow"
           >
-            Start Your Event
+            <MessageSquare size={20} fill="currentColor" />
+            Contact Us
           </motion.a>
         </motion.div>
       </Container>

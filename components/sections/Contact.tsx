@@ -1,104 +1,117 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, MessageSquare } from "lucide-react";
 import React from "react";
 
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
-import GetStartedForm from "@/components/ui/GetStartedForm";
 import { COMPANY_CONTACT } from "@/constants";
 
 const Contact = () => {
   const contactDetails = [
     {
+      icon: <MessageSquare className="h-6 w-6" />,
+      title: "WhatsApp",
+      details: COMPANY_CONTACT.phone,
+      href: `https://wa.me/${COMPANY_CONTACT.whatsapp.replace(/[^0-9]/g, "")}`,
+      subtitle: "Fastest response",
+      color: "bg-[#25D366]",
+    },
+    {
       icon: <Phone className="h-6 w-6" />,
       title: "Call Us",
       details: COMPANY_CONTACT.phone,
       href: `tel:${COMPANY_CONTACT.phoneRaw}`,
-      subtitle: "Mon-Sat, 10am-7pm",
+      subtitle: "10am-7pm Support",
+      color: "bg-accent-yellow",
     },
     {
       icon: <Mail className="h-6 w-6" />,
       title: "Email Us",
       details: COMPANY_CONTACT.email,
       href: `mailto:${COMPANY_CONTACT.email}`,
-      subtitle: "We'll reply within 24h",
+      subtitle: "Official Enquiries",
+      color: "bg-white/10",
     },
     {
       icon: <MapPin className="h-6 w-6" />,
-      title: "Visit Us",
+      title: "Jaipur Office",
       details: COMPANY_CONTACT.address,
       href: "https://maps.google.com",
-      subtitle: "Head Office",
+      subtitle: "Visit us",
+      color: "bg-white/10",
     },
   ];
 
   return (
     <section id="contact" className="relative py-24 md:py-32 overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] bg-accent-yellow/5 rounded-full blur-[120px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-yellow/5 rounded-full blur-[120px]" />
 
       <Container className="relative z-10">
         <SectionHeading
           subtitle="CONTACT US"
-          title="Let's Plan Your Next Event"
+          title="Ready to Start Your Event?"
           align="center"
           className="mb-16"
         />
 
-        <div className="grid lg:grid-cols-5 gap-12 items-start">
-          {/* Contact Info */}
-          <div className="lg:col-span-2 space-y-8">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <h3 className="text-2xl font-bold text-white mb-6">
-                Get in Touch
-              </h3>
-              <p className="text-white/60 mb-8 leading-relaxed">
-                Have a question or ready to start planning? Reach out to us via
-                the form or any of these contact methods. Our team is ready to
-                bring your vision to life.
-              </p>
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <p className="text-white/60 text-lg leading-relaxed">
+              We have unified our communication to provide you with the fastest service. 
+              Click below to chat with our expert team on WhatsApp and get a quote instantly.
+            </p>
+          </motion.div>
 
-              <div className="space-y-6">
-                {contactDetails.map((item, index) => (
-                  <motion.a
-                    key={index}
-                    href={item.href}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex items-start gap-4 p-4 rounded-2xl glass glow-border group transition-all"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-accent-yellow/10 flex items-center justify-center text-accent-yellow transition-colors group-hover:bg-accent-yellow group-hover:text-primary-black">
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h4 className="text-white font-semibold">{item.title}</h4>
-                      <p className="text-white/80">{item.details}</p>
-                      <p className="text-white/40 text-sm">{item.subtitle}</p>
-                    </div>
-                  </motion.a>
-                ))}
-              </div>
-            </motion.div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {contactDetails.map((item, index) => (
+              <motion.a
+                key={index}
+                href={item.href}
+                target={item.href.startsWith("http") ? "_blank" : undefined}
+                rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="flex items-center gap-6 p-6 rounded-3xl glass glow-border group transition-all hover:-translate-y-1"
+              >
+                <div className={`w-14 h-14 rounded-2xl ${item.color} flex items-center justify-center text-black transition-transform group-hover:scale-110`}>
+                  {item.icon}
+                </div>
+                <div>
+                  <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-1">{item.subtitle}</p>
+                  <h4 className="text-white text-xl font-bold">{item.title}</h4>
+                  <p className="text-white/70 text-sm mt-1">{item.details}</p>
+                </div>
+              </motion.a>
+            ))}
           </div>
 
-          {/* Contact Form */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="lg:col-span-3 glass glow-border rounded-3xl p-8 md:p-12"
+            className="mt-16 text-center"
           >
-            <GetStartedForm />
+            <motion.a
+              href={`https://wa.me/${COMPANY_CONTACT.whatsapp.replace(/[^0-9]/g, "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center gap-4 px-12 py-5 bg-[#25D366] text-white rounded-full font-black uppercase tracking-widest shadow-[0_20px_50px_rgba(37,211,102,0.3)]"
+            >
+              <MessageSquare size={24} fill="currentColor" />
+              Chat on WhatsApp Now
+            </motion.a>
           </motion.div>
         </div>
       </Container>

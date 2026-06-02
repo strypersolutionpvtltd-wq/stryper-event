@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight, CheckCircle2, Lightbulb, Target } from "lucide-react";
 import React from "react";
+import Link from "next/link";
 
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -10,7 +11,7 @@ import { CASE_STUDIES } from "@/constants";
 
 const CaseStudies = () => {
   return (
-    <section id="case-studies" className="relative py-24 md:py-32">
+    <section id="case-studies" className="relative py-24 md:py-32 overflow-hidden">
       <Container>
         <SectionHeading
           subtitle="CASE STUDIES"
@@ -25,18 +26,18 @@ const CaseStudies = () => {
               key={study.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6 }}
               className={`flex flex-col gap-8 md:gap-12 lg:items-center ${
                 index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
               }`}
             >
               {/* Image Side */}
-              <div className="group relative flex-1 overflow-hidden rounded-2xl md:rounded-3xl border border-white/10">
+              <Link href={`/events/case-studies/${study.id}`} className="group relative flex-1 overflow-hidden rounded-2xl md:rounded-3xl border border-white/10 aspect-video lg:aspect-[4/3] w-full block">
                 <img
                   src={study.image}
                   alt={study.title}
-                  className="aspect-video lg:aspect-[4/3] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -45,11 +46,11 @@ const CaseStudies = () => {
                      {study.category}
                    </span>
                 </div>
-              </div>
+              </Link>
 
               {/* Content Side */}
               <div className="flex-1 space-y-6 md:space-y-8 px-2 md:px-0">
-                <h3 className="text-2xl font-bold text-white md:text-4xl">
+                <h3 className="text-2xl font-bold text-white md:text-4xl leading-tight">
                   {study.title}
                 </h3>
 
@@ -60,8 +61,8 @@ const CaseStudies = () => {
                       <Target size={18} />
                     </div>
                     <div>
-                      <h4 className="mb-0.5 font-bold text-white text-sm md:text-base">The Challenge</h4>
-                      <p className="text-xs md:text-sm leading-relaxed text-white/50">
+                      <h4 className="mb-0.5 font-bold text-white text-sm md:text-base uppercase tracking-wider">The Challenge</h4>
+                      <p className="text-xs md:text-sm leading-relaxed text-white/50 line-clamp-2">
                         {study.challenge}
                       </p>
                     </div>
@@ -73,33 +74,21 @@ const CaseStudies = () => {
                       <Lightbulb size={18} />
                     </div>
                     <div>
-                      <h4 className="mb-0.5 font-bold text-white text-sm md:text-base">Our Solution</h4>
-                      <p className="text-xs md:text-sm leading-relaxed text-white/50">
+                      <h4 className="mb-0.5 font-bold text-white text-sm md:text-base uppercase tracking-wider">Our Solution</h4>
+                      <p className="text-xs md:text-sm leading-relaxed text-white/50 line-clamp-2">
                         {study.solution}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Result */}
-                  <div className="flex gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-green-500">
-                      <CheckCircle2 size={18} />
-                    </div>
-                    <div>
-                      <h4 className="mb-0.5 font-bold text-white text-sm md:text-base">The Result</h4>
-                      <p className="text-xs md:text-sm leading-relaxed text-white/50">
-                        {study.result}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <motion.button
-                  whileHover={{ x: 5 }}
-                  className="flex items-center gap-2 font-semibold text-accent-yellow text-sm md:text-base"
+                <Link
+                  href={`/events/case-studies/${study.id}`}
+                  className="inline-flex items-center gap-2 font-black text-accent-yellow text-xs md:text-sm uppercase tracking-[0.2em] group"
                 >
-                  View Details <ArrowUpRight size={18} />
-                </motion.button>
+                  View Full Details 
+                  <ArrowUpRight size={18} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                </Link>
               </div>
             </motion.div>
           ))}

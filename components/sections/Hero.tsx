@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect } from "react";
-import { useGetStartedModal } from "@/hooks/useModal";
+import { COMPANY_CONTACT } from "@/constants";
 
 const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1920&q=80", // Grand Gala
@@ -13,13 +13,12 @@ const HERO_IMAGES = [
 ];
 
 const Hero = () => {
-  const { onOpen } = useGetStartedModal();
   const [currentIdx, setCurrentIdx] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIdx((prev) => (prev + 1) % HERO_IMAGES.length);
-    }, 2000);
+    }, 4000);
     return () => clearInterval(timer);
   }, []);
 
@@ -30,13 +29,13 @@ const Hero = () => {
     >
       {/* Absolute Clarity Background Slider */}
       <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           <motion.div
             key={currentIdx}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 1.5 }}
             className="absolute inset-0"
           >
             <img
@@ -47,9 +46,9 @@ const Hero = () => {
           </motion.div>
         </AnimatePresence>
         
-        {/* Invisible protection - only for text contrast */}
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {/* Dark overlay for contrast */}
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
       </div>
 
       {/* Content - Elegant & Non-Intrusive */}
@@ -70,14 +69,16 @@ const Hero = () => {
           </div>
 
           <div className="pt-8">
-            <motion.button
-              onClick={onOpen}
+            <motion.a
+              href={`https://wa.me/${COMPANY_CONTACT.whatsapp.replace(/[^0-9]/g, "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-12 py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.3em] rounded-full hover:bg-accent-yellow transition-colors shadow-2xl"
+              className="inline-block px-12 py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.3em] rounded-full hover:bg-accent-yellow transition-colors shadow-2xl"
             >
               Contact Us
-            </motion.button>
+            </motion.a>
           </div>
         </motion.div>
       </div>

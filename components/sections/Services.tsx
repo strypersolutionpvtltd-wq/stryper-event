@@ -6,12 +6,10 @@ import React from "react";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import ServiceCard from "@/components/ui/ServiceCard";
-import { SERVICES } from "@/constants";
-import { useGetStartedModal } from "@/hooks/useModal";
+import { SERVICES, COMPANY_CONTACT } from "@/constants";
+import { MessageSquare } from "lucide-react";
 
 const Services = () => {
-  const { onOpen } = useGetStartedModal();
-
   return (
     <section
       id="services"
@@ -63,14 +61,17 @@ const Services = () => {
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <motion.button
-            onClick={onOpen}
+          <motion.a
+            href={`https://wa.me/${COMPANY_CONTACT.whatsapp.replace(/[^0-9]/g, "")}`}
+            target="_blank"
+            rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-block px-8 py-4 bg-accent-yellow text-primary-black font-semibold rounded-full hover:shadow-[0_0_30px_rgba(250,204,21,0.4)] transition-shadow"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-accent-yellow text-primary-black font-black uppercase tracking-widest rounded-full hover:shadow-[0_0_30px_rgba(250,204,21,0.4)] transition-shadow"
           >
-            Get Started
-          </motion.button>
+            <MessageSquare size={20} fill="currentColor" />
+            Contact Us
+          </motion.a>
         </motion.div>
       </Container>
     </section>

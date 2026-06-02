@@ -6,6 +6,7 @@ import { NAV_ITEMS, COMPANY_CONTACT, VENUES } from "@/constants";
 import { cn } from "@/lib/utils";
 import Container from "@/components/ui/Container";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 const Navbar = () => {
@@ -56,11 +57,15 @@ const Navbar = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="relative z-[110] flex items-center">
-              <img
-                src="/images/logo.png"
-                alt="Stryper Events"
-                className="h-8 md:h-12 w-auto object-contain mix-blend-screen"
-              />
+              <div className="relative h-8 md:h-12 w-32 md:w-48">
+                <Image
+                  src="/images/logo.png"
+                  alt="Stryper Events"
+                  fill
+                  className="object-contain mix-blend-screen"
+                  priority
+                />
+              </div>
             </Link>
 
             {/* Desktop Menu */}

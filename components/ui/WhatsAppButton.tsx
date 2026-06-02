@@ -2,11 +2,12 @@
 
 import { motion } from "framer-motion";
 import React from "react";
+import { COMPANY_CONTACT } from "@/constants";
 
 const WhatsAppButton = () => {
   return (
     <motion.a
-      href="https://wa.me/919076773330"
+      href={`https://wa.me/${COMPANY_CONTACT.whatsapp.replace(/[^0-9]/g, "")}`}
       target="_blank"
       rel="noopener noreferrer"
       initial={{ scale: 0, opacity: 0 }}
