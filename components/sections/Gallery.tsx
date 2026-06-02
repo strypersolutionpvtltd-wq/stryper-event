@@ -14,12 +14,12 @@ const Gallery = () => {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 
   const categories = [
-    { id: "all", label: "All Events" },
+    { id: "all", label: "All" },
     { id: "corporate", label: "Corporate" },
     { id: "sports", label: "Sports" },
     { id: "weddings", label: "Weddings" },
-    { id: "brand", label: "Brand Promotion" },
-    { id: "fabrication", label: "Fabrication" },
+    { id: "brand", label: "Promotion" },
+    { id: "fabrication", label: "Fab" },
   ];
 
   const galleryItems = [
@@ -209,42 +209,44 @@ const Gallery = () => {
   }, []);
 
   return (
-    <section id="gallery" className="relative py-24 md:py-32 overflow-hidden">
+    <section id="gallery" className="relative py-16 md:py-32 overflow-hidden px-4 md:px-0">
       <Container className="relative z-10">
         {/* Section Heading */}
         <SectionHeading
           subtitle="OUR WORK"
           title="Past Events"
           align="center"
-          className="mb-12"
+          className="mb-8 md:mb-12"
         />
 
-        {/* Filter Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-3 mb-12"
-        >
-          {categories.map((category) => (
-            <motion.button
-              key={category.id}
-              onClick={() => setActiveFilter(category.id)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-6 py-3 rounded-full font-medium transition-all ${
-                activeFilter === category.id
-                  ? "bg-accent-yellow text-primary-black shadow-[0_0_20px_rgba(250,204,21,0.3)]"
-                  : "bg-white/5 text-white/80 border border-white/10 hover:border-accent-yellow/50"
-              }`}
+        {/* Filter Buttons - Scrollable on mobile */}
+        <div className="flex overflow-x-auto no-scrollbar pb-6 -mx-4 px-4 md:overflow-visible md:pb-0 md:justify-center md:mb-12">
+            <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex flex-nowrap md:flex-wrap gap-2 md:gap-3 shrink-0"
             >
-              {category.label}
-            </motion.button>
-          ))}
-        </motion.div>
+            {categories.map((category) => (
+                <motion.button
+                key={category.id}
+                onClick={() => setActiveFilter(category.id)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`px-5 py-2.5 md:px-6 md:py-3 rounded-full text-xs md:text-sm font-bold transition-all whitespace-nowrap ${
+                    activeFilter === category.id
+                    ? "bg-accent-yellow text-primary-black shadow-[0_0_20px_rgba(250,204,21,0.3)]"
+                    : "bg-white/5 text-white/60 border border-white/10 hover:border-accent-yellow/50"
+                }`}
+                >
+                {category.label}
+                </motion.button>
+            ))}
+            </motion.div>
+        </div>
 
-        {/* Gallery Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Gallery Grid - Responsive Columns */}
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-6">
           <AnimatePresence mode="popLayout">
             {filteredItems.map((item, index) => (
               <motion.div
@@ -277,57 +279,48 @@ const Gallery = () => {
                     className="absolute inset-0 w-full h-full object-cover"
                     muted
                     loop
+                    playsInline
                     onMouseOver={(e) => (e.target as HTMLVideoElement).play()}
                     onMouseOut={(e) => (e.target as HTMLVideoElement).pause()}
                   />
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/5 space-y-2">
-                    <div className="w-12 h-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center">
-                      <Play size={20} className="text-white/20" />
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center">
+                      <Play size={16} className="text-white/20 md:w-5 md:h-5" />
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Coming Soon</span>
+                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Coming Soon</span>
                   </div>
                 )}
 
-                {/* Overlay */}
+                {/* Overlay - Optimized for mobile tap */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   whileHover={item.type !== "coming-soon" ? { opacity: 1 } : {}}
-                  className="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/40 to-transparent flex items-end p-6 transition-opacity"
+                  className="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/40 to-transparent flex items-end p-4 md:p-6 transition-opacity"
                 >
-                  <div>
-                    <h3 className="text-xl font-semibold text-white mb-2">
+                  <div className="w-full">
+                    <h3 className="text-base md:text-xl font-bold text-white mb-1 truncate">
                       {item.title}
                     </h3>
-                    <span className="text-sm text-accent-yellow capitalize">
+                    <span className="text-[10px] md:text-sm font-black text-accent-yellow uppercase tracking-widest">
                       {item.category}
                     </span>
                   </div>
                 </motion.div>
 
-                {/* Media Icon */}
+                {/* Media Icon - Larger on mobile */}
                 {item.type !== "coming-soon" && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0 }}
                     whileHover={{ opacity: 1, scale: 1 }}
-                    className="absolute top-4 right-4 w-10 h-10 bg-accent-yellow rounded-full flex items-center justify-center shadow-lg"
+                    className="absolute top-3 right-3 md:top-4 md:right-4 w-9 h-9 md:w-10 md:h-10 bg-accent-yellow rounded-full flex items-center justify-center shadow-lg"
                   >
                     {item.type === "image" ? (
-                      <svg
-                        className="w-5 h-5 text-primary-black"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"
-                        />
+                      <svg className="w-4 h-4 md:w-5 md:h-5 text-primary-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
                       </svg>
                     ) : (
-                      <Play className="w-5 h-5 text-primary-black ml-0.5" fill="currentColor" />
+                      <Play className="w-4 h-4 md:w-5 md:h-5 text-primary-black ml-0.5" fill="currentColor" />
                     )}
                   </motion.div>
                 )}
@@ -336,49 +329,33 @@ const Gallery = () => {
           </AnimatePresence>
         </div>
 
-        {/* Load More Button */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mt-12"
-        >
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-white/5 border border-white/10 hover:border-accent-yellow/50 rounded-full text-white font-medium transition-all"
-          >
-            Load More
-          </motion.button>
-        </motion.div>
-
-        {/* Lightbox / Modal */}
+        {/* Lightbox / Modal - Highly responsive */}
         <AnimatePresence>
           {selectedIdx !== null && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] bg-primary-black/98 backdrop-blur-xl flex items-center justify-center p-4 md:p-12 touch-none"
+              className="fixed inset-0 z-[100] bg-primary-black/98 backdrop-blur-xl flex items-center justify-center p-2 md:p-12 touch-none"
               onClick={() => setSelectedIdx(null)}
             >
               {/* Controls */}
-              <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-[110]">
-                <div className="text-white/50 font-medium">
+              <div className="absolute top-4 left-4 right-4 md:top-6 md:left-6 md:right-6 flex justify-between items-center z-[110]">
+                <div className="text-white/40 text-[10px] font-black uppercase tracking-widest">
                   {selectedIdx + 1} / {filteredItems.length}
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.1, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
-                  className="w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white"
+                  className="w-10 h-10 md:w-12 md:h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white"
                   onClick={() => setSelectedIdx(null)}
                 >
-                  <X size={24} />
+                  <X size={20} className="md:w-6 md:h-6" />
                 </motion.button>
               </div>
 
-              {/* Navigation */}
-              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-4 md:px-10 z-[110] pointer-events-none">
+              {/* Navigation - Hidden on small mobile */}
+              <div className="hidden md:flex absolute inset-x-0 top-1/2 -translate-y-1/2 justify-between px-4 md:px-10 z-[110] pointer-events-none">
                 <motion.button
                   whileHover={{ scale: 1.1, x: -5 }}
                   whileTap={{ scale: 0.9 }}
@@ -404,7 +381,7 @@ const Gallery = () => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
                 transition={{ type: "spring", damping: 25 }}
-                className="relative max-w-5xl w-full aspect-video md:aspect-auto md:h-[80vh] flex items-center justify-center rounded-3xl overflow-hidden shadow-2xl bg-black touch-auto overscroll-contain"
+                className="relative max-w-5xl w-full aspect-[4/5] md:aspect-auto md:h-[80vh] flex items-center justify-center rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl bg-black touch-auto overscroll-contain"
                 onClick={(e) => e.stopPropagation()}
               >
                 {filteredItems[selectedIdx].type === "image" ? (
@@ -414,7 +391,7 @@ const Gallery = () => {
                       alt={filteredItems[selectedIdx].title}
                       fill
                       className="object-contain"
-                      sizes="90vw"
+                      sizes="95vw"
                       priority
                     />
                   </div>
@@ -424,19 +401,20 @@ const Gallery = () => {
                     className="w-full h-full max-h-[80vh] object-contain"
                     controls
                     autoPlay
+                    playsInline
                   />
                 )}
 
-                {/* Bottom Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
-                  <div className="flex justify-between items-end gap-4">
+                {/* Bottom Overlay - Highly optimized for mobile */}
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 bg-gradient-to-t from-black via-black/80 to-transparent">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
                     <div>
-                      <h3 className="text-2xl font-bold text-white mb-1">
-                        {filteredItems[selectedIdx].title}
-                      </h3>
-                      <p className="text-accent-yellow capitalize">
+                      <p className="text-accent-yellow text-[10px] font-black uppercase tracking-[0.2em] mb-1">
                         {filteredItems[selectedIdx].category}
                       </p>
+                      <h3 className="text-lg md:text-2xl font-bold text-white leading-tight">
+                        {filteredItems[selectedIdx].title}
+                      </h3>
                     </div>
                     <motion.a
                       href={`https://wa.me/${COMPANY_CONTACT.whatsapp.replace(/[^0-9]/g, "")}?text=Hi, I am interested in knowing more about the ${filteredItems[selectedIdx].title} project.`}
@@ -444,9 +422,9 @@ const Gallery = () => {
                       rel="noopener noreferrer"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="flex items-center gap-2 px-6 py-3 bg-[#25D366] text-white rounded-full text-xs font-black uppercase tracking-widest"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-[#25D366] text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-transform"
                     >
-                      <MessageSquare size={14} fill="currentColor" /> Enquire
+                      <MessageSquare size={14} fill="currentColor" /> Enquire Now
                     </motion.a>
                   </div>
                 </div>

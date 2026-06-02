@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { COMPANY_CONTACT } from "@/constants";
 
 const HERO_IMAGES = [
@@ -18,7 +19,7 @@ const Hero = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIdx((prev) => (prev + 1) % HERO_IMAGES.length);
-    }, 4000);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
 
@@ -38,44 +39,47 @@ const Hero = () => {
             transition={{ duration: 1.5 }}
             className="absolute inset-0"
           >
-            <img
+            <Image
               src={HERO_IMAGES[currentIdx]}
               alt="Luxury Event"
-              className="h-full w-full object-cover"
+              fill
+              priority={currentIdx === 0}
+              className="object-cover"
+              sizes="100vw"
             />
           </motion.div>
         </AnimatePresence>
         
         {/* Dark overlay for contrast */}
-        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-black/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
       </div>
 
-      {/* Content - Elegant & Non-Intrusive */}
+      {/* Content - Highly Responsive Scaling */}
       <div className="container relative z-10 mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="mx-auto max-w-4xl text-center space-y-6"
+          className="mx-auto max-w-4xl text-center space-y-4 md:space-y-8"
         >
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-7xl font-extralight text-white tracking-[0.2em] uppercase leading-none drop-shadow-lg">
+          <div className="space-y-1 md:space-y-3">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-extralight text-white tracking-[0.1em] sm:tracking-[0.2em] uppercase leading-tight drop-shadow-lg">
               Stryper <span className="font-bold text-accent-yellow">Events</span>
             </h1>
-            <p className="text-sm md:text-base text-white/80 font-bold uppercase tracking-[0.5em] drop-shadow-md">
+            <p className="text-[10px] sm:text-sm md:text-base text-white/80 font-black uppercase tracking-[0.3em] sm:tracking-[0.5em] drop-shadow-md">
               Jaipur&apos;s Premier Event Architects
             </p>
           </div>
 
-          <div className="pt-8">
+          <div className="pt-4 md:pt-8">
             <motion.a
               href={`https://wa.me/${COMPANY_CONTACT.whatsapp.replace(/[^0-9]/g, "")}`}
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-block px-12 py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.3em] rounded-full hover:bg-accent-yellow transition-colors shadow-2xl"
+              className="inline-block px-8 py-3.5 md:px-12 md:py-4 bg-white text-black text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] rounded-full hover:bg-accent-yellow transition-colors shadow-2xl"
             >
               Contact Us
             </motion.a>
@@ -84,11 +88,11 @@ const Hero = () => {
       </div>
 
       {/* Elegant minimalist indicator */}
-      <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-3 z-20">
+      <div className="absolute bottom-16 md:bottom-10 left-0 right-0 flex justify-center gap-2 md:gap-3 z-20">
         {HERO_IMAGES.map((_, i) => (
           <div 
             key={i} 
-            className={`h-[2px] transition-all duration-700 ${i === currentIdx ? "w-8 bg-accent-yellow" : "w-4 bg-white/30"}`}
+            className={`h-[2px] transition-all duration-700 ${i === currentIdx ? "w-6 md:w-8 bg-accent-yellow" : "w-3 md:w-4 bg-white/30"}`}
           />
         ))}
       </div>
