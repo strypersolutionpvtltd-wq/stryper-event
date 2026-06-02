@@ -8,22 +8,31 @@ const PageLoader = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Shorter delay + check for document state
+    let isMounted = true;
+    
     const handleLoad = () => {
-      setTimeout(() => setIsLoading(false), 800);
+      if (isMounted) {
+        setTimeout(() => {
+          if (isMounted) setIsLoading(false);
+        }, 800);
+      }
     };
 
     if (document.readyState === "complete") {
       handleLoad();
     } else {
       window.addEventListener("load", handleLoad);
-      // Fallback timer
       const timer = setTimeout(handleLoad, 2500);
       return () => {
+        isMounted = false;
         window.removeEventListener("load", handleLoad);
         clearTimeout(timer);
       };
     }
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (

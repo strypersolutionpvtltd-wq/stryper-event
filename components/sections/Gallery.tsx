@@ -264,7 +264,7 @@ const Gallery = () => {
                 {/* Actual Media */}
                 {item.type === "image" ? (
                   <Image
-                    src={item.image}
+                    src={item.image || "/images/placeholder.jpg"}
                     alt={item.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"

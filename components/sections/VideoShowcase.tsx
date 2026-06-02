@@ -1,8 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import { Play, X } from "lucide-react";
+import React, { useState } from "react";
 
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
