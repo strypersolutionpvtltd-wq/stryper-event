@@ -14,7 +14,7 @@ const WhatsAppButton = () => {
       transition={{ delay: 1, type: "spring" }}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
-      className="fixed bottom-6 right-6 z-50 hidden md:flex w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] transition-shadow group"
+      className="fixed bottom-6 left-6 z-50 hidden md:flex w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] transition-shadow group"
       aria-label="Contact us on WhatsApp"
     >
       {/* Pulse animation */}
@@ -41,7 +41,7 @@ const WhatsAppButton = () => {
       </svg>
 
       {/* Tooltip */}
-      <div className="absolute right-full mr-3 px-3 py-2 bg-primary-black border border-accent-yellow/30 rounded-lg text-sm text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+      <div className="absolute left-full ml-3 px-3 py-2 bg-primary-black border border-accent-yellow/30 rounded-lg text-sm text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
         Chat with us!
       </div>
     </motion.a>

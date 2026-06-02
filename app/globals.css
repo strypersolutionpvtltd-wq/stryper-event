@@ -19,25 +19,6 @@
       "calt" 1;
   }
 
-  /* Premium Scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-primary-black;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-accent-yellow/30;
-    transition: background 0.3s ease;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-accent-yellow/50;
-  }
-
   /* Modern Selection Color */
   ::selection {
     @apply bg-accent-yellow text-primary-black;

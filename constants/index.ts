@@ -3,8 +3,185 @@ export const NAV_ITEMS = [
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
   { name: "Services", href: "/services" },
+  { name: "Venue", href: "/venue", isDropdown: true },
   { name: "Events", href: "/events" },
   { name: "Contact", href: "/contact" },
+] as const;
+
+// Jaipur Premium Venues
+export const VENUES = [
+  {
+    name: "Fairmont Jaipur",
+    slug: "fairmont-jaipur",
+    rating: "5 Star Luxury",
+    location: "Kukas, Amber Road, Jaipur",
+    description:
+      "A tribute to the pink city, Fairmont Jaipur is a luxurious living palace built in the tradition of the region's royal heritage. Featuring Rajput and Mughal architecture, it offers a grand setting for luxury destination weddings with stunning views of the Aravalli hills.",
+    features: ["Grand Ballroom", "Aravalli View Lawns", "Traditional Welcomes", "Luxury Suites"],
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
+    ],
+    videos: [
+      "/videos/gallery/WhatsApp Video 2026-06-02 at 2.51.14 AM.mp4",
+      "/videos/gallery/WhatsApp Video 2026-06-02 at 2.51.15 AM.mp4",
+    ],
+  },
+  {
+    name: "Taj Rambagh Palace Jaipur",
+    slug: "taj-rambagh-palace",
+    rating: "Palatial 5 Star",
+    location: "Bhawani Singh Road, Jaipur",
+    description:
+      "The 'Jewel of Jaipur', Rambagh Palace offers an authentic experience of royal living. Spread across 47 acres of lush gardens, this former residence of the Maharaja is arguably the most prestigious wedding venue in the world.",
+    features: ["Historic Gardens", "Royal Durbar Hall", "Peacock Courtyard", "Heritage Suites"],
+    image: "https://images.unsplash.com/photo-1583037189850-1921ae7c6c22?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1583037189850-1921ae7c6c22?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1549294413-26f195200c16?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=800&q=80",
+    ],
+    videos: ["/videos/gallery/WhatsApp Video 2026-06-02 at 2.51.16 AM.mp4"],
+  },
+  {
+    name: "Taj Amer Jaipur",
+    slug: "taj-amer-jaipur",
+    rating: "5 Star Luxury",
+    location: "Amber, Jaipur",
+    description:
+      "Nestled near the iconic Amer Fort, Taj Amer combines modern luxury with the timeless beauty of Jaipur's history. It's an ideal choice for couples seeking a majestic backdrop for their special day.",
+    features: ["Fort Backdrop", "Infinity Pool", "Grand Courtyards", "Modern Ballroom"],
+    image: "https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1551882547-ff43c61f1c90?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80",
+    ],
+    videos: ["/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.12 PM (1).mp4"],
+  },
+  {
+    name: "Jai Mahal Palace, Jaipur",
+    slug: "jai-mahal-palace",
+    rating: "Heritage 5 Star",
+    location: "Civil Lines, Jaipur",
+    description:
+      "Built in 1745, Jai Mahal Palace is a masterpiece in the Indo-Saracenic style of architecture. Its 18 acres of beautiful landscaped gardens are perfect for grand outdoor wedding ceremonies.",
+    features: ["Landscaped Gardens", "Marble Hall", "Heritage Architecture", "Luxury Pool"],
+    image: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
+    ],
+    videos: ["/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.12 PM (2).mp4"],
+  },
+  {
+    name: "Taj Devi Ratn Resort & Spa, Jaipur",
+    slug: "taj-devi-ratn",
+    rating: "5 Star Boutique",
+    location: "Jamdoli, Agra Road, Jaipur",
+    description:
+      "A bold, modern interpretation of Jaipur's heritage. Devi Ratn is inspired by the gems of Rajasthan, featuring avant-garde architecture and unique spaces for creative destination weddings.",
+    features: ["Avant-garde Design", "Mountain Backdrop", "Unique Event Spaces", "Modern Spa"],
+    image: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
+    ],
+    videos: ["/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.11 PM (1).mp4"],
+  },
+  {
+    name: "Hyatt Regency Jaipur Mansarovar",
+    slug: "hyatt-regency-jaipur",
+    rating: "5 Star Luxury",
+    location: "Mansarovar, Jaipur",
+    description:
+      "Modern luxury meets local culture. Hyatt Regency Mansarovar offers expansive banqueting spaces and contemporary design, making it perfect for high-volume corporate and wedding events.",
+    features: ["Massive Banquets", "Modern Decor", "Poolside Lawns", "City Location"],
+    image: "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1562790351-d273a961e00d?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1543967354-28193cbef2e9?auto=format&fit=crop&w=800&q=80",
+    ],
+    videos: ["/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.11 PM.mp4"],
+  },
+  {
+    name: "Mundota Fort And Palace, Jaipur",
+    slug: "mundota-fort-palace",
+    rating: "Heritage 5 Star",
+    location: "Mundota, Jaipur",
+    description:
+      "Experience weddings atop a hill at the Mundota Fort or in the majestic palace below. Known for its polo grounds and historical significance, it provides a truly unique setting for elite events.",
+    features: ["Hilltop Fort", "Polo Grounds", "War Horse Statues", "Desert Landscape"],
+    image: "https://images.unsplash.com/photo-1590050756297-bbc731766624?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1590050756297-bbc731766624?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1583037189850-1921ae7c6c22?auto=format&fit=crop&w=800&q=80",
+    ],
+    videos: ["/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.13 PM.mp4"],
+  },
+  {
+    name: "The Leela Palace, Jaipur",
+    slug: "the-leela-palace-jaipur",
+    rating: "5 Star Luxury",
+    location: "Amber, Jaipur",
+    description:
+      "The Leela Palace Jaipur is a stunning modern palace inspired by the grandeur of Rajputana heritage. It offers a majestic and contemporary setting for the most opulent weddings.",
+    features: ["Modern Palatial Design", "Lush Lawns", "Signature Dining", "Grand Ballrooms"],
+    image: "https://images.unsplash.com/photo-1513581163417-bcac5192b16e?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1513581163417-bcac5192b16e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=80",
+    ],
+    videos: ["/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.13 PM (1).mp4"],
+  },
+  {
+    name: "Mementos By ITC Hotels - Jaipur",
+    slug: "mementos-itc-jaipur",
+    rating: "5 Star Luxury",
+    location: "Kukas, Jaipur",
+    description:
+      "A luxury resort that celebrates the unique character of Jaipur. Mementos offers bespoke experiences and grand venues that blend seamlessly with the local traditions and landscape.",
+    features: ["Bespoke Service", "Luxury Villas", "Traditional Vibe", "Expansive Banquets"],
+    image: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1444201983204-c43cbd584d93?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+    ],
+    videos: ["/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.13 PM (2).mp4"],
+  },
+  {
+    name: "Anantara Jewel Bagh Jaipur Hotel",
+    slug: "anantara-jewel-bagh",
+    rating: "5 Star Luxury",
+    location: "Agra Road, Jaipur",
+    description:
+      "Bringing world-class Anantara luxury to Jaipur. Jewel Bagh is designed to host grand celebrations with a perfect mix of international hospitality and Rajasthani charm.",
+    features: ["International Luxury", "Signature Pool", "Gourmet Catering", "Luxury Pavilions"],
+    image: "https://images.unsplash.com/photo-1544124499-58912cbddada?auto=format&fit=crop&w=1200&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1544124499-58912cbddada?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1562790351-d273a961e00d?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
+    ],
+  },
 ] as const;
 
 // Company stats
@@ -31,7 +208,7 @@ export const SERVICES = [
     description:
       "We handle your business events, conferences, and meetings. Everything runs on time and looks professional.",
     icon: "briefcase",
-    image: "/images/dealer.jpg",
+    image: "/images/corporate-new.jpg",
   },
   {
     title: "Wedding Events",
@@ -47,7 +224,7 @@ export const SERVICES = [
     description:
       "From planning to setup, we take care of everything. You get a complete event solution.",
     icon: "video",
-    image: "/images/gallery/1120880-ambiance-concert.jpg.jpeg",
+    image: "/images/production-new.jpg",
   },
   {
     title: "Sports Management",
@@ -55,7 +232,7 @@ export const SERVICES = [
     description:
       "Tournaments, marathons, or sports days — we manage all types of sports events smoothly.",
     icon: "trophy",
-    image: "/images/sports.jpg",
+    image: "/images/sports-new.jpg",
   },
   {
     title: "Award Shows",
@@ -63,7 +240,7 @@ export const SERVICES = [
     description:
       "Make your award ceremony special. We create events that honor achievements in style.",
     icon: "award",
-    image: "/images/gallery/Award-shows-Host.jpg.jpeg",
+    image: "/images/awards-new.jpg",
   },
   {
     title: "Brand Promotion",
@@ -87,7 +264,25 @@ export const SERVICES = [
     description:
       "Need custom stages, structures, or setups? We build exactly what your event needs.",
     icon: "box",
-    image: "/images/gallery/w5-1024x782.jpg.jpeg",
+    image: "/images/fabrication-new.jpg",
+    portfolio: [
+      {
+        title: "Setup Process",
+        video: "/videos/gallery/WhatsApp Video 2026-06-02 at 2.51.14 AM.mp4",
+      },
+      {
+        title: "Stage Construction",
+        video: "/videos/gallery/WhatsApp Video 2026-06-02 at 2.51.15 AM (2).mp4",
+      },
+      {
+        title: "Exhibition Fabrication",
+        video: "/videos/gallery/WhatsApp Video 2026-06-02 at 2.51.15 AM.mp4",
+      },
+      {
+        title: "Production Final",
+        video: "/videos/gallery/WhatsApp Video 2026-06-02 at 2.51.16 AM.mp4",
+      },
+    ],
   },
   {
     title: "Event Staff",
@@ -95,7 +290,7 @@ export const SERVICES = [
     description:
       "Our trained team makes sure your event runs smoothly and your guests are well taken care of.",
     icon: "users",
-    image: "/images/gallery/IMG_1850.JPG.jpeg",
+    image: "/images/staff-new.jpg",
   },
 ] as const;
 
@@ -139,7 +334,7 @@ export const EVENT_CATEGORIES = [
     title: "Dealer Meets",
     slug: "corporate-events",
     description: "Dealer meetings and business networking events",
-    image: "/images/dealer.jpg",
+    image: "/images/corporate-new.jpg",
   },
   {
     title: "Product Launches",
@@ -151,7 +346,7 @@ export const EVENT_CATEGORIES = [
     title: "Sports Events",
     slug: "sports-management",
     description: "Tournaments, marathons, and sports competitions",
-    image: "/images/sports.jpg",
+    image: "/images/sports-new.jpg",
   },
   {
     title: "Family Day Events",
@@ -212,7 +407,7 @@ export const CASE_STUDIES = [
     id: "jaipur-tech-expo",
     title: "Rajasthan Tech Expo 2024",
     category: "Corporate Events",
-    image: "/images/dealer.jpg",
+    image: "/images/corporate-new.jpg",
     challenge: "Organizing a large-scale tech exhibition with 80+ exhibitors and 2000+ daily visitors in a heritage-style venue.",
     solution: "We designed a modular booth system that blended with the venue's architecture and managed crowd flow using digital check-ins.",
     result: "High exhibitor satisfaction with zero logistical delays and extensive local media coverage.",
@@ -240,57 +435,25 @@ export const CASE_STUDIES = [
 // Team Members
 export const TEAM_MEMBERS = [
   {
-    name: "Deepak Shah",
-    role: "Founder & Director",
-    experience: "8+ Years",
-    image: "/images/logo.png",
-    bio: "The driving force behind Stryper, Deepak has managed over 500+ events with a focus on precision and client happiness.",
-  },
-  {
     name: "Kartikey Niranjan",
-    role: "Co-Founder & Creative Head",
-    experience: "6+ Years",
+    role: "Chairman",
+    experience: "8 Years",
     image: "/images/logo.png",
-    bio: "Expert in conceptualizing unique event themes and ensuring high-end visual aesthetics for every project.",
+    bio: "8 Years of Experience in leadership and strategic vision.",
   },
   {
-    name: "Aman Nayak",
-    role: "Head of Operations",
-    experience: "7+ Years",
+    name: "Deepak Shah",
+    role: "Business Developer",
+    experience: "1 Year",
     image: "/images/logo.png",
-    bio: "Specializes in ground execution and vendor management, making sure every event runs like clockwork.",
+    bio: "1 Year of Experience in driving business growth and client relations.",
   },
   {
     name: "Lokesh Nagar",
-    role: "Senior Event Strategist",
-    experience: "5+ Years",
+    role: "HR (Human Resources)",
+    experience: "3 Years",
     image: "/images/logo.png",
-    bio: "Dedicated to planning and strategy, ensuring that every client's vision is translated into a successful reality.",
-  },
-] as const;
-
-// Video Testimonials
-export const VIDEO_TESTIMONIALS = [
-  {
-    id: 1,
-    clientName: "Rahul Kapoor",
-    event: "Annual Corporate Gala",
-    videoUrl: "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.11 PM (1).mp4",
-    thumbnail: "/images/dealer.jpg",
-  },
-  {
-    id: 2,
-    clientName: "Sneha & Amit",
-    event: "Royal Destination Wedding",
-    videoUrl: "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.13 PM (1).mp4",
-    thumbnail: "/images/family.jpg",
-  },
-  {
-    id: 3,
-    clientName: "Vikram Singh",
-    event: "Product Launch Event",
-    videoUrl: "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.12 PM (1).mp4",
-    thumbnail: "/images/brand.jpg",
+    bio: "3 Years of Experience in talent acquisition and team management.",
   },
 ] as const;
 

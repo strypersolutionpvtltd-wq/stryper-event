@@ -10,23 +10,23 @@ import SectionHeading from "@/components/ui/SectionHeading";
 const VIDEOS = [
   {
     title: "Corporate Excellence",
-    src: "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.11 PM (1).mp4",
-    thumbnail: "/images/gallery/Award-shows-Host.jpg.jpeg",
+    src: "/videos/gallery/WhatsApp Video 2026-06-02 at 2.51.15 AM.mp4",
+    thumbnail: "/images/corporate-new.jpg",
   },
   {
     title: "Musical Nights",
     src: "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.12 PM (2).mp4",
-    thumbnail: "/images/gallery/concert.webp",
+    thumbnail: "/images/production-new.jpg",
   },
   {
-    title: "Grand Events",
-    src: "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.13 PM.mp4",
-    thumbnail: "/images/gallery/1120880-ambiance-concert.jpg.jpeg",
+    title: "Grand Award Shows",
+    src: "/videos/gallery/WhatsApp Video 2026-06-02 at 2.51.16 AM.mp4",
+    thumbnail: "/images/awards-new.jpg",
   },
   {
-    title: "Sports Action",
-    src: "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.12 PM (1).mp4",
-    thumbnail: "/images/gallery/IMG_1850.JPG.jpeg",
+    title: "Event Fabrication",
+    src: "/videos/gallery/WhatsApp Video 2026-06-02 at 2.51.14 AM.mp4",
+    thumbnail: "/images/fabrication-new.jpg",
   },
 ];
 

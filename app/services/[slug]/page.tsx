@@ -100,6 +100,39 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         </Container>
       </section>
 
+      {/* Service Portfolio (Videos/Images) */}
+      {"portfolio" in service && service.portfolio && (
+        <section className="py-24 bg-white/[0.01]">
+          <Container>
+            <SectionHeading
+              subtitle="OUR CATALOG"
+              title={`${service.title} Highlights`}
+              align="center"
+              className="mb-16"
+            />
+            <div className="grid gap-8 md:grid-cols-2">
+              {service.portfolio.map((item: any, index: number) => (
+                <div
+                  key={index}
+                  className="group relative aspect-video rounded-2xl overflow-hidden glass glow-border"
+                >
+                  <video
+                    src={item.video}
+                    className="h-full w-full object-cover"
+                    controls
+                    muted
+                    loop
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+                    <h3 className="text-xl font-bold text-white">{item.title}</h3>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Container>
+        </section>
+      )}
+
       {/* Why Choose Us for this service */}
       <section className="py-24">
         <Container>

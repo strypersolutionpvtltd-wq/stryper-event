@@ -6,7 +6,6 @@ import EventCategories from "@/components/sections/EventCategories";
 import Hero from "@/components/sections/Hero";
 import Services from "@/components/sections/Services";
 import Testimonials from "@/components/sections/Testimonials";
-import VideoTestimonials from "@/components/sections/VideoTestimonials";
 import SectionDivider from "@/components/ui/SectionDivider";
 
 export default function Home() {
@@ -32,9 +31,6 @@ export default function Home() {
 
         <SectionDivider />
         <Testimonials />
-
-        <SectionDivider />
-        <VideoTestimonials />
 
         <SectionDivider />
         <Contact />

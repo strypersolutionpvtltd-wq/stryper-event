@@ -1,8 +1,8 @@
 "use client";
 
-import { Mail, Phone, Menu, X } from "lucide-react";
+import { Mail, Phone, Menu, X, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
-import { NAV_ITEMS, COMPANY_CONTACT } from "@/constants";
+import { NAV_ITEMS, COMPANY_CONTACT, VENUES } from "@/constants";
 import { cn } from "@/lib/utils";
 import Container from "@/components/ui/Container";
 import Link from "next/link";
@@ -11,6 +11,7 @@ import { usePathname } from "next/navigation";
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isVenueDropdownOpen, setIsVenueDropdownOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -65,18 +66,59 @@ const Navbar = () => {
             {/* Desktop Menu */}
             <div className="hidden lg:flex items-center gap-1 relative z-[110]">
               {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "px-5 py-2 text-sm font-bold uppercase tracking-widest transition-all rounded-full",
-                    pathname === item.href 
-                      ? "text-primary-black bg-accent-yellow shadow-[0_0_20px_rgba(250,204,21,0.3)]" 
-                      : "text-white/60 hover:text-white hover:bg-white/5"
-                  )}
+                <div 
+                  key={item.name} 
+                  className="relative group"
+                  onMouseEnter={() => item.isDropdown && setIsVenueDropdownOpen(true)}
+                  onMouseLeave={() => item.isDropdown && setIsVenueDropdownOpen(false)}
                 >
-                  {item.name}
-                </Link>
+                  {item.isDropdown ? (
+                    <button
+                      className={cn(
+                        "px-5 py-2 text-sm font-bold uppercase tracking-widest transition-all rounded-full flex items-center gap-1",
+                        pathname.startsWith(item.href)
+                          ? "text-primary-black bg-accent-yellow shadow-[0_0_20px_rgba(250,204,21,0.3)]" 
+                          : "text-white/60 hover:text-white hover:bg-white/5"
+                      )}
+                    >
+                      {item.name} <ChevronDown size={14} className={cn("transition-transform duration-300", isVenueDropdownOpen && "rotate-180")} />
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        "px-5 py-2 text-sm font-bold uppercase tracking-widest transition-all rounded-full",
+                        pathname === item.href 
+                          ? "text-primary-black bg-accent-yellow shadow-[0_0_20px_rgba(250,204,21,0.3)]" 
+                          : "text-white/60 hover:text-white hover:bg-white/5"
+                      )}
+                    >
+                      {item.name}
+                    </Link>
+                  )}
+
+                  {/* Venue Dropdown */}
+                  {item.isDropdown && (
+                    <div className={cn(
+                      "absolute top-full left-0 mt-2 w-72 bg-black/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-2xl transition-all duration-300 origin-top-left",
+                      isVenueDropdownOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+                    )}>
+                      <div className="grid gap-1">
+                        <p className="px-3 py-2 text-[10px] font-black text-accent-yellow uppercase tracking-widest border-b border-white/5 mb-2">Premium Jaipur Venues</p>
+                        {VENUES.map((venue) => (
+                          <Link
+                            key={venue.slug}
+                            href={`/venue/${venue.slug}`}
+                            className="px-3 py-2.5 text-xs font-bold text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                            onClick={() => setIsVenueDropdownOpen(false)}
+                          >
+                            {venue.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
 
@@ -95,20 +137,37 @@ const Navbar = () => {
         {/* Mobile Fullscreen Menu */}
         {isMobileMenuOpen && (
           <div className="fixed inset-0 z-[105] bg-black flex flex-col items-center justify-center p-8 lg:hidden animate-in fade-in duration-300">
-            <div className="flex flex-col gap-8 w-full max-w-xs text-center">
+            <div className="flex flex-col gap-4 w-full max-w-xs text-center overflow-y-auto max-h-[70vh] py-8">
               {NAV_ITEMS.map((item, index) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    "text-4xl font-black uppercase tracking-tighter transition-all",
-                    pathname === item.href ? "text-accent-yellow" : "text-white/20 hover:text-white"
+                <div key={item.name}>
+                  {item.isDropdown ? (
+                    <div className="flex flex-col gap-4">
+                      <span className="text-sm font-black text-accent-yellow uppercase tracking-widest">Premium Venues</span>
+                      {VENUES.map((venue) => (
+                        <Link
+                          key={venue.slug}
+                          href={`/venue/${venue.slug}`}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="text-2xl font-bold uppercase text-white/40 hover:text-white"
+                        >
+                          {venue.name}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        "text-4xl font-black uppercase tracking-tighter transition-all",
+                        pathname === item.href ? "text-accent-yellow" : "text-white/20 hover:text-white"
+                      )}
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      {item.name}
+                    </Link>
                   )}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  {item.name}
-                </Link>
+                </div>
               ))}
             </div>
             
