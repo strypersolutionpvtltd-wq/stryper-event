@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight, CheckCircle2, Lightbulb, Target } from "lucide-react";
+import { ArrowUpRight, Lightbulb, Target } from "lucide-react";
 import React from "react";
 import Link from "next/link";
 
