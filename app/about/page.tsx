@@ -1,6 +1,6 @@
 import About from "@/components/sections/About";
 import WhyChooseUs from "@/components/sections/WhyChooseUs";
-import ClientLogos from "@/components/sections/ClientLogos";
+import Team from "@/components/sections/Team";
 import SectionDivider from "@/components/ui/SectionDivider";
 import { Metadata } from "next";
 
@@ -19,7 +19,7 @@ export default function AboutPage() {
       <SectionDivider />
       <WhyChooseUs />
       <SectionDivider />
-      <ClientLogos />
+      <Team />
     </main>
   );
 }

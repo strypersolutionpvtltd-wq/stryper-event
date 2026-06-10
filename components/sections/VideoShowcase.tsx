@@ -81,21 +81,27 @@ const VideoShowcase = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4"
+              className="fixed inset-0 z-[200] bg-black/98 backdrop-blur-2xl flex items-center justify-center p-2 md:p-8"
               onClick={() => setSelectedVideo(null)}
             >
+              {/* Enhanced Close Button */}
               <motion.button
-                className="absolute top-8 right-8 text-white/50 hover:text-white"
+                initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                className="absolute top-6 right-6 md:top-10 md:right-10 z-[210] flex items-center gap-3 group"
                 onClick={() => setSelectedVideo(null)}
               >
-                <X size={40} />
+                <span className="hidden md:block text-white/40 text-[10px] font-black uppercase tracking-[0.3em] group-hover:text-white transition-colors">Close Video</span>
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full flex items-center justify-center text-white transition-all group-hover:rotate-90">
+                  <X size={24} className="md:w-8 md:h-8" />
+                </div>
               </motion.button>
 
               <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="relative w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black"
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                className="relative w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] bg-black"
                 onClick={(e) => e.stopPropagation()}
               >
                 <video

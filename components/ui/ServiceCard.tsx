@@ -57,42 +57,35 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
         delay,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="group relative flex flex-col items-center text-center"
+      className="group relative flex flex-col items-center text-center w-full"
     >
-      <Link href={`/services/${slug}`} className="block">
+      <Link href={`/services/${slug}`} className="block w-full">
         {/* Circular Image Container */}
-        <div className="relative mb-6">
-          {/* Animated Outer Ring */}
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-3 rounded-full border border-dashed border-accent-yellow/30"
-          />
-          
+        <div className="relative mb-6 flex justify-center">
           {/* Main Circle */}
-          <div className="relative h-44 w-44 md:h-52 md:w-52 overflow-hidden rounded-full border-4 border-white/10 bg-white/5 transition-smooth group-hover:border-accent-yellow/50 group-hover:shadow-[0_0_40px_rgba(250,204,21,0.3)]">
+          <div className="relative h-40 w-40 xs:h-44 xs:w-44 md:h-52 md:w-52 overflow-hidden rounded-full border-4 border-white/10 bg-white/5 transition-smooth group-hover:border-accent-yellow/50 group-hover:shadow-[0_0_40px_rgba(250,204,21,0.3)]">
             <Image
               src={image}
               alt={title}
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-110"
-              sizes="(max-width: 768px) 176px, 208px"
+              sizes="(max-width: 768px) 160px, 208px"
             />
             {/* Dark Overlay */}
             <div className="absolute inset-0 bg-black/40 transition-opacity duration-500 group-hover:opacity-20" />
             
             {/* Hover Icon Overlay */}
             <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-300 group-hover:opacity-100">
-               <div className="rounded-full bg-accent-yellow p-4 text-primary-black shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                  <IconComponent size={28} />
+               <div className="rounded-full bg-accent-yellow p-3 sm:p-4 text-primary-black shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                  <IconComponent size={24} className="sm:w-7 sm:h-7" />
                </div>
             </div>
           </div>
         </div>
 
         {/* Content */}
-        <div className="max-w-[280px] px-2">
-          <h3 className="mb-3 text-xl font-bold text-white transition-colors group-hover:text-accent-yellow md:text-2xl">
+        <div className="max-w-[320px] mx-auto px-4">
+          <h3 className="mb-2 text-xl font-bold text-white transition-colors group-hover:text-accent-yellow md:text-2xl">
             {title}
           </h3>
           <p className="text-sm leading-relaxed text-white/60 line-clamp-3 transition-colors group-hover:text-white/90 md:text-base">

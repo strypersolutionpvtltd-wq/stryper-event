@@ -1,7 +1,4 @@
 import Services from "@/components/sections/Services";
-import ProcessRoadmap from "@/components/sections/ProcessRoadmap";
-import BudgetCalculator from "@/components/sections/BudgetCalculator";
-import SectionDivider from "@/components/ui/SectionDivider";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -16,10 +13,6 @@ export default function ServicesPage() {
         <h1 className="text-4xl md:text-6xl font-bold text-white uppercase tracking-tighter">Our Services</h1>
       </div>
       <Services />
-      <SectionDivider />
-      <ProcessRoadmap />
-      <SectionDivider />
-      <BudgetCalculator />
     </main>
   );
 }

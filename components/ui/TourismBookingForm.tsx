@@ -1,36 +1,34 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Send, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-
 import Button from "@/components/ui/Button";
 
 interface FormData {
   fullName: string;
-  companyName: string;
   phone: string;
   email: string;
-  eventType: string;
-  budgetRange: string;
-  eventDate: string;
+  numPersons: string;
+  travelDate: string;
+  selectedPlan: string;
   message: string;
 }
 
-interface GetStartedFormProps {
+interface TourismBookingFormProps {
+  planName?: string;
   onSuccess?: () => void;
 }
 
-const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
+const TourismBookingForm: React.FC<TourismBookingFormProps> = ({ planName, onSuccess }) => {
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
-    companyName: "",
     phone: "",
     email: "",
-    eventType: "",
-    budgetRange: "",
-    eventDate: "",
+    numPersons: "1",
+    travelDate: "",
+    selectedPlan: planName || "Standard",
     message: "",
   });
 
@@ -38,24 +36,7 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const eventTypes = [
-    "Corporate Event",
-    "Wedding Event",
-    "Sports Event",
-    "Product Launch",
-    "Award Ceremony",
-    "Brand Promotion",
-    "Exhibition",
-    "Other",
-  ];
-
-  const budgetRanges = [
-    "Under ₹5 Lakhs",
-    "₹5-10 Lakhs",
-    "₹10-25 Lakhs",
-    "₹25-50 Lakhs",
-    "₹50 Lakhs+",
-  ];
+  const tourismPlans = ["Basic", "Standard", "Premium", "Luxury"];
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -70,7 +51,6 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setIsSubmitting(true);
 
     try {
@@ -79,12 +59,12 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formData }),
+        body: JSON.stringify({ ...formData, type: "tourism" }),
       });
 
       if (response.ok) {
         setIsSuccess(true);
-        toast.success("Message sent successfully!");
+        toast.success("Booking inquiry sent!");
         if (onSuccess) {
           onSuccess();
         }
@@ -93,21 +73,19 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
           setIsSuccess(false);
           setFormData({
             fullName: "",
-            companyName: "",
             phone: "",
             email: "",
-            eventType: "",
-            budgetRange: "",
-            eventDate: "",
+            numPersons: "1",
+            travelDate: "",
+            selectedPlan: planName || "Standard",
             message: "",
           });
         }, 3000);
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || "Failed to send message.");
+        toast.error(errorData.error || "Failed to send inquiry.");
       }
     } catch (error) {
-      console.error("Network error:", error);
       toast.error("Network error. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -116,7 +94,6 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
 
   return (
     <div className="relative overflow-hidden">
-      {/* Success Overlay */}
       {isSuccess && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -131,14 +108,13 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
             >
               <CheckCircle className="w-20 h-20 text-accent-yellow mx-auto" />
             </motion.div>
-            <h3 className="text-2xl font-bold text-white">Message Sent!</h3>
-            <p className="text-white/70">We&apos;ll get back to you soon.</p>
+            <h3 className="text-2xl font-bold text-white">Inquiry Sent!</h3>
+            <p className="text-white/70">Our travel expert will contact you soon.</p>
           </div>
         </motion.div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Full Name */}
         <div className="relative">
           <input
             type="text"
@@ -162,30 +138,6 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
           </label>
         </div>
 
-        {/* Company Name */}
-        <div className="relative">
-          <input
-            type="text"
-            name="companyName"
-            value={formData.companyName}
-            onChange={handleChange}
-            onFocus={() => setFocusedField("companyName")}
-            onBlur={() => setFocusedField(null)}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 text-white placeholder-transparent focus:outline-none focus:border-accent-yellow/50 transition-colors peer"
-            placeholder="Company Name"
-          />
-          <label
-            className={`absolute left-4 transition-all pointer-events-none ${
-              formData.companyName || focusedField === "companyName"
-                ? "-top-2 text-xs bg-primary-black px-2 text-accent-yellow"
-                : "top-4 text-white/60"
-            }`}
-          >
-            Company Name
-          </label>
-        </div>
-
-        {/* Phone & Email */}
         <div className="grid md:grid-cols-2 gap-6">
           <div className="relative">
             <input
@@ -234,71 +186,67 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
           </div>
         </div>
 
-        {/* Event Type & Budget */}
         <div className="grid md:grid-cols-2 gap-6">
           <div className="relative">
             <select
-              name="eventType"
-              value={formData.eventType}
+              name="selectedPlan"
+              value={formData.selectedPlan}
               onChange={handleChange}
               required
               className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 text-white focus:outline-none focus:border-accent-yellow/50 transition-colors appearance-none cursor-pointer"
             >
-              <option value="" disabled>
-                Select Event Type
-              </option>
-              {eventTypes.map((type) => (
-                <option key={type} value={type} className="bg-primary-black">
-                  {type}
+              {tourismPlans.map((plan) => (
+                <option key={plan} value={plan} className="bg-primary-black">
+                  {plan} Plan
                 </option>
               ))}
             </select>
             <label className="absolute -top-2 left-4 text-xs bg-primary-black px-2 text-accent-yellow">
-              Event Type *
+              Selected Plan *
             </label>
           </div>
 
           <div className="relative">
-            <select
-              name="budgetRange"
-              value={formData.budgetRange}
+            <input
+              type="number"
+              name="numPersons"
+              min="1"
+              value={formData.numPersons}
               onChange={handleChange}
+              onFocus={() => setFocusedField("numPersons")}
+              onBlur={() => setFocusedField(null)}
               required
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 text-white focus:outline-none focus:border-accent-yellow/50 transition-colors appearance-none cursor-pointer"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 text-white focus:outline-none focus:border-accent-yellow/50 transition-colors"
+              placeholder="No. of Persons"
+            />
+            <label
+              className={`absolute left-4 transition-all pointer-events-none ${
+                formData.numPersons || focusedField === "numPersons"
+                  ? "-top-2 text-xs bg-primary-black px-2 text-accent-yellow"
+                  : "top-4 text-white/60"
+              }`}
             >
-              <option value="" disabled>
-                Select Budget Range
-              </option>
-              {budgetRanges.map((range) => (
-                <option key={range} value={range} className="bg-primary-black">
-                  {range}
-                </option>
-              ))}
-            </select>
-            <label className="absolute -top-2 left-4 text-xs bg-primary-black px-2 text-accent-yellow">
-              Budget Range *
+              No. of Persons *
             </label>
           </div>
         </div>
 
-        {/* Event Date */}
         <div className="relative">
           <input
             type="date"
-            name="eventDate"
-            value={formData.eventDate}
+            name="travelDate"
+            value={formData.travelDate}
             onChange={handleChange}
-            onFocus={() => setFocusedField("eventDate")}
+            onFocus={() => setFocusedField("travelDate")}
             onBlur={() => setFocusedField(null)}
             required
             className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 text-white focus:outline-none focus:border-accent-yellow/50 transition-colors"
           />
           <label className="absolute -top-2 left-4 text-xs bg-primary-black px-2 text-accent-yellow">
-            Event Date *
+            Travel Date *
           </label>
         </div>
 
-        {/* Message */}
         <div className="relative">
           <textarea
             name="message"
@@ -306,10 +254,9 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
             onChange={handleChange}
             onFocus={() => setFocusedField("message")}
             onBlur={() => setFocusedField(null)}
-            rows={4}
-            required
+            rows={3}
             className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-4 text-white placeholder-transparent focus:outline-none focus:border-accent-yellow/50 transition-colors resize-none"
-            placeholder="Message"
+            placeholder="Special Requirements (Optional)"
           />
           <label
             className={`absolute left-4 transition-all pointer-events-none ${
@@ -318,11 +265,10 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
                 : "top-4 text-white/60"
             }`}
           >
-            Message *
+            Special Requirements (Optional)
           </label>
         </div>
 
-        {/* Submit Button */}
         <Button
           type="submit"
           variant="primary"
@@ -330,29 +276,11 @@ const GetStartedForm: React.FC<GetStartedFormProps> = ({ onSuccess }) => {
           className="w-full group"
           disabled={isSubmitting}
         >
-          {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-                className="w-5 h-5 border-2 border-primary-black border-t-transparent rounded-full"
-              />
-              Sending...
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">
-              Send Message
-              <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </span>
-          )}
+          {isSubmitting ? "Sending..." : "Submit Inquiry"}
         </Button>
       </form>
     </div>
   );
 };
 
-export default GetStartedForm;
+export default TourismBookingForm;

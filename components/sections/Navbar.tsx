@@ -1,8 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Phone, Menu, X, ChevronDown, Facebook, Instagram, Twitter } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Mail, Phone, Menu, X, ChevronDown, Facebook, Instagram } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 import { NAV_ITEMS, COMPANY_CONTACT, VENUES } from "@/constants";
 import { cn } from "@/lib/utils";
 import Container from "@/components/ui/Container";
@@ -14,6 +14,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVenueDropdownOpen, setIsVenueDropdownOpen] = useState(false);
+  const dropdownTimerRef = useRef<NodeJS.Timeout | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -23,6 +24,36 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Dropdown Handlers
+  const handleMouseEnter = () => {
+    if (dropdownTimerRef.current) {
+      clearTimeout(dropdownTimerRef.current);
+    }
+    setIsVenueDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    dropdownTimerRef.current = setTimeout(() => {
+      setIsVenueDropdownOpen(false);
+    }, 300); // 300ms delay to make it stable
+  };
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isVenueDropdownOpen && !(event.target as Element).closest(".venue-dropdown-container")) {
+        setIsVenueDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      if (dropdownTimerRef.current) {
+        clearTimeout(dropdownTimerRef.current);
+      }
+    };
+  }, [isVenueDropdownOpen]);
 
   // Prevent scroll when mobile menu is open
   useEffect(() => {
@@ -37,23 +68,22 @@ const Navbar = () => {
     <div className="fixed left-0 right-0 top-0 z-[100] w-full">
       {/* Top Info Bar - Optimized for Mobile */}
       {!isScrolled && (
-        <div className="bg-[#0a0a0a] border-b border-white/5 py-1.5 md:py-2">
+        <div className="bg-[#0a0a0a] border-b border-white/5 py-2">
           <Container>
-            <div className="flex justify-between items-center text-[9px] md:text-[10px] uppercase tracking-[0.15em] md:tracking-[0.2em] text-white/40 font-bold">
+            <div className="flex justify-between items-center text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">
               <div className="flex gap-4 md:gap-6">
-                <a href={`mailto:${COMPANY_CONTACT.email}`} className="hover:text-accent-yellow transition-colors flex items-center gap-1.5 md:gap-2">
-                  <Mail size={10} className="md:w-3 md:h-3" /> 
-                  <span className="hidden xs:inline">{COMPANY_CONTACT.email}</span>
-                  <span className="xs:hidden">Email</span>
+                <a href={`mailto:${COMPANY_CONTACT.email}`} className="hover:text-accent-yellow transition-colors flex items-center gap-2">
+                  <Mail size={12} /> 
+                  <span className="hidden sm:inline">{COMPANY_CONTACT.email}</span>
+                  <span className="sm:hidden">Email</span>
                 </a>
-                <a href={`tel:${COMPANY_CONTACT.phoneRaw}`} className="hover:text-accent-yellow transition-colors flex items-center gap-1.5 md:gap-2">
-                  <Phone size={10} className="md:w-3 md:h-3" /> {COMPANY_CONTACT.phone}
+                <a href={`tel:${COMPANY_CONTACT.phoneRaw}`} className="hover:text-accent-yellow transition-colors flex items-center gap-2">
+                  <Phone size={12} /> {COMPANY_CONTACT.phone}
                 </a>
               </div>
-              <div className="flex gap-3 md:gap-4">
+              <div className="hidden xs:flex gap-4">
                  <a href={COMPANY_CONTACT.facebook} className="hover:text-white transition-colors">FB</a>
                  <a href={COMPANY_CONTACT.instagram} className="hover:text-white transition-colors">IG</a>
-                 <a href={COMPANY_CONTACT.twitter} className="hover:text-white transition-colors">TW</a>
               </div>
             </div>
           </Container>
@@ -69,7 +99,7 @@ const Navbar = () => {
           <div className="flex items-center justify-between">
             {/* Logo - Scalable */}
             <Link href="/" className="relative z-[110] flex items-center shrink-0">
-              <div className="relative h-7 w-28 md:h-12 md:w-48">
+              <div className="relative h-8 w-32 md:h-12 md:w-48">
                 <Image
                   src="/images/logo.png"
                   alt="Stryper Events"
@@ -85,21 +115,22 @@ const Navbar = () => {
               {NAV_ITEMS.map((item: any) => (
                 <div 
                   key={item.name} 
-                  className="relative group"
-                  onMouseEnter={() => item.isDropdown && setIsVenueDropdownOpen(true)}
-                  onMouseLeave={() => item.isDropdown && setIsVenueDropdownOpen(false)}
+                  className={cn("relative group", item.isDropdown && "venue-dropdown-container")}
+                  onMouseEnter={() => item.isDropdown && handleMouseEnter()}
+                  onMouseLeave={() => item.isDropdown && handleMouseLeave()}
                 >
                   {item.isDropdown ? (
-                    <button
+                    <Link
+                      href={item.href}
                       className={cn(
                         "px-4 py-2 text-[13px] font-bold uppercase tracking-widest transition-all rounded-full flex items-center gap-1",
-                        pathname.startsWith(item.href)
+                        pathname.startsWith(item.href) || isVenueDropdownOpen
                           ? "text-primary-black bg-accent-yellow shadow-[0_0_20px_rgba(250,204,21,0.3)]" 
                           : "text-white/60 hover:text-white hover:bg-white/5"
                       )}
                     >
                       {item.name} <ChevronDown size={14} className={cn("transition-transform duration-300", isVenueDropdownOpen && "rotate-180")} />
-                    </button>
+                    </Link>
                   ) : (
                     <Link
                       href={item.href}
@@ -114,39 +145,68 @@ const Navbar = () => {
                     </Link>
                   )}
 
-                  {/* Venue Dropdown */}
+                  {/* Venue Dropdown - With invisible bridge to maintain hover */}
                   {item.isDropdown && (
-                    <div className={cn(
-                      "absolute top-full left-0 mt-2 w-72 bg-black/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-2xl transition-all duration-300 origin-top-left",
-                      isVenueDropdownOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
-                    )}>
-                      <div className="grid gap-1">
-                        <p className="px-3 py-2 text-[10px] font-black text-accent-yellow uppercase tracking-widest border-b border-white/5 mb-2">Premium Jaipur Venues</p>
-                        {VENUES.map((venue) => (
-                          <Link
-                            key={venue.slug}
-                            href={`/venue/${venue.slug}`}
-                            className="px-3 py-2.5 text-xs font-bold text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                            onClick={() => setIsVenueDropdownOpen(false)}
-                          >
-                            {venue.name}
-                          </Link>
-                        ))}
+                    <>
+                      {/* Invisible bridge to prevent closure on gap */}
+                      <div className={cn(
+                        "absolute top-full left-0 w-full h-4 bg-transparent",
+                        !isVenueDropdownOpen && "hidden"
+                      )} />
+                      
+                      <div className={cn(
+                        "absolute top-[calc(100%+0.5rem)] left-1/2 -translate-x-1/2 w-72 bg-black/95 backdrop-blur-3xl border border-white/10 rounded-3xl p-5 shadow-2xl transition-all duration-300 origin-top z-[200]",
+                        isVenueDropdownOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+                      )}>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                            <p className="text-[9px] font-black text-accent-yellow uppercase tracking-[0.3em]">Premium Venues</p>
+                            <Link 
+                              href="/venue" 
+                              className="text-[9px] font-black text-white/40 uppercase tracking-widest hover:text-white transition-colors"
+                              onClick={() => setIsVenueDropdownOpen(false)}
+                            >
+                              View All
+                            </Link>
+                          </div>
+                          <div className="grid grid-cols-1 gap-1 max-h-[60vh] overflow-y-auto pr-1 custom-scrollbar">
+                            {VENUES.map((venue) => (
+                              <Link
+                                key={venue.slug}
+                                href={`/venue/${venue.slug}`}
+                                className="group/item flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all"
+                                onClick={() => setIsVenueDropdownOpen(false)}
+                              >
+                                <div className="flex flex-col min-w-0">
+                                  <span className="text-xs font-bold text-white/70 group-hover/item:text-accent-yellow transition-colors truncate">{venue.name}</span>
+                                  <span className="text-[8px] text-white/30 uppercase tracking-widest truncate">{venue.location.split(',')[0]}</span>
+                                </div>
+                                <ChevronDown size={12} className="-rotate-90 text-white/20 group-hover/item:text-accent-yellow transition-colors shrink-0 ml-2" />
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    </>
                   )}
                 </div>
               ))}
             </div>
 
             {/* Mobile Actions */}
-            <div className="flex items-center gap-2 md:gap-4 lg:hidden relative z-[110]">
+            <div className="flex items-center gap-3 lg:hidden relative z-[110]">
+              <a 
+                href={`tel:${COMPANY_CONTACT.phoneRaw}`}
+                className="hidden xs:flex p-2.5 bg-accent-yellow rounded-xl text-primary-black shadow-lg shadow-accent-yellow/20 active:scale-95 transition-transform"
+              >
+                <Phone size={18} />
+              </a>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2.5 md:p-3 bg-white/5 rounded-xl md:rounded-2xl text-white border border-white/10 active:scale-95 transition-transform"
+                className="p-2.5 bg-white/5 rounded-xl text-white border border-white/10 active:scale-95 transition-transform"
                 aria-label="Toggle Menu"
               >
-                {isMobileMenuOpen ? <X size={20} className="md:w-6 md:h-6" /> : <Menu size={20} className="md:w-6 md:h-6" />}
+                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
             </div>
           </div>
@@ -162,7 +222,7 @@ const Navbar = () => {
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className="fixed inset-0 z-[105] bg-black flex flex-col lg:hidden"
             >
-              <div className="flex-1 flex flex-col justify-center p-8 overflow-y-auto">
+              <div className="flex-1 flex flex-col justify-center p-8 overflow-y-auto pt-24">
                 <div className="flex flex-col gap-6 w-full max-w-sm mx-auto">
                   {NAV_ITEMS.map((item: any, index: number) => (
                     <motion.div 
@@ -172,32 +232,37 @@ const Navbar = () => {
                       transition={{ delay: 0.1 + index * 0.05 }}
                     >
                       {item.isDropdown ? (
-                        <div className="flex flex-col gap-4 border-l-2 border-accent-yellow/20 pl-6 py-2">
-                          <span className="text-[10px] font-black text-accent-yellow uppercase tracking-[0.3em]">Our Venues</span>
-                          {VENUES.slice(0, 5).map((venue) => (
-                            <Link
-                              key={venue.slug}
-                              href={`/venue/${venue.slug}`}
+                        <div className="flex flex-col gap-6 border-l-2 border-accent-yellow/20 pl-6 py-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black text-accent-yellow uppercase tracking-[0.3em]">Our Venues</span>
+                            <Link 
+                              href="/venue" 
                               onClick={() => setIsMobileMenuOpen(false)}
-                              className="text-xl font-bold uppercase text-white/50 hover:text-white"
+                              className="text-[10px] font-black text-white/30 uppercase tracking-widest"
                             >
-                              {venue.name}
+                              View All
                             </Link>
-                          ))}
-                          <Link
-                            href="/venue"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="text-sm font-bold text-accent-yellow underline underline-offset-4"
-                          >
-                            View All Venues
-                          </Link>
+                          </div>
+                          <div className="flex flex-col gap-5">
+                            {VENUES.map((venue) => (
+                              <Link
+                                key={venue.slug}
+                                href={`/venue/${venue.slug}`}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex flex-col gap-1"
+                              >
+                                <span className="text-2xl font-black uppercase text-white/80 active:text-accent-yellow transition-colors leading-none">{venue.name}</span>
+                                <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">{venue.location.split(',')[0]}</span>
+                              </Link>
+                            ))}
+                          </div>
                         </div>
                       ) : (
                         <Link
                           href={item.href}
                           onClick={() => setIsMobileMenuOpen(false)}
                           className={cn(
-                            "text-5xl font-black uppercase tracking-tighter transition-all",
+                            "text-4xl xs:text-5xl font-black uppercase tracking-tighter transition-all",
                             pathname === item.href ? "text-accent-yellow" : "text-white/20 hover:text-white"
                           )}
                         >
@@ -210,13 +275,14 @@ const Navbar = () => {
               </div>
               
               <div className="p-8 border-t border-white/5 bg-white/[0.02]">
-                <div className="flex justify-between items-center max-w-sm mx-auto">
-                  <div className="flex gap-6">
-                    <a href={COMPANY_CONTACT.facebook} className="text-white/40 hover:text-white transition-colors"><Facebook size={20} /></a>
-                    <a href={COMPANY_CONTACT.instagram} className="text-white/40 hover:text-white transition-colors"><Instagram size={20} /></a>
-                    <a href={COMPANY_CONTACT.twitter} className="text-white/40 hover:text-white transition-colors"><Twitter size={20} /></a>
+                <div className="flex flex-col gap-6 max-w-sm mx-auto">
+                  <div className="flex justify-between items-center">
+                    <div className="flex gap-6">
+                      <a href={COMPANY_CONTACT.facebook} className="text-white/40 hover:text-white transition-colors"><Facebook size={20} /></a>
+                      <a href={COMPANY_CONTACT.instagram} className="text-white/40 hover:text-white transition-colors"><Instagram size={20} /></a>
+                    </div>
+                    <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Stryper Events © 2026</p>
                   </div>
-                  <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Stryper Events © 2026</p>
                 </div>
               </div>
             </motion.div>

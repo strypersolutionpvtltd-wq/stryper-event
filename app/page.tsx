@@ -4,9 +4,16 @@ import About from "@/components/sections/About";
 import Benefits from "@/components/sections/Benefits";
 import ClientLogos from "@/components/sections/ClientLogos";
 import EventCategories from "@/components/sections/EventCategories";
-import Hero from "@/components/sections/Hero";
 import Services from "@/components/sections/Services";
+import TourismServices from "@/components/sections/TourismServices";
 import Testimonials from "@/components/sections/Testimonials";
+import CaseStudies from "@/components/sections/CaseStudies";
+import Gallery from "@/components/sections/Gallery";
+import VideoShowcase from "@/components/sections/VideoShowcase";
+import FAQ from "@/components/sections/FAQ";
+import ProcessRoadmap from "@/components/sections/ProcessRoadmap";
+import WhyChooseUs from "@/components/sections/WhyChooseUs";
+import CityCoverage from "@/components/sections/CityCoverage";
 import SectionDivider from "@/components/ui/SectionDivider";
 import Container from "@/components/ui/Container";
 import { motion } from "framer-motion";
@@ -17,16 +24,29 @@ export default function Home() {
   return (
     <div className="w-full overflow-x-hidden">
       <main className="relative w-full">
-        <Hero />
+        {/* Everything on Home Page, organized properly */}
+        <Services />
 
         <SectionDivider />
-        <Services />
+        <ProcessRoadmap />
+
+        <SectionDivider />
+        <TourismServices />
 
         <SectionDivider />
         <EventCategories />
 
         <SectionDivider />
+        <CaseStudies />
+
+        <SectionDivider />
         <Benefits />
+
+        <SectionDivider />
+        <WhyChooseUs />
+
+        <SectionDivider />
+        <VideoShowcase />
 
         <SectionDivider />
         <ClientLogos />
@@ -35,10 +55,19 @@ export default function Home() {
         <Testimonials />
 
         <SectionDivider />
+        <Gallery />
+
+        <SectionDivider />
         <About />
 
         <SectionDivider />
-        {/* Simplified WhatsApp CTA instead of full Contact Form */}
+        <CityCoverage />
+
+        <SectionDivider />
+        <FAQ />
+
+        <SectionDivider />
+        {/* Final WhatsApp CTA */}
         <section className="py-24 md:py-32 relative overflow-hidden w-full">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#25D366]/5 rounded-full blur-[120px]" />
           <Container className="relative z-10 text-center">

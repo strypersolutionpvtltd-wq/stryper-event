@@ -26,7 +26,7 @@ const Hero = () => {
   return (
     <section
       id="home"
-      className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-black"
+      className="relative flex min-h-[100dvh] w-full items-center justify-center overflow-hidden bg-black"
     >
       {/* Absolute Clarity Background Slider */}
       <div className="absolute inset-0 z-0">
@@ -56,30 +56,30 @@ const Hero = () => {
       </div>
 
       {/* Content - Highly Responsive Scaling */}
-      <div className="container relative z-10 mx-auto px-4">
+      <div className="container relative z-10 mx-auto px-4 py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="mx-auto max-w-4xl text-center space-y-4 md:space-y-8"
+          className="mx-auto max-w-4xl text-center space-y-6 md:space-y-8"
         >
-          <div className="space-y-1 md:space-y-3">
-            <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-extralight text-white tracking-[0.1em] sm:tracking-[0.2em] uppercase leading-tight drop-shadow-lg">
+          <div className="space-y-3 md:space-y-4">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extralight text-white tracking-[0.05em] sm:tracking-[0.2em] uppercase leading-tight drop-shadow-lg">
               Stryper <span className="font-bold text-accent-yellow">Events</span>
             </h1>
-            <p className="text-[10px] sm:text-sm md:text-base text-white/80 font-black uppercase tracking-[0.3em] sm:tracking-[0.5em] drop-shadow-md">
+            <p className="text-[10px] sm:text-sm md:text-base text-white/80 font-black uppercase tracking-[0.2em] sm:tracking-[0.5em] drop-shadow-md max-w-[280px] sm:max-w-none mx-auto leading-relaxed">
               Jaipur&apos;s Premier Event Architects
             </p>
           </div>
 
-          <div className="pt-4 md:pt-8">
+          <div className="pt-6 md:pt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <motion.a
               href={`https://wa.me/${COMPANY_CONTACT.whatsapp.replace(/[^0-9]/g, "")}`}
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-block px-8 py-3.5 md:px-12 md:py-4 bg-white text-black text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] rounded-full hover:bg-accent-yellow transition-colors shadow-2xl"
+              className="w-full sm:w-auto inline-block px-10 py-4 md:px-12 md:py-4 bg-white text-black text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] rounded-full hover:bg-accent-yellow transition-colors shadow-2xl"
             >
               Contact Us
             </motion.a>
@@ -88,7 +88,7 @@ const Hero = () => {
       </div>
 
       {/* Elegant minimalist indicator */}
-      <div className="absolute bottom-16 md:bottom-10 left-0 right-0 flex justify-center gap-2 md:gap-3 z-20">
+      <div className="absolute bottom-24 md:bottom-10 left-0 right-0 flex justify-center gap-2 md:gap-3 z-20">
         {HERO_IMAGES.map((_, i) => (
           <div 
             key={i} 

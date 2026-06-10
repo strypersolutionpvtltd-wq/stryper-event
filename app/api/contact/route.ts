@@ -8,16 +8,11 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Validate required fields
-    const requiredFields = [
-      "fullName",
-      "phone",
-      "email",
-      "eventType",
-      "budgetRange",
-      "eventDate",
-      "message",
-    ];
+    // Determine inquiry type and required fields
+    const isInquiryTourism = body.type === "tourism";
+    const requiredFields = isInquiryTourism
+      ? ["fullName", "phone", "email", "selectedPlan", "numPersons", "travelDate"]
+      : ["fullName", "phone", "email", "eventType", "budgetRange", "eventDate", "message"];
 
     for (const field of requiredFields) {
       if (!body[field]) {
@@ -29,31 +24,22 @@ export async function POST(request: Request) {
     }
 
     // --- EMAIL NOTIFICATION LOGIC ---
-    // If you want to receive emails on your Gmail, follow these steps:
-    // Option A: Use a service like Resend.com (easiest)
     /*
-    import { Resend } from 'resend';
-    const resend = new Resend('YOUR_API_KEY');
-    await resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: 'your-gmail@gmail.com',
-      subject: 'New Event Inquiry: ' + body.fullName,
-      html: `<p>New inquiry from <strong>${body.fullName}</strong></p>
-             <p>Phone: ${body.phone}</p>
-             <p>Email: ${body.email}</p>
-             <p>Event Type: ${body.eventType}</p>
-             <p>Budget: ${body.budgetRange}</p>
-             <p>Date: ${body.eventDate}</p>
-             <p>Message: ${body.message}</p>`
-    });
+    const subject = isInquiryTourism 
+      ? `New Tourism Inquiry: ${body.selectedPlan} Plan` 
+      : `New Event Inquiry: ${body.eventType}`;
+    
+    const details = isInquiryTourism
+      ? `<p>Plan: ${body.selectedPlan}</p>
+         <p>Persons: ${body.numPersons}</p>
+         <p>Travel Date: ${body.travelDate}</p>`
+      : `<p>Event Type: ${body.eventType}</p>
+         <p>Budget: ${body.budgetRange}</p>
+         <p>Event Date: ${body.eventDate}</p>`;
     */
 
-    // --- WHATSAPP NOTIFICATION LOGIC ---
-    // For direct phone notifications, you can use Twilio or a WhatsApp API provider.
-    // Alternatively, the client-side form can redirect to a WhatsApp link.
-
     // eslint-disable-next-line no-console
-    console.log("New Contact Form Submission:", body);
+    console.log(`New ${body.type || "Event"} Submission:`, body);
 
     // Simulate processing delay
     await new Promise((resolve) => setTimeout(resolve, 800));

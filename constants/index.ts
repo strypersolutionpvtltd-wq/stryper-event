@@ -1,8 +1,9 @@
 // Navigation items
 export const NAV_ITEMS = [
-  { name: "Home", href: "/" },
+  { name: "Overview", href: "/" },
   { name: "Services", href: "/services" },
   { name: "Venue", href: "/venue", isDropdown: true },
+  { name: "Tourism", href: "/tourism" },
   { name: "Events", href: "/events" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },

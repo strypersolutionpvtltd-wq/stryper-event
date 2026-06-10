@@ -4,20 +4,17 @@ import { notFound } from "next/navigation";
 import React, { useState } from "react";
 import { VENUES, COMPANY_CONTACT } from "@/constants";
 import Container from "@/components/ui/Container";
-import { Star, MapPin, CheckCircle2, Image as ImageIcon, Video, MessageSquare } from "lucide-react";
+import { Star, MapPin, CheckCircle2, Image as ImageIcon, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
 
 export default function VenuePage({ params }: { params: { slug: string } }) {
   const venue = VENUES.find((v) => v.slug === params.slug);
-  const [activeTab, setActiveTab] = useState<"images" | "videos">("images");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   if (!venue) {
     notFound();
   }
-
-  // Define a type for venue to handle conditional properties safely
-  const typedVenue = venue as any;
 
   return (
     <main className="pt-24 min-h-screen bg-primary-black">
@@ -116,64 +113,63 @@ export default function VenuePage({ params }: { params: { slug: string } }) {
       {/* Media Gallery Section */}
       <section className="py-24 bg-white/[0.01]">
         <Container>
-          <div className="flex flex-col items-center mb-16 space-y-12">
-            <div className="text-center space-y-4">
+          <div className="mb-16">
+            <div className="space-y-4">
               <span className="text-accent-yellow text-xs font-black uppercase tracking-[0.4em]">Visual Showcase</span>
               <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">Experience Grandeur</h2>
             </div>
-            
-            {/* Tabs - Refined Style */}
-            <div className="flex p-1.5 bg-white/5 rounded-2xl border border-white/10">
-              <button
-                onClick={() => setActiveTab("images")}
-                className={cn(
-                  "px-10 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
-                  activeTab === "images" ? "bg-accent-yellow text-primary-black shadow-lg" : "text-white/40 hover:text-white"
-                )}
-              >
-                <ImageIcon size={14} /> Images
-              </button>
-              <button
-                onClick={() => setActiveTab("videos")}
-                className={cn(
-                  "px-10 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
-                  activeTab === "videos" ? "bg-accent-yellow text-primary-black shadow-lg" : "text-white/40 hover:text-white"
-                )}
-              >
-                <Video size={14} /> Videos
-              </button>
-            </div>
           </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4 }}
-              className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {activeTab === "images" ? (
-                venue.images.map((img: string, idx: number) => (
-                  <div key={idx} className="relative aspect-[4/5] rounded-[2rem] overflow-hidden glass hover-glow transition-all duration-500 group">
-                    <img src={img} alt={`${venue.name} view ${idx}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
-                  </div>
-                ))
-              ) : (
-                typedVenue.videos && typedVenue.videos.map((vid: string, idx: number) => (
-                  <div key={idx} className="relative aspect-video rounded-[2rem] overflow-hidden glass border border-white/10">
-                    <video src={vid} controls className="w-full h-full object-cover" />
-                  </div>
-                ))
-              )}
-            </motion.div>
-          </AnimatePresence>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {venue.images.map((img: string, idx: number) => (
+              <motion.div 
+                key={idx} 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className="relative aspect-[4/5] rounded-[2rem] overflow-hidden glass hover-glow transition-all duration-500 group cursor-pointer"
+                onClick={() => {
+                  setSelectedImage(img);
+                  setIsLightboxOpen(true);
+                }}
+              >
+                <img src={img} alt={`${venue.name} view ${idx}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-12 h-12 rounded-full bg-accent-yellow text-black flex items-center justify-center">
+                        <ImageIcon size={20} />
+                    </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </Container>
       </section>
 
-      {/* Floating WhatsApp Replaced by site-wide layout bot or kept consistent */}
+      {/* Image Lightbox */}
+      <AnimatePresence>
+        {isLightboxOpen && selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
+            onClick={() => setIsLightboxOpen(false)}
+          >
+             <button className="absolute top-10 right-10 text-white/50 hover:text-white transition-colors">
+                <ImageIcon size={32} />
+             </button>
+             <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="relative w-full max-w-5xl aspect-video rounded-3xl overflow-hidden"
+             >
+                <img src={selectedImage} alt="Selected view" className="w-full h-full object-contain" />
+             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
