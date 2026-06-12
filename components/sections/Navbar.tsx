@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Phone, Menu, X, ChevronDown, Facebook, Instagram } from "lucide-react";
+import { Phone, Menu, X, ChevronDown, Facebook, Instagram } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { NAV_ITEMS, COMPANY_CONTACT, VENUES } from "@/constants";
 import { cn } from "@/lib/utils";
@@ -66,30 +66,6 @@ const Navbar = () => {
 
   return (
     <div className="fixed left-0 right-0 top-0 z-[100] w-full">
-      {/* Top Info Bar - Optimized for Mobile */}
-      {!isScrolled && (
-        <div className="bg-[#0a0a0a] border-b border-white/5 py-2">
-          <Container>
-            <div className="flex justify-between items-center text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold">
-              <div className="flex gap-4 md:gap-6">
-                <a href={`mailto:${COMPANY_CONTACT.email}`} className="hover:text-accent-yellow transition-colors flex items-center gap-2">
-                  <Mail size={12} /> 
-                  <span className="hidden sm:inline">{COMPANY_CONTACT.email}</span>
-                  <span className="sm:hidden">Email</span>
-                </a>
-                <a href={`tel:${COMPANY_CONTACT.phoneRaw}`} className="hover:text-accent-yellow transition-colors flex items-center gap-2">
-                  <Phone size={12} /> {COMPANY_CONTACT.phone}
-                </a>
-              </div>
-              <div className="hidden xs:flex gap-4">
-                 <a href={COMPANY_CONTACT.facebook} className="hover:text-white transition-colors">FB</a>
-                 <a href={COMPANY_CONTACT.instagram} className="hover:text-white transition-colors">IG</a>
-              </div>
-            </div>
-          </Container>
-        </div>
-      )}
-
       {/* Main Navigation */}
       <nav className={cn(
         "w-full transition-all duration-500 py-3 md:py-4",

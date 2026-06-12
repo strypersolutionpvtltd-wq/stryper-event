@@ -1,6 +1,7 @@
 "use client";
 
 import About from "@/components/sections/About";
+import Hero from "@/components/sections/Hero";
 import Benefits from "@/components/sections/Benefits";
 import ClientLogos from "@/components/sections/ClientLogos";
 import EventCategories from "@/components/sections/EventCategories";
@@ -24,6 +25,7 @@ export default function Home() {
   return (
     <div className="w-full overflow-x-hidden">
       <main className="relative w-full">
+        <Hero />
         {/* Everything on Home Page, organized properly */}
         <Services />
 
