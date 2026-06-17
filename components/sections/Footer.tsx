@@ -44,19 +44,19 @@ const Footer = () => {
                 <div className="flex items-center gap-4">
                   <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-accent-yellow/30 bg-black p-1 transition-transform md:group-hover:scale-110">
                     <Image
-                      src="/images/logo.png"
+                      src="/images/chairman_final.png"
                       alt="Chairman"
                       fill
-                      className="object-contain mix-blend-screen p-1"
+                      className="object-cover rounded-full"
                     />
                   </div>
                   <div className="min-w-0">
-                    <h4 className="text-base font-bold text-white uppercase tracking-tight truncate">Kartikey Niranjan</h4>
+                    <h4 className="text-base font-bold text-white uppercase tracking-tight truncate">Kartike Nirjayene</h4>
                     <p className="text-[9px] font-black text-accent-yellow uppercase tracking-[0.2em]">Chairman & Visionary</p>
                   </div>
                 </div>
                 <p className="text-xs italic text-white/50 leading-relaxed">
-                  &quot;With over 8 years of leadership, Kartikey drives our mission to redefine excellence in event management through innovation.&quot;
+                  &quot;With over 8 years of leadership, Kartike drives our mission to redefine excellence in event management through innovation.&quot;
                 </p>
                 <a 
                   href="https://www.linkedin.com/in/kartikey-niranjan-493115188"

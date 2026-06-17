@@ -436,10 +436,10 @@ export const CASE_STUDIES = [
 // Team Members
 export const TEAM_MEMBERS = [
   {
-    name: "Kartikey Niranjan",
+    name: "Kartike Nirjayene",
     role: "Chairman",
     experience: "8 Years",
-    image: "/images/logo.png",
+    image: "/images/chairman_final.png",
     bio: "8 Years of Experience in leadership and strategic vision.",
   },
   {
