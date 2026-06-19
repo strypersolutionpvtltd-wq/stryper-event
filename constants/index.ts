@@ -436,7 +436,7 @@ export const CASE_STUDIES = [
 // Team Members
 export const TEAM_MEMBERS = [
   {
-    name: "Kartike Nirjayene",
+    name: "Kartikey Niranjan",
     role: "Chairman",
     experience: "8 Years",
     image: "/images/chairman_final.png",

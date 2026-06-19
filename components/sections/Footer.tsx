@@ -51,12 +51,12 @@ const Footer = () => {
                     />
                   </div>
                   <div className="min-w-0">
-                    <h4 className="text-base font-bold text-white uppercase tracking-tight truncate">Kartike Nirjayene</h4>
+                    <h4 className="text-base font-bold text-white uppercase tracking-tight truncate">Kartikey Niranjan</h4>
                     <p className="text-[9px] font-black text-accent-yellow uppercase tracking-[0.2em]">Chairman & Visionary</p>
                   </div>
                 </div>
                 <p className="text-xs italic text-white/50 leading-relaxed">
-                  &quot;With over 8 years of leadership, Kartike drives our mission to redefine excellence in event management through innovation.&quot;
+                  &quot;With over 8 years of leadership, Kartikey drives our mission to redefine excellence in event management through innovation.&quot;
                 </p>
                 <a 
                   href="https://www.linkedin.com/in/kartikey-niranjan-493115188"
