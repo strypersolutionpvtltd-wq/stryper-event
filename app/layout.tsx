@@ -76,6 +76,14 @@ export const metadata: Metadata = {
     // yandex: "your-yandex-verification-code",
     // bing: "your-bing-verification-code",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico?v=2" },
+      { url: "/icon-192.png?v=2", sizes: "192x192", type: "image/png" }
+    ],
+    shortcut: "/favicon.ico?v=2",
+    apple: "/icon-192.png?v=2",
+  },
 };
 
 export default function RootLayout({
