@@ -12,6 +12,8 @@ import { COMPANY_CONTACT } from "@/constants";
 const Gallery = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [galleryItems, setGalleryItems] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const categories = [
     { id: "all", label: "All" },
@@ -22,7 +24,28 @@ const Gallery = () => {
     { id: "fabrication", label: "Fab" },
   ];
 
-  const galleryItems = [
+  // Fetch gallery items from local API
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const res = await fetch("/api/events");
+        if (res.ok) {
+          const data = await res.json();
+          setGalleryItems(data);
+        } else {
+          throw new Error("Failed to load");
+        }
+      } catch (err) {
+        console.warn("Using fallback gallery items", err);
+        setGalleryItems(fallbackItems);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchGallery();
+  }, []);
+
+  const fallbackItems = [
     {
       id: 1,
       category: "corporate",
@@ -246,88 +269,102 @@ const Gallery = () => {
         </div>
 
         {/* Gallery Grid - Responsive Columns */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-6">
-          <AnimatePresence mode="popLayout">
-            {filteredItems.map((item, index) => (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{
-                  duration: 0.4,
-                  delay: index * 0.05,
-                }}
-                whileHover={item.type !== "coming-soon" ? { y: -8 } : {}}
-                onClick={() => item.type !== "coming-soon" && setSelectedIdx(index)}
-                className={`group relative aspect-[4/3] rounded-2xl overflow-hidden glass glow-border ${item.type !== "coming-soon" ? "cursor-pointer" : ""}`}
+        {isLoading ? (
+          <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-6">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="relative aspect-[4/3] rounded-2xl bg-white/5 animate-pulse border border-white/10 flex items-center justify-center overflow-hidden"
               >
-                {/* Actual Media */}
-                {item.type === "image" ? (
-                  <Image
-                    src={item.image || "/images/placeholder.jpg"}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    loading="lazy"
-                  />
-                ) : item.type === "video" ? (
-                  <video
-                    src={item.video}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    muted
-                    loop
-                    playsInline
-                    onMouseOver={(e) => (e.target as HTMLVideoElement).play()}
-                    onMouseOut={(e) => (e.target as HTMLVideoElement).pause()}
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/5 space-y-2">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center">
-                      <Play size={16} className="text-white/20 md:w-5 md:h-5" />
-                    </div>
-                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Coming Soon</span>
-                  </div>
-                )}
-
-                {/* Overlay - Optimized for mobile tap */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileHover={item.type !== "coming-soon" ? { opacity: 1 } : {}}
-                  className="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/40 to-transparent flex items-end p-4 md:p-6 transition-opacity"
-                >
-                  <div className="w-full">
-                    <h3 className="text-base md:text-xl font-bold text-white mb-1 truncate">
-                      {item.title}
-                    </h3>
-                    <span className="text-[10px] md:text-sm font-black text-accent-yellow uppercase tracking-widest">
-                      {item.category}
-                    </span>
-                  </div>
-                </motion.div>
-
-                {/* Media Icon - Larger on mobile */}
-                {item.type !== "coming-soon" && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0 }}
-                    whileHover={{ opacity: 1, scale: 1 }}
-                    className="absolute top-3 right-3 md:top-4 md:right-4 w-9 h-9 md:w-10 md:h-10 bg-accent-yellow rounded-full flex items-center justify-center shadow-lg"
-                  >
-                    {item.type === "image" ? (
-                      <svg className="w-4 h-4 md:w-5 md:h-5 text-primary-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                      </svg>
-                    ) : (
-                      <Play className="w-4 h-4 md:w-5 md:h-5 text-primary-black ml-0.5" fill="currentColor" />
-                    )}
-                  </motion.div>
-                )}
-              </motion.div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-shimmer" />
+                <div className="w-12 h-12 rounded-full border border-white/10 border-t-accent-yellow animate-spin" />
+              </div>
             ))}
-          </AnimatePresence>
-        </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-6">
+            <AnimatePresence mode="popLayout">
+              {filteredItems.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: index * 0.05,
+                  }}
+                  whileHover={item.type !== "coming-soon" ? { y: -8 } : {}}
+                  onClick={() => item.type !== "coming-soon" && setSelectedIdx(index)}
+                  className={`group relative aspect-[4/3] rounded-2xl overflow-hidden glass glow-border ${item.type !== "coming-soon" ? "cursor-pointer" : ""}`}
+                >
+                  {/* Actual Media */}
+                  {item.type === "image" ? (
+                    <Image
+                      src={item.image || "/images/placeholder.jpg"}
+                      alt={item.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      loading="lazy"
+                    />
+                  ) : item.type === "video" ? (
+                    <video
+                      src={item.video}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      muted
+                      loop
+                      playsInline
+                      onMouseOver={(e) => (e.target as HTMLVideoElement).play()}
+                      onMouseOut={(e) => (e.target as HTMLVideoElement).pause()}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/5 space-y-2">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center">
+                        <Play size={16} className="text-white/20 md:w-5 md:h-5" />
+                      </div>
+                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Coming Soon</span>
+                    </div>
+                  )}
+
+                  {/* Overlay - Optimized for mobile tap */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    whileHover={item.type !== "coming-soon" ? { opacity: 1 } : {}}
+                    className="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/40 to-transparent flex items-end p-4 md:p-6 transition-opacity"
+                  >
+                    <div className="w-full">
+                      <h3 className="text-base md:text-xl font-bold text-white mb-1 truncate">
+                        {item.title}
+                      </h3>
+                      <span className="text-[10px] md:text-sm font-black text-accent-yellow uppercase tracking-widest">
+                        {item.category}
+                      </span>
+                    </div>
+                  </motion.div>
+
+                  {/* Media Icon - Larger on mobile */}
+                  {item.type !== "coming-soon" && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileHover={{ opacity: 1, scale: 1 }}
+                      className="absolute top-3 right-3 md:top-4 md:right-4 w-9 h-9 md:w-10 md:h-10 bg-accent-yellow rounded-full flex items-center justify-center shadow-lg"
+                    >
+                      {item.type === "image" ? (
+                        <svg className="w-4 h-4 md:w-5 md:h-5 text-primary-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                        </svg>
+                      ) : (
+                        <Play className="w-4 h-4 md:w-5 md:h-5 text-primary-black ml-0.5" fill="currentColor" />
+                      )}
+                    </motion.div>
+                  )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
 
         {/* Lightbox / Modal - Highly responsive */}
         <AnimatePresence>

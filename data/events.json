@@ -1,0 +1,140 @@
+[
+  {
+    "id": 1,
+    "category": "corporate",
+    "title": "Award Show Host",
+    "image": "/images/awards-new.jpg",
+    "type": "image"
+  },
+  {
+    "id": 2,
+    "category": "brand",
+    "title": "Concert Ambiance",
+    "image": "/images/production-new.jpg",
+    "type": "image"
+  },
+  {
+    "id": 3,
+    "category": "brand",
+    "title": "Major Concert Setup",
+    "image": "/images/gallery/coldplay-concert-in-mumbai-143846109-1x1.webp",
+    "type": "image"
+  },
+  {
+    "id": 4,
+    "category": "brand",
+    "title": "Live Concert",
+    "image": "/images/gallery/concert.webp",
+    "type": "image"
+  },
+  {
+    "id": 5,
+    "category": "weddings",
+    "title": "Live Band Performance",
+    "image": "/images/gallery/Katherine-Marchand-Weddings_Three-ways-you-can-utilize-a-live-band-at-your-wedding_5-1-1024x683.jpg.jpeg",
+    "type": "image"
+  },
+  {
+    "id": 6,
+    "category": "weddings",
+    "title": "Wedding Sangeet",
+    "image": "/images/gallery/ptaufiq-indian-wedding-cancun-mexico-sangeet.jpg.jpeg",
+    "type": "image"
+  },
+  {
+    "id": 7,
+    "category": "corporate",
+    "title": "Corporate Event",
+    "image": "/images/corporate-new.jpg",
+    "type": "image"
+  },
+  {
+    "id": 8,
+    "category": "sports",
+    "title": "Sports Event",
+    "image": "/images/sports-new.jpg",
+    "type": "image"
+  },
+  {
+    "id": 9,
+    "category": "sports",
+    "title": "Tournament Day",
+    "image": "/images/gallery/IMG_1856.JPG.jpeg",
+    "type": "image"
+  },
+  {
+    "id": 10,
+    "category": "brand",
+    "title": "Brand Promotion",
+    "image": "/images/brand.jpg",
+    "type": "image"
+  },
+  {
+    "id": 11,
+    "category": "corporate",
+    "title": "Corporate Gala Video",
+    "video": "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.11 PM (1).mp4",
+    "type": "video"
+  },
+  {
+    "id": 12,
+    "category": "sports",
+    "title": "Sports Action Video",
+    "video": "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.12 PM (1).mp4",
+    "type": "video"
+  },
+  {
+    "id": 13,
+    "category": "brand",
+    "title": "Festival Celebration",
+    "video": "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.13 PM.mp4",
+    "type": "video"
+  },
+  {
+    "id": 14,
+    "category": "weddings",
+    "title": "Grand Wedding Entry",
+    "video": "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.13 PM (1).mp4",
+    "type": "video"
+  },
+  {
+    "id": 15,
+    "category": "sports",
+    "title": "Winning Moment",
+    "video": "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.13 PM (2).mp4",
+    "type": "video"
+  },
+  {
+    "id": 16,
+    "category": "fabrication",
+    "title": "Stage Construction",
+    "video": "/videos/gallery/WhatsApp Video 2026-06-02 at 2.51.15 AM (2).mp4",
+    "type": "video"
+  },
+  {
+    "id": 17,
+    "category": "fabrication",
+    "title": "Exhibition Setup",
+    "video": "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.11 PM.mp4",
+    "type": "video"
+  },
+  {
+    "id": 18,
+    "category": "corporate",
+    "title": "Corporate Seminar",
+    "video": "/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.12 PM.mp4",
+    "type": "video"
+  },
+  {
+    "id": 19,
+    "category": "fabrication",
+    "title": "New Setup",
+    "type": "coming-soon"
+  },
+  {
+    "id": 20,
+    "category": "corporate",
+    "title": "Executive Meet",
+    "type": "coming-soon"
+  }
+]
