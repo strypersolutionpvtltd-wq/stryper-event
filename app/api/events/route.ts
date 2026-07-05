@@ -1,15 +1,12 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { connectToDatabase } from "@/lib/db";
+import { Event } from "@/models/Event";
 import crypto from "crypto";
-
-const DATA_FILE_PATH = path.join(process.cwd(), "data", "events.json");
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 
 // Helper to verify admin token
 function verifyAdmin(request: Request): boolean {
   try {
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "event@@2026";
     const expectedToken = crypto
       .createHmac("sha256", ADMIN_PASSWORD)
       .update("stryper-admin-session")
@@ -26,30 +23,27 @@ function verifyAdmin(request: Request): boolean {
   }
 }
 
-// Helper to read events from file
-async function readEvents(): Promise<any[]> {
-  try {
-    const data = await fs.readFile(DATA_FILE_PATH, "utf-8");
-    return JSON.parse(data);
-  } catch (error) {
-    console.warn("Could not read events.json, returning empty array:", error);
-    return [];
-  }
-}
-
-// Helper to write events to file
-async function writeEvents(events: any[]) {
-  const dir = path.dirname(DATA_FILE_PATH);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(DATA_FILE_PATH, JSON.stringify(events, null, 2), "utf-8");
-}
-
 export async function GET() {
   try {
-    const events = await readEvents();
-    return NextResponse.json(events);
-  } catch (error) {
+    await connectToDatabase();
+    const events = await Event.find({}).sort({ created_at: -1 });
+    
+    // Transform _id to id for the frontend
+    const transformedEvents = events.map((evt) => {
+      const obj = evt.toObject();
+      return {
+        ...obj,
+        id: obj._id.toString(),
+      };
+    });
+
+    return NextResponse.json(transformedEvents);
+  } catch (error: any) {
     console.error("GET events error:", error);
+    // Return empty array on connection warning to prevent client crash during setup
+    if (error.message && error.message.includes("MONGODB_URI")) {
+      return NextResponse.json([]);
+    }
     return NextResponse.json({ error: "Failed to read events portfolio" }, { status: 500 });
   }
 }
@@ -60,11 +54,13 @@ export async function POST(request: Request) {
   }
 
   try {
+    await connectToDatabase();
+
     const formData = await request.formData();
     const title = formData.get("title")?.toString();
     const category = formData.get("category")?.toString();
     const type = formData.get("type")?.toString(); // "image" | "video" | "coming-soon"
-    const mediaSource = formData.get("mediaSource")?.toString(); // "upload" | "url" | "none"
+    const mediaSource = formData.get("mediaSource")?.toString(); // "upload" | "url"
     const externalUrl = formData.get("externalUrl")?.toString();
 
     if (!title || !category || !type) {
@@ -80,20 +76,11 @@ export async function POST(request: Request) {
           return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
         }
 
-        // Ensure upload directory exists
-        await fs.mkdir(UPLOAD_DIR, { recursive: true });
-
-        // Create unique name
-        const fileExt = path.extname(file.name);
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}${fileExt}`;
-        const filePath = path.join(UPLOAD_DIR, fileName);
-
-        // Save file
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        await fs.writeFile(filePath, buffer);
-
-        mediaUrl = `/uploads/${fileName}`;
+        // Convert file to Base64 data URI (enables direct cloud database storage)
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const base64String = buffer.toString("base64");
+        mediaUrl = `data:${file.type};base64,${base64String}`;
       } else if (mediaSource === "url") {
         if (!externalUrl) {
           return NextResponse.json({ error: "External URL is required" }, { status: 400 });
@@ -102,27 +89,26 @@ export async function POST(request: Request) {
       }
     }
 
-    const events = await readEvents();
-
-    // Create new event item
-    const newEvent: any = {
-      id: Date.now(), // Unique ID based on timestamp
-      category,
+    // Save event to MongoDB
+    const newEventData: any = {
       title,
+      category,
       type,
     };
 
     if (type === "image") {
-      newEvent.image = mediaUrl;
+      newEventData.image = mediaUrl;
     } else if (type === "video") {
-      newEvent.video = mediaUrl;
+      newEventData.video = mediaUrl;
     }
 
-    // Add to the top
-    events.unshift(newEvent);
-    await writeEvents(events);
+    const newEvent = new Event(newEventData);
+    await newEvent.save();
 
-    return NextResponse.json({ success: true, event: newEvent });
+    const result = newEvent.toObject();
+    result.id = result._id.toString();
+
+    return NextResponse.json({ success: true, event: result });
   } catch (error) {
     console.error("Failed to add event:", error);
     return NextResponse.json({ error: "Failed to add event post" }, { status: 500 });
@@ -135,40 +121,18 @@ export async function DELETE(request: Request) {
   }
 
   try {
+    await connectToDatabase();
+
     const { searchParams } = new URL(request.url);
-    const idStr = searchParams.get("id");
-    if (!idStr) {
+    const id = searchParams.get("id");
+    if (!id) {
       return NextResponse.json({ error: "Missing event ID" }, { status: 400 });
     }
 
-    const id = parseInt(idStr, 10);
-    const events = await readEvents();
-    
-    // Find the item index supporting both numbers and string match
-    const itemIndex = events.findIndex(
-      (e) => e.id === id || e.id?.toString() === idStr
-    );
-
-    if (itemIndex === -1) {
+    const deletedEvent = await Event.findByIdAndDelete(id);
+    if (!deletedEvent) {
       return NextResponse.json({ error: "Event post not found" }, { status: 404 });
     }
-
-    const item = events[itemIndex];
-
-    // Delete local file if it exists
-    const mediaUrl = item.type === "image" ? item.image : item.video;
-    if (mediaUrl && mediaUrl.startsWith("/uploads/")) {
-      const fileName = mediaUrl.replace("/uploads/", "");
-      const filePath = path.join(UPLOAD_DIR, fileName);
-      try {
-        await fs.unlink(filePath);
-      } catch (err) {
-        console.warn("Failed to delete local media file from disk:", filePath, err);
-      }
-    }
-
-    events.splice(itemIndex, 1);
-    await writeEvents(events);
 
     return NextResponse.json({ success: true, message: "Event post deleted successfully" });
   } catch (error) {

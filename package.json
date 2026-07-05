@@ -16,10 +16,12 @@
     "safe-push": "npm run type-check && npm run lint && git add . && git commit -m 'Safe deployment push' && git push origin main"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.15.0",
     "lenis": "^1.1.17",
     "lucide-react": "^0.468.0",
+    "mongoose": "^9.7.3",
     "next": "14.2.35",
     "react": "^18",
     "react-dom": "^18",
