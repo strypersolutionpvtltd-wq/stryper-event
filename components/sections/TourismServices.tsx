@@ -60,7 +60,11 @@ const TOURISM_PLANS = [
   },
 ];
 
-const TourismServices = () => {
+interface TourismServicesProps {
+  isPage?: boolean;
+}
+
+const TourismServices = ({ isPage = false }: TourismServicesProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
@@ -75,14 +79,22 @@ const TourismServices = () => {
       
       <Container className="relative z-10">
         <div className="text-center mb-16 md:mb-24">
-          <motion.h2
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-7xl font-black text-white uppercase tracking-tighter mb-6"
+            className="mb-6"
           >
-            Tourism <span className="text-accent-yellow">Services</span>
-          </motion.h2>
+            {isPage ? (
+              <h1 className="text-4xl md:text-7xl font-black text-white uppercase tracking-tighter">
+                Tourism <span className="text-accent-yellow">Services</span>
+              </h1>
+            ) : (
+              <h2 className="text-4xl md:text-7xl font-black text-white uppercase tracking-tighter">
+                Tourism <span className="text-accent-yellow">Services</span>
+              </h2>
+            )}
+          </motion.div>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

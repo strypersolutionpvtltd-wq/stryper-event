@@ -11,10 +11,7 @@ export const metadata: Metadata = {
 export default function TourismPage() {
   return (
     <main className="pt-24 md:pt-32">
-      <div className="text-center py-12">
-        <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">Tourism Services</h1>
-      </div>
-      <TourismServices />
+      <TourismServices isPage={true} />
       <SectionDivider />
       <CityCoverage />
     </main>

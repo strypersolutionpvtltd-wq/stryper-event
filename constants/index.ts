@@ -59,7 +59,7 @@ export const VENUES = [
     image: "https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?auto=format&fit=crop&w=1200&q=80",
     images: [
       "https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1551882547-ff43c61f1c90?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80",
     ],
@@ -110,9 +110,9 @@ export const VENUES = [
     image: "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=1200&q=80",
     images: [
       "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1562790351-d273a961e00d?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1543967354-28193cbef2e9?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
     ],
     videos: ["/videos/gallery/WhatsApp Video 2026-05-24 at 11.34.11 PM.mp4"],
   },
@@ -124,9 +124,9 @@ export const VENUES = [
     description:
       "Experience weddings atop a hill at the Mundota Fort or in the majestic palace below. Known for its polo grounds and historical significance, it provides a truly unique setting for elite events.",
     features: ["Hilltop Fort", "Polo Grounds", "War Horse Statues", "Desert Landscape"],
-    image: "https://images.unsplash.com/photo-1590050756297-bbc731766624?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1585135497273-1a86b09fe70e?auto=format&fit=crop&w=1200&q=80",
     images: [
-      "https://images.unsplash.com/photo-1590050756297-bbc731766624?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1585135497273-1a86b09fe70e?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1583037189850-1921ae7c6c22?auto=format&fit=crop&w=800&q=80",
@@ -141,9 +141,9 @@ export const VENUES = [
     description:
       "The Leela Palace Jaipur is a stunning modern palace inspired by the grandeur of Rajputana heritage. It offers a majestic and contemporary setting for the most opulent weddings.",
     features: ["Modern Palatial Design", "Lush Lawns", "Signature Dining", "Grand Ballrooms"],
-    image: "https://images.unsplash.com/photo-1513581163417-bcac5192b16e?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
     images: [
-      "https://images.unsplash.com/photo-1513581163417-bcac5192b16e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=80",
@@ -175,11 +175,11 @@ export const VENUES = [
     description:
       "Bringing world-class Anantara luxury to Jaipur. Jewel Bagh is designed to host grand celebrations with a perfect mix of international hospitality and Rajasthani charm.",
     features: ["International Luxury", "Signature Pool", "Gourmet Catering", "Luxury Pavilions"],
-    image: "https://images.unsplash.com/photo-1544124499-58912cbddada?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1597659840241-37e2b9c2f55f?auto=format&fit=crop&w=1200&q=80",
     images: [
-      "https://images.unsplash.com/photo-1544124499-58912cbddada?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1597659840241-37e2b9c2f55f?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1562790351-d273a961e00d?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80",
     ],
   },
