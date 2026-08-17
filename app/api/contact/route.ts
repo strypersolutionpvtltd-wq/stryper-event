@@ -104,7 +104,7 @@ export async function GET(request: Request) {
     return NextResponse.json(transformed);
   } catch (error) {
     console.error("GET inquiries error:", error);
-    return NextResponse.json({ error: "Failed to fetch inquiries" }, { status: 500 });
+    return NextResponse.json([]);
   }
 }
 

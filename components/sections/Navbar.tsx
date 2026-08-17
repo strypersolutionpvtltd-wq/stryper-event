@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, ChevronDown, Facebook, Instagram } from "lucide-react";
+import { Phone, ChevronDown, Facebook, Instagram, Menu, X } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { NAV_ITEMS, COMPANY_CONTACT, VENUES } from "@/constants";
 import { cn } from "@/lib/utils";
@@ -84,6 +84,7 @@ const Navbar = () => {
                   src="/images/logo.png"
                   alt="Stryper Events"
                   fill
+                  sizes="(max-width: 768px) 128px, 192px"
                   className="object-contain mix-blend-screen"
                   priority
                 />
@@ -186,31 +187,11 @@ const Navbar = () => {
                 className="relative flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white active:scale-95 transition-transform overflow-hidden"
                 aria-label="Toggle Menu"
               >
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Top Line */}
-                  <motion.path
-                    animate={isMobileMenuOpen ? { d: "M3 17L17 3", stroke: "#facc15" } : { d: "M3 5H17", stroke: "#ffffff" }}
-                    transition={{ duration: 0.3 }}
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  {/* Middle Line */}
-                  <motion.path
-                    animate={isMobileMenuOpen ? { opacity: 0 } : { opacity: 1 }}
-                    transition={{ duration: 0.2 }}
-                    d="M3 10H17"
-                    stroke="#ffffff"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  {/* Bottom Line */}
-                  <motion.path
-                    animate={isMobileMenuOpen ? { d: "M3 3L17 17", stroke: "#facc15" } : { d: "M3 15H17", stroke: "#ffffff" }}
-                    transition={{ duration: 0.3 }}
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
+                {isMobileMenuOpen ? (
+                  <X size={20} className="text-accent-yellow" />
+                ) : (
+                  <Menu size={20} className="text-white" />
+                )}
               </button>
             </div>
           </div>

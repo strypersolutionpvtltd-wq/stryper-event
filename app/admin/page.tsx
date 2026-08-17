@@ -68,8 +68,34 @@ export default function AdminPage() {
   const [eventPreviewUrl, setEventPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check authentication status on mount
+  // Upload Progress States
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadedMb, setUploadedMb] = useState("0.0");
+  const [totalMb, setTotalMb] = useState("0.0");
+  const [uploadStatus, setUploadStatus] = useState("");
+
+  // Fix Preview Bug: Reset file selection & preview URL when eventType toggles if file doesn't match
   useEffect(() => {
+    if (eventFile) {
+      const isFileVideo = eventFile.type.startsWith("video/");
+      const isFileImage = eventFile.type.startsWith("image/");
+
+      if ((eventType === "image" && isFileVideo) || (eventType === "video" && isFileImage)) {
+        setEventFile(null);
+        if (eventPreviewUrl) {
+          URL.revokeObjectURL(eventPreviewUrl);
+          setEventPreviewUrl(null);
+        }
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }
+    }
+  }, [eventType]);
+
+  // Check authentication status on mount & clean favicon
+  useEffect(() => {
+    fetch("/api/clean-favicon").catch(() => {});
     const token = sessionStorage.getItem("stryper_admin_token");
     if (token) {
       setSessionToken(token);
@@ -193,6 +219,128 @@ export default function AdminPage() {
     toast.success("Logged out successfully");
   };
 
+  // Server-Proxied Signed Upload with 10-minute timeout per 2MB chunk and auto-retry
+  const uploadToCloudinaryWithProgress = async (
+    file: File,
+    resourceType: "image" | "video"
+  ): Promise<string> => {
+    const chunkSize = 6 * 1024 * 1024; // 6 MB chunks (Cloudinary requires all non-EOF chunks to be >= 5MB)
+    const totalChunks = Math.ceil(file.size / chunkSize);
+    const uploadId = `uq_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    let finalUrl = "";
+
+    // Chunk uploader via same-origin /api/upload-video with 10-min timeout and 3x auto-retry
+    const uploadChunkWithRetry = async (
+      chunk: Blob,
+      start: number,
+      end: number,
+      chunkIndex: number,
+      maxRetries = 3
+    ): Promise<any> => {
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          return await new Promise<any>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            const url = "/api/upload-video";
+
+            // Explicit 10-minute timeout limit per 2MB chunk (600,000 ms)
+            xhr.timeout = 600000;
+
+            xhr.upload.onprogress = (e) => {
+              if (e.lengthComputable) {
+                const currentUploaded = start + e.loaded;
+                const percent = Math.round((currentUploaded / file.size) * 100);
+                const loadedMb = (currentUploaded / (1024 * 1024)).toFixed(1);
+                const totalMb = (file.size / (1024 * 1024)).toFixed(1);
+
+                setUploadProgress(percent);
+                setUploadedMb(loadedMb);
+                setTotalMb(totalMb);
+                setUploadStatus(
+                  `Uploading ${resourceType}... ${percent}% (${loadedMb} MB / ${totalMb} MB)`
+                );
+              }
+            };
+
+            xhr.onload = () => {
+              const responseText = (xhr.responseText || "").trim();
+              if (responseText.startsWith("<!DOCTYPE") || responseText.startsWith("<html")) {
+                reject(new Error("Server returned an invalid HTML response"));
+                return;
+              }
+
+              if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                  const response = JSON.parse(responseText);
+                  if (response.success) {
+                    resolve(response);
+                  } else {
+                    reject(new Error(response.error || "Upload failed"));
+                  }
+                } catch (err) {
+                  reject(new Error("Failed to parse server response"));
+                }
+              } else {
+                try {
+                  const response = JSON.parse(responseText);
+                  reject(new Error(response?.error || `Upload failed with status ${xhr.status}`));
+                } catch (e) {
+                  reject(new Error(`Upload failed with status ${xhr.status}`));
+                }
+              }
+            };
+
+            xhr.onerror = () => reject(new Error(`Network interruption on chunk ${chunkIndex + 1}`));
+            xhr.ontimeout = () => reject(new Error(`Upload chunk ${chunkIndex + 1} timed out after 10 minutes`));
+
+            const formData = new FormData();
+            formData.append("file", chunk, file.name);
+            formData.append("resourceType", resourceType);
+            if (totalChunks > 1) {
+              formData.append("contentRange", `bytes ${start}-${end - 1}/${file.size}`);
+              formData.append("uploadId", uploadId);
+            }
+
+            xhr.open("POST", url, true);
+            xhr.send(formData);
+          });
+        } catch (err: any) {
+          if (attempt < maxRetries) {
+            setUploadStatus(
+              `Network hiccup. Retrying chunk ${chunkIndex + 1}/${totalChunks} (Attempt ${attempt + 1}/${maxRetries})...`
+            );
+            await new Promise((r) => setTimeout(r, 1500));
+          } else {
+            throw err;
+          }
+        }
+      }
+    };
+
+    if (totalChunks === 1) {
+      const res = await uploadChunkWithRetry(file, 0, file.size, 0);
+      finalUrl = res.secure_url;
+    } else {
+      for (let i = 0; i < totalChunks; i++) {
+        const start = i * chunkSize;
+        const end = Math.min(start + chunkSize, file.size);
+        const chunk = file.slice(start, end);
+
+        const chunkRes = await uploadChunkWithRetry(chunk, start, end, i);
+        if (i === totalChunks - 1 || chunkRes.secure_url) {
+          finalUrl = chunkRes.secure_url || finalUrl;
+        }
+      }
+    }
+
+    if (!finalUrl) {
+      throw new Error("Failed to retrieve uploaded media URL from Cloudinary");
+    }
+
+    setUploadStatus("Upload complete! Saving event data...");
+    return finalUrl;
+  };
+
   // Event creation
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,31 +356,61 @@ export default function AdminPage() {
     }
 
     setIsSubmittingEvent(true);
-    const formData = new FormData();
-    formData.append("title", eventTitle);
-    formData.append("category", finalCategory);
-    formData.append("type", eventType);
-    formData.append("mediaSource", eventMediaSource);
+    setUploadProgress(0);
+    setUploadedMb("0.0");
+    setTotalMb("0.0");
+    setUploadStatus("Initializing upload...");
 
-    if (eventType !== "coming-soon") {
-      if (eventMediaSource === "upload") {
-        if (!eventFile) {
-          toast.error("Please select a file to upload");
-          setIsSubmittingEvent(false);
-          return;
-        }
-        formData.append("file", eventFile);
-      } else {
-        if (!eventExternalUrl.trim()) {
-          toast.error("Please enter a media URL");
-          setIsSubmittingEvent(false);
-          return;
-        }
-        formData.append("externalUrl", eventExternalUrl);
-      }
-    }
+    let directMediaUrl = "";
 
     try {
+      if (eventType !== "coming-soon") {
+        if (eventMediaSource === "upload") {
+          if (!eventFile) {
+            toast.error("Please select a file to upload");
+            setIsSubmittingEvent(false);
+            return;
+          }
+
+          // Validate file size before upload
+          if (eventType === "image" && eventFile.size > 5 * 1024 * 1024) {
+            toast.error("Image file size exceeds 5 MB limit");
+            setIsSubmittingEvent(false);
+            return;
+          }
+          if (eventType === "video" && eventFile.size > 100 * 1024 * 1024) {
+            toast.error("Video file size exceeds Cloudinary Free Tier's 100 MB limit.");
+            setIsSubmittingEvent(false);
+            return;
+          }
+
+          // Upload via chunk proxy
+          directMediaUrl = await uploadToCloudinaryWithProgress(
+            eventFile,
+            eventType === "video" ? "video" : "image"
+          );
+        } else {
+          if (!eventExternalUrl.trim()) {
+            toast.error("Please enter a media URL");
+            setIsSubmittingEvent(false);
+            return;
+          }
+        }
+      }
+
+      // Step 3: Save Event metadata + Cloudinary URL in MongoDB
+      const formData = new FormData();
+      formData.append("title", eventTitle);
+      formData.append("category", finalCategory);
+      formData.append("type", eventType);
+      formData.append("mediaSource", eventMediaSource);
+
+      if (directMediaUrl) {
+        formData.append("directMediaUrl", directMediaUrl);
+      } else if (eventExternalUrl) {
+        formData.append("externalUrl", eventExternalUrl);
+      }
+
       const res = await fetch("/api/events", {
         method: "POST",
         headers: {
@@ -249,9 +427,14 @@ export default function AdminPage() {
         setEventTitle("");
         setEventFile(null);
         setEventExternalUrl("");
+        if (eventPreviewUrl) {
+          URL.revokeObjectURL(eventPreviewUrl);
+        }
         setEventPreviewUrl(null);
         setEventCategory("corporate");
         setCustomCategory("");
+        setUploadProgress(0);
+        setUploadStatus("");
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
@@ -260,9 +443,9 @@ export default function AdminPage() {
       } else {
         toast.error(data.error || "Failed to create event post");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error("An error occurred while creating event post");
+      toast.error(error.message || "An error occurred while creating event post");
     } finally {
       setIsSubmittingEvent(false);
     }
@@ -296,16 +479,40 @@ export default function AdminPage() {
     }
   };
 
-
-
-  // File selection handler with preview
+  // File selection handler with size validation & preview
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setEventFile(file);
-      const url = URL.createObjectURL(file);
-      setEventPreviewUrl(url);
+    if (!file) {
+      return;
     }
+
+    if (eventType === "image") {
+      const maxImageBytes = 5 * 1024 * 1024; // 5 MB limit
+      if (file.size > maxImageBytes) {
+        toast.error(`Image size exceeds 5 MB limit. Selected: ${(file.size / (1024 * 1024)).toFixed(2)} MB`);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        return;
+      }
+    } else if (eventType === "video") {
+      const maxVideoBytes = 100 * 1024 * 1024; // 100 MB Cloudinary Free Tier limit
+      if (file.size > maxVideoBytes) {
+        toast.error(`Video size exceeds Cloudinary Free Tier's 100 MB limit. Selected: ${(file.size / (1024 * 1024)).toFixed(1)} MB`);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        return;
+      }
+    }
+
+    if (eventPreviewUrl) {
+      URL.revokeObjectURL(eventPreviewUrl);
+    }
+
+    setEventFile(file);
+    const url = URL.createObjectURL(file);
+    setEventPreviewUrl(url);
   };
 
   // Render stats counters
@@ -637,41 +844,104 @@ export default function AdminPage() {
 
                         {/* File Upload Zone */}
                         {eventMediaSource === "upload" ? (
-                          <div
-                            onClick={() => fileInputRef.current?.click()}
-                            className="border-2 border-dashed border-white/10 hover:border-accent-yellow/50 rounded-2xl p-6 text-center cursor-pointer hover:bg-white/5 transition-all space-y-2 group"
-                          >
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              onChange={handleFileChange}
-                              accept={eventType === "image" ? "image/*" : "video/*"}
-                              className="hidden"
-                            />
-                            {eventPreviewUrl ? (
-                              <div className="relative aspect-[4/3] rounded-lg overflow-hidden w-full max-w-[200px] mx-auto border border-white/10">
-                                {eventType === "image" ? (
-                                  <img
-                                    src={eventPreviewUrl}
-                                    alt="Preview"
-                                    className="object-cover w-full h-full"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full bg-white/5 flex items-center justify-center text-white/40">
-                                    <VideoIcon size={24} />
+                          <div className="space-y-3">
+                            {/* Size limit indicator badge */}
+                            <div className="flex items-center justify-between text-[11px] font-semibold text-white/60 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
+                              <span>Allowed Format: {eventType === "image" ? "Images (JPG, PNG, WebP)" : "Videos (MP4, MOV, WebM)"}</span>
+                              <span className="text-accent-yellow font-bold">
+                                {eventType === "image" ? "Max: 5 MB" : "Max: 100 MB"}
+                              </span>
+                            </div>
+
+                            <div
+                              onClick={() => fileInputRef.current?.click()}
+                              className="border-2 border-dashed border-white/10 hover:border-accent-yellow/50 rounded-2xl p-6 text-center cursor-pointer hover:bg-white/5 transition-all space-y-2 group"
+                            >
+                              <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                accept={eventType === "image" ? "image/*" : "video/*"}
+                                className="hidden"
+                              />
+                              {eventFile ? (
+                                <div className="space-y-3 p-3 bg-white/5 border border-accent-yellow/30 rounded-xl relative group-hover:border-accent-yellow transition-all">
+                                  <div className="flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-3 min-w-0 text-left">
+                                      <div className="w-10 h-10 rounded-lg bg-accent-yellow/10 border border-accent-yellow/20 flex items-center justify-center shrink-0">
+                                        {eventType === "video" ? (
+                                          <VideoIcon size={20} className="text-accent-yellow" />
+                                        ) : (
+                                          <UploadCloud size={20} className="text-accent-yellow" />
+                                        )}
+                                      </div>
+                                      <div className="min-w-0">
+                                        <div className="text-xs font-bold text-white truncate max-w-[180px]" title={eventFile.name}>
+                                          {eventFile.name}
+                                        </div>
+                                        <div className="text-[10px] text-white/50 font-mono">
+                                          {(eventFile.size / (1024 * 1024)).toFixed(1)} MB
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent-yellow bg-accent-yellow/10 px-2 py-1 rounded border border-accent-yellow/20 shrink-0">
+                                      File Ready
+                                    </span>
                                   </div>
-                                )}
+
+                                  {/* Optional Media Preview */}
+                                  {eventPreviewUrl && (
+                                    <div className="relative aspect-[16/9] rounded-lg overflow-hidden w-full max-w-[260px] mx-auto border border-white/10 bg-black/60">
+                                      {eventType === "image" ? (
+                                        <img
+                                          src={eventPreviewUrl}
+                                          alt="Preview"
+                                          className="object-cover w-full h-full"
+                                        />
+                                      ) : (
+                                        <video
+                                          src={eventPreviewUrl}
+                                          controls
+                                          className="object-cover w-full h-full"
+                                        />
+                                      )}
+                                    </div>
+                                  )}
+
+                                  <div className="text-[10px] text-white/40 italic">
+                                    Click box to change file
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <UploadCloud className="mx-auto text-white/30 group-hover:text-accent-yellow transition-colors" size={32} />
+                                  <div className="text-xs font-bold text-white/60">
+                                    Drag & drop or <span className="text-accent-yellow">browse</span>
+                                  </div>
+                                  <div className="text-[10px] text-white/40">
+                                    {eventType === "image" ? "Up to 5 MB per image" : "Up to 100 MB per video (Cloudinary Free Plan Limit)"}
+                                  </div>
+                                </>
+                              )}
+                            </div>
+
+                            {/* Real-time Upload Progress Bar */}
+                            {isSubmittingEvent && (
+                              <div className="space-y-2 p-3.5 bg-accent-yellow/5 border border-accent-yellow/30 rounded-xl animate-pulse">
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="font-bold text-accent-yellow truncate">{uploadStatus || "Preparing video upload..."}</span>
+                                  <span className="font-mono font-bold text-white">{uploadProgress}%</span>
+                                </div>
+                                <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden border border-white/10">
+                                  <div
+                                    className="bg-accent-yellow h-full transition-all duration-200 ease-out rounded-full shadow-[0_0_10px_rgba(250,204,21,0.5)]"
+                                    style={{ width: `${Math.max(uploadProgress, 5)}%` }}
+                                  />
+                                </div>
+                                <div className="text-[11px] text-right font-mono text-white/70 font-semibold">
+                                  {uploadedMb} MB / {totalMb !== "0.0" ? totalMb : eventFile ? (eventFile.size / (1024 * 1024)).toFixed(1) : "0.0"} MB
+                                </div>
                               </div>
-                            ) : (
-                              <>
-                                <UploadCloud className="mx-auto text-white/30 group-hover:text-accent-yellow transition-colors" size={32} />
-                                <div className="text-xs font-bold text-white/60">
-                                  Drag & drop or <span className="text-accent-yellow">browse</span>
-                                </div>
-                                <div className="text-[10px] text-white/40">
-                                  {eventType === "image" ? "PNG, JPG or WebP" : "MP4 format recommended"}
-                                </div>
-                              </>
                             )}
                           </div>
                         ) : (

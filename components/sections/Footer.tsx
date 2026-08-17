@@ -47,6 +47,7 @@ const Footer = () => {
                       src="/images/chairman_final.png"
                       alt="Chairman"
                       fill
+                      sizes="56px"
                       className="object-cover rounded-full"
                     />
                   </div>

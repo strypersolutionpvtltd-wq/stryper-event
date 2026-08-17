@@ -1,9 +1,12 @@
 import mongoose from "mongoose";
 import dns from "dns";
 
-// Resolve querySrv ECONNREFUSED issues on local ISP/DNS systems
+// Fix querySrv ECONNREFUSED issues on local Windows / ISP DNS systems
 try {
-  dns.setServers(["8.8.8.8", "1.1.1.1"]);
+  dns.setServers(["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
+  if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder("ipv4first");
+  }
 } catch (e) {
   console.warn("Could not set custom DNS servers:", e);
 }
@@ -28,13 +31,16 @@ export async function connectToDatabase() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      family: 4,
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
       return mongooseInstance;
     });
   }
-  
+
   try {
     cached.conn = await cached.promise;
   } catch (e) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { Event } from "@/models/Event";
 import crypto from "crypto";
+import fallbackEvents from "@/data/events.json";
 
 // Helper to verify admin token
 function verifyAdmin(request: Request): boolean {
@@ -39,12 +40,8 @@ export async function GET() {
 
     return NextResponse.json(transformedEvents);
   } catch (error: any) {
-    console.error("GET events error:", error);
-    // Return empty array on connection warning to prevent client crash during setup
-    if (error.message && error.message.includes("MONGODB_URI")) {
-      return NextResponse.json([]);
-    }
-    return NextResponse.json({ error: "Failed to read events portfolio" }, { status: 500 });
+    console.warn("MongoDB connection warning, using fallback events data:", error?.message || error);
+    return NextResponse.json(fallbackEvents, { status: 200 });
   }
 }
 
@@ -63,6 +60,8 @@ export async function POST(request: Request) {
     const mediaSource = formData.get("mediaSource")?.toString(); // "upload" | "url"
     const externalUrl = formData.get("externalUrl")?.toString();
 
+    const directMediaUrl = formData.get("directMediaUrl")?.toString();
+
     if (!title || !category || !type) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
@@ -70,13 +69,15 @@ export async function POST(request: Request) {
     let mediaUrl = "";
 
     if (type !== "coming-soon") {
-      if (mediaSource === "upload") {
+      if (directMediaUrl) {
+        mediaUrl = directMediaUrl;
+      } else if (mediaSource === "upload") {
         const file = formData.get("file") as File;
         if (!file || file.size === 0) {
           return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
         }
 
-        // Convert file to Base64 data URI (enables direct cloud database storage)
+        // Convert file to Base64 data URI fallback
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const base64String = buffer.toString("base64");
