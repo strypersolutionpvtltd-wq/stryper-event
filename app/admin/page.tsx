@@ -219,126 +219,83 @@ export default function AdminPage() {
     toast.success("Logged out successfully");
   };
 
-  // Server-Proxied Signed Upload with 10-minute timeout per 2MB chunk and auto-retry
+  // Direct Signed Client-to-Cloudinary Upload (Bypasses Vercel 4.5MB Serverless Payload Limits!)
   const uploadToCloudinaryWithProgress = async (
     file: File,
     resourceType: "image" | "video"
   ): Promise<string> => {
-    const chunkSize = 6 * 1024 * 1024; // 6 MB chunks (Cloudinary requires all non-EOF chunks to be >= 5MB)
-    const totalChunks = Math.ceil(file.size / chunkSize);
-    const uploadId = `uq_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    let finalUrl = "";
+    // 1. Get secure signature from server API (/api/cloudinary-sign)
+    const signRes = await fetch("/api/cloudinary-sign", { method: "POST" });
+    if (!signRes.ok) {
+      throw new Error("Failed to generate upload signature from server");
+    }
+    const signData = await signRes.json();
+    const { signature, timestamp, apiKey, cloudName, folder } = signData;
 
-    // Chunk uploader via same-origin /api/upload-video with 10-min timeout and 3x auto-retry
-    const uploadChunkWithRetry = async (
-      chunk: Blob,
-      start: number,
-      end: number,
-      chunkIndex: number,
-      maxRetries = 3
-    ): Promise<any> => {
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          return await new Promise<any>((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            const url = "/api/upload-video";
+    if (!signature || !apiKey || !cloudName) {
+      throw new Error("Cloudinary credentials missing or invalid signature");
+    }
 
-            // Explicit 10-minute timeout limit per 2MB chunk (600,000 ms)
-            xhr.timeout = 600000;
+    // 2. Direct upload to Cloudinary (no Vercel body limits, no 413 error!)
+    return new Promise<string>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
 
-            xhr.upload.onprogress = (e) => {
-              if (e.lengthComputable) {
-                const currentUploaded = start + e.loaded;
-                const percent = Math.round((currentUploaded / file.size) * 100);
-                const loadedMb = (currentUploaded / (1024 * 1024)).toFixed(1);
-                const totalMb = (file.size / (1024 * 1024)).toFixed(1);
+      // 10 minute upload timeout limit
+      xhr.timeout = 600000;
 
-                setUploadProgress(percent);
-                setUploadedMb(loadedMb);
-                setTotalMb(totalMb);
-                setUploadStatus(
-                  `Uploading ${resourceType}... ${percent}% (${loadedMb} MB / ${totalMb} MB)`
-                );
-              }
-            };
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          const loadedMb = (e.loaded / (1024 * 1024)).toFixed(1);
+          const totalMb = (e.total / (1024 * 1024)).toFixed(1);
 
-            xhr.onload = () => {
-              const responseText = (xhr.responseText || "").trim();
-              if (responseText.startsWith("<!DOCTYPE") || responseText.startsWith("<html")) {
-                reject(new Error("Server returned an invalid HTML response"));
-                return;
-              }
+          setUploadProgress(percent);
+          setUploadedMb(loadedMb);
+          setTotalMb(totalMb);
+          setUploadStatus(
+            `Uploading ${resourceType}... ${percent}% (${loadedMb} MB / ${totalMb} MB)`
+          );
+        }
+      };
 
-              if (xhr.status >= 200 && xhr.status < 300) {
-                try {
-                  const response = JSON.parse(responseText);
-                  if (response.success) {
-                    resolve(response);
-                  } else {
-                    reject(new Error(response.error || "Upload failed"));
-                  }
-                } catch (err) {
-                  reject(new Error("Failed to parse server response"));
-                }
-              } else {
-                try {
-                  const response = JSON.parse(responseText);
-                  reject(new Error(response?.error || `Upload failed with status ${xhr.status}`));
-                } catch (e) {
-                  reject(new Error(`Upload failed with status ${xhr.status}`));
-                }
-              }
-            };
-
-            xhr.onerror = () => reject(new Error(`Network interruption on chunk ${chunkIndex + 1}`));
-            xhr.ontimeout = () => reject(new Error(`Upload chunk ${chunkIndex + 1} timed out after 10 minutes`));
-
-            const formData = new FormData();
-            formData.append("file", chunk, file.name);
-            formData.append("resourceType", resourceType);
-            if (totalChunks > 1) {
-              formData.append("contentRange", `bytes ${start}-${end - 1}/${file.size}`);
-              formData.append("uploadId", uploadId);
+      xhr.onload = () => {
+        const responseText = (xhr.responseText || "").trim();
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const response = JSON.parse(responseText);
+            if (response.secure_url) {
+              setUploadStatus("Upload complete! Saving event data...");
+              resolve(response.secure_url);
+            } else {
+              reject(new Error("Cloudinary response missing media URL"));
             }
-
-            xhr.open("POST", url, true);
-            xhr.send(formData);
-          });
-        } catch (err: any) {
-          if (attempt < maxRetries) {
-            setUploadStatus(
-              `Network hiccup. Retrying chunk ${chunkIndex + 1}/${totalChunks} (Attempt ${attempt + 1}/${maxRetries})...`
-            );
-            await new Promise((r) => setTimeout(r, 1500));
-          } else {
-            throw err;
+          } catch (err) {
+            reject(new Error("Failed to parse Cloudinary response"));
+          }
+        } else {
+          try {
+            const response = JSON.parse(responseText);
+            reject(new Error(response?.error?.message || `Upload failed with status ${xhr.status}`));
+          } catch (e) {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
           }
         }
-      }
-    };
+      };
 
-    if (totalChunks === 1) {
-      const res = await uploadChunkWithRetry(file, 0, file.size, 0);
-      finalUrl = res.secure_url;
-    } else {
-      for (let i = 0; i < totalChunks; i++) {
-        const start = i * chunkSize;
-        const end = Math.min(start + chunkSize, file.size);
-        const chunk = file.slice(start, end);
+      xhr.onerror = () => reject(new Error("Network interruption during upload to Cloudinary"));
+      xhr.ontimeout = () => reject(new Error("Upload to Cloudinary timed out"));
 
-        const chunkRes = await uploadChunkWithRetry(chunk, start, end, i);
-        if (i === totalChunks - 1 || chunkRes.secure_url) {
-          finalUrl = chunkRes.secure_url || finalUrl;
-        }
-      }
-    }
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", apiKey);
+      formData.append("timestamp", timestamp.toString());
+      formData.append("signature", signature);
+      formData.append("folder", folder);
 
-    if (!finalUrl) {
-      throw new Error("Failed to retrieve uploaded media URL from Cloudinary");
-    }
-
-    setUploadStatus("Upload complete! Saving event data...");
-    return finalUrl;
+      xhr.open("POST", cloudinaryUrl, true);
+      xhr.send(formData);
+    });
   };
 
   // Event creation
