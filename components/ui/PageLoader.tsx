@@ -59,6 +59,7 @@ const PageLoader = () => {
                   src="/images/logo.png"
                   alt="Stryper Events"
                   fill
+                  sizes="(max-width: 768px) 256px, 320px"
                   priority
                   className="object-contain drop-shadow-[0_0_30px_rgba(250,204,21,0.5)] mix-blend-screen"
                 />
