@@ -17,6 +17,10 @@ import {
   AlertCircle, 
   FileText,
   LayoutDashboard,
+  Building2,
+  ExternalLink,
+  Search,
+  Globe,
   X
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -47,14 +51,17 @@ export default function AdminPage() {
   // Media preview lightbox state
   const [previewMedia, setPreviewMedia] = useState<{ url: string; type: "image" | "video"; title: string } | null>(null);
 
-  // Tab states: overview, portfolio, inquiries
-  const [activeTab, setActiveTab] = useState<"overview" | "portfolio" | "inquiries">("overview");
+  // Tab states: overview, portfolio, clients, inquiries
+  const [activeTab, setActiveTab] = useState<"overview" | "portfolio" | "clients" | "inquiries">("overview");
 
   // Data states
   const [events, setEvents] = useState<any[]>([]);
   const [inquiries, setInquiries] = useState<any[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const [isLoadingInquiries, setIsLoadingInquiries] = useState(true);
+  const [isLoadingClients, setIsLoadingClients] = useState(true);
+  const [clientSearchQuery, setClientSearchQuery] = useState("");
 
   // Form states for Event Post
   const [eventTitle, setEventTitle] = useState("");
@@ -67,6 +74,16 @@ export default function AdminPage() {
   const [isSubmittingEvent, setIsSubmittingEvent] = useState(false);
   const [eventPreviewUrl, setEventPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Form states for Company / Client
+  const [companyName, setCompanyName] = useState("");
+  const [companyWebsite, setCompanyWebsite] = useState("");
+  const [companyLogoSource, setCompanyLogoSource] = useState<"text" | "upload" | "url">("text");
+  const [companyFile, setCompanyFile] = useState<File | null>(null);
+  const [companyExternalUrl, setCompanyExternalUrl] = useState("");
+  const [companyPreviewUrl, setCompanyPreviewUrl] = useState<string | null>(null);
+  const [isSubmittingCompany, setIsSubmittingCompany] = useState(false);
+  const companyFileInputRef = useRef<HTMLInputElement>(null);
 
   // Upload Progress States
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -108,6 +125,7 @@ export default function AdminPage() {
     if (isAuthenticated) {
       fetchEvents();
       fetchInquiries();
+      fetchClients();
     }
   }, [isAuthenticated]);
 
@@ -148,6 +166,24 @@ export default function AdminPage() {
       toast.error("Network error loading inquiries");
     } finally {
       setIsLoadingInquiries(false);
+    }
+  };
+
+  const fetchClients = async () => {
+    setIsLoadingClients(true);
+    try {
+      const res = await fetch("/api/clients");
+      if (res.ok) {
+        const data = await res.json();
+        setClients(data);
+      } else {
+        toast.error("Failed to load companies");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Network error loading companies");
+    } finally {
+      setIsLoadingClients(false);
     }
   };
 
@@ -524,6 +560,136 @@ export default function AdminPage() {
     setEventPreviewUrl(url);
   };
 
+  // Company logo file selection handler
+  const handleCompanyFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const maxImageBytes = 5 * 1024 * 1024; // 5 MB limit
+    if (file.size > maxImageBytes) {
+      toast.error(`Logo image size exceeds 5 MB limit. Selected: ${(file.size / (1024 * 1024)).toFixed(2)} MB`);
+      if (companyFileInputRef.current) {
+        companyFileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    if (companyPreviewUrl) {
+      URL.revokeObjectURL(companyPreviewUrl);
+    }
+
+    setCompanyFile(file);
+    const url = URL.createObjectURL(file);
+    setCompanyPreviewUrl(url);
+  };
+
+  // Company creation handler
+  const handleCreateCompany = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!companyName.trim()) {
+      toast.error("Company name is required");
+      return;
+    }
+
+    setIsSubmittingCompany(true);
+    setUploadProgress(0);
+    setUploadStatus("Saving company...");
+
+    try {
+      let directLogoUrl = "";
+
+      if (companyLogoSource === "upload") {
+        if (!companyFile) {
+          toast.error("Please select a logo image file to upload");
+          setIsSubmittingCompany(false);
+          return;
+        }
+        setUploadStatus("Uploading company logo...");
+        directLogoUrl = await uploadToCloudinaryWithProgress(companyFile, "image");
+      } else if (companyLogoSource === "url") {
+        if (!companyExternalUrl.trim()) {
+          toast.error("Please enter a valid logo image URL");
+          setIsSubmittingCompany(false);
+          return;
+        }
+        directLogoUrl = companyExternalUrl.trim();
+      }
+
+      const formData = new FormData();
+      formData.append("name", companyName.trim());
+      if (companyWebsite.trim()) {
+        formData.append("website", companyWebsite.trim());
+      }
+      if (directLogoUrl) {
+        formData.append("directMediaUrl", directLogoUrl);
+      }
+
+      const res = await fetch("/api/clients", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        toast.success(`"${companyName}" added to Trusted Companies!`);
+        setCompanyName("");
+        setCompanyWebsite("");
+        setCompanyFile(null);
+        setCompanyExternalUrl("");
+        if (companyPreviewUrl) {
+          URL.revokeObjectURL(companyPreviewUrl);
+        }
+        setCompanyPreviewUrl(null);
+        setCompanyLogoSource("text");
+        if (companyFileInputRef.current) {
+          companyFileInputRef.current.value = "";
+        }
+        fetchClients();
+      } else {
+        toast.error(data.error || "Failed to add company");
+      }
+    } catch (error: any) {
+      console.error("Error creating company:", error);
+      toast.error(error?.message || "Failed to add company");
+    } finally {
+      setIsSubmittingCompany(false);
+      setUploadStatus("");
+      setUploadProgress(0);
+    }
+  };
+
+  // Company delete handler
+  const handleDeleteCompany = async (id: any, name: string) => {
+    if (!confirm(`Are you sure you want to remove "${name}" from Trusted Companies?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/clients?id=${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        toast.success(`"${name}" removed successfully!`);
+        fetchClients();
+      } else {
+        toast.error(data.error || "Failed to delete company");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred while deleting company");
+    }
+  };
+
   // Render stats counters
   const totalEvents = events.length;
   const imageEventsCount = events.filter((e) => e.type === "image").length;
@@ -601,6 +767,7 @@ export default function AdminPage() {
           {[
             { id: "overview", label: "Overview", icon: LayoutDashboard, badge: 0 },
             { id: "portfolio", label: "Event Portfolio", icon: ImageIcon, badge: 0 },
+            { id: "clients", label: "Trusted Companies", icon: Building2, badge: clients.length },
             { id: "inquiries", label: "Client Inquiries", icon: FileText, badge: inquiries.length },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -617,7 +784,9 @@ export default function AdminPage() {
                 <Icon size={16} />
                 {tab.label}
                 {tab.badge > 0 && (
-                  <span className="ml-1.5 px-2.5 py-0.5 text-[10px] font-black bg-red-500 text-white rounded-full">
+                  <span className={`ml-1.5 px-2.5 py-0.5 text-[10px] font-black rounded-full ${
+                    tab.id === "inquiries" ? "bg-red-500 text-white" : "bg-accent-yellow/20 text-accent-yellow"
+                  }`}>
                     {tab.badge}
                   </span>
                 )}
@@ -637,11 +806,12 @@ export default function AdminPage() {
               className="space-y-8"
             >
               {/* Stat Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 {[
                   { title: "Total Events", value: totalEvents, icon: ImageIcon, desc: "Live in gallery", tab: "portfolio" },
                   { title: "Image Posts", value: imageEventsCount, icon: ImageIcon, desc: "Event photographs", tab: "portfolio" },
                   { title: "Video Posts", value: videoEventsCount, icon: VideoIcon, desc: "Event recordings", tab: "portfolio" },
+                  { title: "Trusted Brands", value: clients.length, icon: Building2, desc: "Companies we work with", tab: "clients" },
                   { title: "Client Inquiries", value: inquiries.length, icon: FileText, desc: "Awaiting response", tab: "inquiries" },
                 ].map((stat, i) => {
                   const Icon = stat.icon;
@@ -678,7 +848,7 @@ export default function AdminPage() {
                     </div>
                     <div className="flex justify-between border-b border-white/5 pb-2">
                       <span className="text-white/50">Media Location</span>
-                      <span className="font-bold text-white">Inline Base64 Cloud</span>
+                      <span className="font-bold text-white">Inline Base64 / Cloudinary</span>
                     </div>
                     <div className="flex justify-between border-b border-white/5 pb-2">
                       <span className="text-white/50">Security Token</span>
@@ -700,15 +870,21 @@ export default function AdminPage() {
                       Quick Setup Shortcut
                     </h3>
                     <p className="text-sm text-white/60 leading-relaxed">
-                      You can navigate directly to the **Event Portfolio** or **Client Inquiries** tabs using the tab bar above to quickly manage event details or view leads.
+                      You can navigate directly to **Event Portfolio**, **Trusted Companies**, or **Client Inquiries** using the tab bar above to quickly manage event details, companies or view leads.
                     </p>
                   </div>
-                  <div className="flex gap-3 mt-6">
+                  <div className="flex flex-wrap gap-3 mt-6">
                     <button
                       onClick={() => setActiveTab("portfolio")}
                       className="px-5 py-2.5 bg-accent-yellow text-primary-black text-xs font-black uppercase tracking-wider rounded-full hover:bg-accent-yellow/90 transition-all"
                     >
                       Manage Portfolio
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("clients")}
+                      className="px-5 py-2.5 bg-white/10 border border-white/10 text-accent-yellow text-xs font-black uppercase tracking-wider rounded-full hover:bg-white/20 transition-all"
+                    >
+                      Manage Companies
                     </button>
                     <button
                       onClick={() => setActiveTab("inquiries")}
@@ -1078,6 +1254,328 @@ export default function AdminPage() {
                           </div>
                         );
                       })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === "clients" && (
+            <motion.div
+              key="clients"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+            >
+              {/* Add Company Form (Col 1) */}
+              <div className="lg:col-span-1">
+                <div className="glass glow-border p-6 rounded-3xl space-y-6 sticky top-28">
+                  <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                    <h3 className="text-xl font-bold uppercase tracking-tight flex items-center gap-2">
+                      <Plus className="text-accent-yellow" size={22} />
+                      Add Company
+                    </h3>
+                    <span className="text-[10px] text-accent-yellow font-black uppercase tracking-widest bg-accent-yellow/10 px-2.5 py-1 rounded-full border border-accent-yellow/20">
+                      Trusted By
+                    </span>
+                  </div>
+
+                  <form onSubmit={handleCreateCompany} className="space-y-4">
+                    {/* Company Name */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-white/60 uppercase flex items-center justify-between">
+                        <span>Company / Brand Name</span>
+                        <span className="text-red-400 font-normal">*Required</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Google, Swiggy, Mankind"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent-yellow transition-all"
+                        required
+                      />
+                    </div>
+
+                    {/* Logo Display Style */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-white/60 uppercase block">Logo Display Type</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { id: "text", label: "Text Logo" },
+                          { id: "upload", label: "Upload" },
+                          { id: "url", label: "Image URL" },
+                        ].map((mode) => (
+                          <button
+                            key={mode.id}
+                            type="button"
+                            onClick={() => setCompanyLogoSource(mode.id as any)}
+                            className={`py-2 rounded-lg text-xs font-bold transition-all border ${
+                              companyLogoSource === mode.id
+                                ? "bg-accent-yellow text-primary-black border-accent-yellow font-black"
+                                : "bg-white/5 text-white/60 border-white/10 hover:border-white/20"
+                            }`}
+                          >
+                            {mode.label}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-white/40 italic">
+                        {companyLogoSource === "text" && "Renders company name in luxury typography marquee on website."}
+                        {companyLogoSource === "upload" && "Upload a PNG, SVG, or WEBP transparent logo image (up to 5MB)."}
+                        {companyLogoSource === "url" && "Paste a direct web link to company logo image."}
+                      </p>
+                    </div>
+
+                    {/* File Upload Field */}
+                    {companyLogoSource === "upload" && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-white/60 uppercase">Logo Image File</label>
+                        <div
+                          onClick={() => companyFileInputRef.current?.click()}
+                          className="border-2 border-dashed border-white/10 hover:border-accent-yellow/50 rounded-2xl p-6 text-center cursor-pointer transition-all bg-white/5 group"
+                        >
+                          <input
+                            ref={companyFileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleCompanyFileChange}
+                            className="hidden"
+                          />
+
+                          {companyFile ? (
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-center gap-2 text-xs font-bold text-green-400">
+                                <Check size={16} /> Selected: {companyFile.name}
+                              </div>
+                              <div className="text-[10px] text-white/40">
+                                Size: {(companyFile.size / (1024 * 1024)).toFixed(2)} MB
+                              </div>
+                              {companyPreviewUrl && (
+                                <div className="h-20 bg-black/60 rounded-xl p-2 flex items-center justify-center border border-white/10">
+                                  <img
+                                    src={companyPreviewUrl}
+                                    alt="Preview"
+                                    className="max-h-full max-w-full object-contain"
+                                  />
+                                </div>
+                              )}
+                              <div className="text-[10px] text-white/40 italic">Click to choose another file</div>
+                            </div>
+                          ) : (
+                            <>
+                              <UploadCloud className="mx-auto text-white/30 group-hover:text-accent-yellow transition-colors" size={28} />
+                              <div className="text-xs font-bold text-white/60 mt-2">
+                                Click or drag logo image here
+                              </div>
+                              <div className="text-[10px] text-white/40 mt-1">PNG, SVG, WEBP up to 5 MB</div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* External URL Field */}
+                    {companyLogoSource === "url" && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-white/60 uppercase">Logo Image URL</label>
+                        <input
+                          type="url"
+                          placeholder="https://example.com/logo.png"
+                          value={companyExternalUrl}
+                          onChange={(e) => setCompanyExternalUrl(e.target.value)}
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent-yellow transition-all"
+                        />
+                        {companyExternalUrl && (
+                          <div className="h-16 bg-black/60 rounded-xl p-2 flex items-center justify-center border border-white/10 mt-2">
+                            <img
+                              src={companyExternalUrl}
+                              alt="Logo Preview"
+                              className="max-h-full max-w-full object-contain"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = "none";
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Live Marquee Preview for Text Mode */}
+                    {companyLogoSource === "text" && companyName.trim() && (
+                      <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-center">
+                        <span className="text-[10px] text-white/40 uppercase block mb-1">Marquee Preview</span>
+                        <span className="text-xl font-bold text-white/70 hover:text-accent-yellow transition-colors uppercase tracking-widest">
+                          {companyName.trim()}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Optional Website Link */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-white/60 uppercase flex items-center justify-between">
+                        <span>Website Link</span>
+                        <span className="text-[10px] text-white/30 font-normal">(Optional)</span>
+                      </label>
+                      <div className="relative">
+                        <Globe size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+                        <input
+                          type="url"
+                          placeholder="https://company.com"
+                          value={companyWebsite}
+                          onChange={(e) => setCompanyWebsite(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent-yellow transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      disabled={isSubmittingCompany}
+                      className="w-full py-4 bg-accent-yellow hover:bg-accent-yellow/90 text-primary-black rounded-xl font-black uppercase tracking-wider text-sm transition-all shadow-[0_10px_20px_rgba(250,204,21,0.2)] disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {isSubmittingCompany ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-primary-black border-t-transparent rounded-full animate-spin" />
+                          <span>Saving Company...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus size={18} />
+                          <span>Add to Trusted Companies</span>
+                        </>
+                      )}
+                    </motion.button>
+                  </form>
+                </div>
+              </div>
+
+              {/* Companies Management List (Col 2-3) */}
+              <div className="lg:col-span-2 space-y-6">
+                <div className="glass glow-border p-6 rounded-3xl space-y-6">
+                  {/* Header & Search */}
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/5 pb-4">
+                    <div>
+                      <h3 className="text-xl font-bold uppercase tracking-tight flex items-center gap-2">
+                        <Building2 className="text-accent-yellow" size={20} />
+                        Companies We Serve ({clients.length})
+                      </h3>
+                      <p className="text-[10px] text-white/40 mt-1 uppercase tracking-wider">
+                        Displayed in the &quot;Companies We Proudly Serve&quot; marquee section
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                      <div className="relative flex-1 sm:w-64">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                        <input
+                          type="text"
+                          placeholder="Search companies..."
+                          value={clientSearchQuery}
+                          onChange={(e) => setClientSearchQuery(e.target.value)}
+                          className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-white placeholder-white/30 focus:outline-none focus:border-accent-yellow"
+                        />
+                      </div>
+                      <button
+                        onClick={fetchClients}
+                        className="text-xs font-bold text-accent-yellow hover:underline whitespace-nowrap px-2"
+                      >
+                        Refresh
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* List Content */}
+                  {isLoadingClients ? (
+                    <div className="py-16 text-center text-white/40">
+                      <div className="w-8 h-8 rounded-full border border-white/10 border-t-accent-yellow animate-spin mx-auto mb-4" />
+                      Loading companies...
+                    </div>
+                  ) : clients.length === 0 ? (
+                    <div className="text-center py-16 border border-white/5 rounded-2xl bg-white/5 text-white/40">
+                      <Building2 className="mx-auto mb-3 text-white/20" size={40} />
+                      <p className="font-bold text-sm text-white/60">No companies added yet</p>
+                      <p className="text-xs text-white/40 mt-1">Use the form on the left to add your first partner brand.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[68vh] overflow-y-auto pr-1 no-scrollbar">
+                      {clients
+                        .filter((client) =>
+                          !clientSearchQuery.trim() ||
+                          client.name?.toLowerCase().includes(clientSearchQuery.toLowerCase())
+                        )
+                        .map((client) => {
+                          const hasLogo = client.logo && client.logo.trim().length > 0;
+                          return (
+                            <motion.div
+                              key={client.id || client._id}
+                              layout
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.95 }}
+                              className="flex items-center justify-between p-4 bg-white/5 border border-white/10 hover:border-accent-yellow/40 rounded-2xl transition-all duration-300 group"
+                            >
+                              <div className="flex items-center gap-3.5 min-w-0">
+                                {/* Visual Badge */}
+                                <div className="w-12 h-12 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 p-1">
+                                  {hasLogo ? (
+                                    <img
+                                      src={client.logo}
+                                      alt={client.name}
+                                      className="max-h-full max-w-full object-contain"
+                                      onError={(e) => {
+                                        (e.target as HTMLElement).style.display = "none";
+                                      }}
+                                    />
+                                  ) : (
+                                    <span className="text-sm font-black text-accent-yellow uppercase">
+                                      {client.name.substring(0, 2)}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div className="min-w-0">
+                                  <h4 className="text-sm font-bold text-white truncate uppercase tracking-wider">
+                                    {client.name}
+                                  </h4>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-[9px] font-bold text-accent-yellow uppercase tracking-wider">
+                                      {hasLogo ? "Logo Brand" : "Text Brand"}
+                                    </span>
+                                    {client.website && (
+                                      <>
+                                        <span className="w-1 h-1 bg-white/20 rounded-full" />
+                                        <a
+                                          href={client.website.startsWith("http") ? client.website : `https://${client.website}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-[10px] text-white/50 hover:text-accent-yellow flex items-center gap-1 truncate"
+                                        >
+                                          <ExternalLink size={10} /> Link
+                                        </a>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <motion.button
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => handleDeleteCompany(client.id || client._id, client.name)}
+                                className="w-9 h-9 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:border-red-500 rounded-xl flex items-center justify-center text-red-400 hover:text-white transition-all shrink-0 ml-2"
+                                title={`Delete ${client.name}`}
+                              >
+                                <Trash2 size={15} />
+                              </motion.button>
+                            </motion.div>
+                          );
+                        })}
                     </div>
                   )}
                 </div>
