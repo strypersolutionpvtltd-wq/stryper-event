@@ -24,14 +24,14 @@ const Gallery = () => {
     { id: "fabrication", label: "Fab" },
   ];
 
-  // Fetch gallery items from local API
+  // Fetch gallery items from local API (includes images, videos, and placeholders)
   useEffect(() => {
     const fetchGallery = async () => {
       try {
         const res = await fetch("/api/events");
         if (res.ok) {
           const data = await res.json();
-          setGalleryItems(data);
+          setGalleryItems(data.length > 0 ? data : fallbackItems);
         } else {
           throw new Error("Failed to load");
         }
@@ -339,7 +339,7 @@ const Gallery = () => {
                         {item.title}
                       </h3>
                       <span className="text-[10px] md:text-sm font-black text-accent-yellow uppercase tracking-widest">
-                        {item.category}
+                        {item.category} • {item.type === "video" ? "VIDEO" : item.type === "image" ? "IMAGE" : "PLACEHOLDER"}
                       </span>
                     </div>
                   </motion.div>
@@ -445,14 +445,14 @@ const Gallery = () => {
                   />
                 )}
 
-                {/* Bottom Overlay - Highly optimized for mobile */}
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 bg-gradient-to-t from-black via-black/80 to-transparent">
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
-                    <div>
-                      <p className="text-accent-yellow text-[10px] font-black uppercase tracking-[0.2em] mb-1">
-                        {filteredItems[selectedIdx].category}
+                {/* Overlay - Optimized to prevent video controls overlap */}
+                {filteredItems[selectedIdx].type === "video" ? (
+                  <>
+                    <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20 pointer-events-none max-w-[70%] bg-black/75 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/10 shadow-2xl">
+                      <p className="text-accent-yellow text-[10px] font-black uppercase tracking-[0.2em] mb-0.5">
+                        {filteredItems[selectedIdx].category} • VIDEO
                       </p>
-                      <h3 className="text-lg md:text-2xl font-bold text-white leading-tight">
+                      <h3 className="text-sm md:text-lg font-bold text-white leading-tight truncate">
                         {filteredItems[selectedIdx].title}
                       </h3>
                     </div>
@@ -462,12 +462,35 @@ const Gallery = () => {
                       rel="noopener noreferrer"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-[#25D366] text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-transform"
+                      className="absolute bottom-16 right-4 md:bottom-20 md:right-6 z-30 flex items-center justify-center gap-2 px-5 py-2.5 bg-[#25D366] text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-transform"
                     >
                       <MessageSquare size={14} fill="currentColor" /> Enquire Now
                     </motion.a>
+                  </>
+                ) : (
+                  <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 bg-gradient-to-t from-black via-black/80 to-transparent z-20">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+                      <div>
+                        <p className="text-accent-yellow text-[10px] font-black uppercase tracking-[0.2em] mb-1">
+                          {filteredItems[selectedIdx].category} • {filteredItems[selectedIdx].type === "image" ? "IMAGE" : "PLACEHOLDER"}
+                        </p>
+                        <h3 className="text-lg md:text-2xl font-bold text-white leading-tight">
+                          {filteredItems[selectedIdx].title}
+                        </h3>
+                      </div>
+                      <motion.a
+                        href={`https://wa.me/${COMPANY_CONTACT.whatsapp.replace(/[^0-9]/g, "")}?text=Hi, I am interested in knowing more about the ${filteredItems[selectedIdx].title} project.`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center justify-center gap-2 px-6 py-3 bg-[#25D366] text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-transform"
+                      >
+                        <MessageSquare size={14} fill="currentColor" /> Enquire Now
+                      </motion.a>
+                    </div>
                   </div>
-                </div>
+                )}
               </motion.div>
             </motion.div>
           )}

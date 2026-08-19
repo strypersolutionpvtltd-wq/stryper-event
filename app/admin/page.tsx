@@ -219,7 +219,7 @@ export default function AdminPage() {
     toast.success("Logged out successfully");
   };
 
-  // Direct Signed Client-to-Cloudinary Upload (Bypasses Vercel 4.5MB Serverless Payload Limits!)
+  // Direct Signed Client-to-Cloudinary Chunked Upload for Files up to 1 GB
   const uploadToCloudinaryWithProgress = async (
     file: File,
     resourceType: "image" | "video"
@@ -236,66 +236,114 @@ export default function AdminPage() {
       throw new Error("Cloudinary credentials missing or invalid signature");
     }
 
-    // 2. Direct upload to Cloudinary (no Vercel body limits, no 413 error!)
-    return new Promise<string>((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
+    const chunkSize = 6 * 1024 * 1024; // 6 MB chunks (Cloudinary requires all non-EOF chunks to be >= 5MB)
+    const totalChunks = Math.ceil(file.size / chunkSize);
+    const uploadId = `uq_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
 
-      // 10 minute upload timeout limit
-      xhr.timeout = 600000;
+    let finalUrl = "";
 
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          const percent = Math.round((e.loaded / e.total) * 100);
-          const loadedMb = (e.loaded / (1024 * 1024)).toFixed(1);
-          const totalMb = (e.total / (1024 * 1024)).toFixed(1);
+    // Upload individual 6MB chunk directly from browser to Cloudinary with retry
+    const uploadChunkWithRetry = async (
+      chunk: Blob,
+      start: number,
+      end: number,
+      chunkIndex: number,
+      maxRetries = 3
+    ): Promise<any> => {
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          return await new Promise<any>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.timeout = 300000; // 5 minute timeout per 6MB chunk
 
-          setUploadProgress(percent);
-          setUploadedMb(loadedMb);
-          setTotalMb(totalMb);
-          setUploadStatus(
-            `Uploading ${resourceType}... ${percent}% (${loadedMb} MB / ${totalMb} MB)`
-          );
-        }
-      };
+            xhr.upload.onprogress = (e) => {
+              if (e.lengthComputable) {
+                const currentUploaded = start + e.loaded;
+                const percent = Math.round((currentUploaded / file.size) * 100);
+                const loadedMb = (currentUploaded / (1024 * 1024)).toFixed(1);
+                const totalMb = (file.size / (1024 * 1024)).toFixed(1);
 
-      xhr.onload = () => {
-        const responseText = (xhr.responseText || "").trim();
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            const response = JSON.parse(responseText);
-            if (response.secure_url) {
-              setUploadStatus("Upload complete! Saving event data...");
-              resolve(response.secure_url);
-            } else {
-              reject(new Error("Cloudinary response missing media URL"));
+                setUploadProgress(percent);
+                setUploadedMb(loadedMb);
+                setTotalMb(totalMb);
+                setUploadStatus(
+                  `Uploading ${resourceType}... ${percent}% (${loadedMb} MB / ${totalMb} MB)`
+                );
+              }
+            };
+
+            xhr.onload = () => {
+              const responseText = (xhr.responseText || "").trim();
+              if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                  const response = JSON.parse(responseText);
+                  resolve(response);
+                } catch (err) {
+                  reject(new Error("Failed to parse Cloudinary response"));
+                }
+              } else {
+                try {
+                  const response = JSON.parse(responseText);
+                  reject(new Error(response?.error?.message || `Upload failed with status ${xhr.status}`));
+                } catch (e) {
+                  reject(new Error(`Upload failed with status ${xhr.status}`));
+                }
+              }
+            };
+
+            xhr.onerror = () => reject(new Error(`Network error on chunk ${chunkIndex + 1}`));
+            xhr.ontimeout = () => reject(new Error(`Upload chunk ${chunkIndex + 1} timed out`));
+
+            const formData = new FormData();
+            formData.append("file", chunk, file.name);
+            formData.append("api_key", apiKey);
+            formData.append("timestamp", timestamp.toString());
+            formData.append("signature", signature);
+            formData.append("folder", folder);
+
+            xhr.open("POST", cloudinaryUrl, true);
+            if (totalChunks > 1) {
+              xhr.setRequestHeader("Content-Range", `bytes ${start}-${end - 1}/${file.size}`);
+              xhr.setRequestHeader("X-Unique-Upload-Id", uploadId);
             }
-          } catch (err) {
-            reject(new Error("Failed to parse Cloudinary response"));
-          }
-        } else {
-          try {
-            const response = JSON.parse(responseText);
-            reject(new Error(response?.error?.message || `Upload failed with status ${xhr.status}`));
-          } catch (e) {
-            reject(new Error(`Upload failed with status ${xhr.status}`));
+            xhr.send(formData);
+          });
+        } catch (err: any) {
+          if (attempt < maxRetries) {
+            setUploadStatus(
+              `Network hiccup. Retrying chunk ${chunkIndex + 1}/${totalChunks} (Attempt ${attempt + 1}/${maxRetries})...`
+            );
+            await new Promise((r) => setTimeout(r, 1500));
+          } else {
+            throw err;
           }
         }
-      };
+      }
+    };
 
-      xhr.onerror = () => reject(new Error("Network interruption during upload to Cloudinary"));
-      xhr.ontimeout = () => reject(new Error("Upload to Cloudinary timed out"));
+    if (totalChunks === 1) {
+      const res = await uploadChunkWithRetry(file, 0, file.size, 0);
+      finalUrl = res.secure_url;
+    } else {
+      for (let i = 0; i < totalChunks; i++) {
+        const start = i * chunkSize;
+        const end = Math.min(start + chunkSize, file.size);
+        const chunk = file.slice(start, end);
 
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("api_key", apiKey);
-      formData.append("timestamp", timestamp.toString());
-      formData.append("signature", signature);
-      formData.append("folder", folder);
+        const chunkRes = await uploadChunkWithRetry(chunk, start, end, i);
+        if (chunkRes.secure_url) {
+          finalUrl = chunkRes.secure_url;
+        }
+      }
+    }
 
-      xhr.open("POST", cloudinaryUrl, true);
-      xhr.send(formData);
-    });
+    if (!finalUrl) {
+      throw new Error("Failed to retrieve uploaded media URL from Cloudinary");
+    }
+
+    setUploadStatus("Upload complete! Saving event data...");
+    return finalUrl;
   };
 
   // Event creation
@@ -336,7 +384,7 @@ export default function AdminPage() {
             return;
           }
           if (eventType === "video" && eventFile.size > 100 * 1024 * 1024) {
-            toast.error("Video file size exceeds Cloudinary Free Tier's 100 MB limit.");
+            toast.error("Video file size exceeds Cloudinary Free Account limit (100 MB). Use 'External URL' for larger videos.");
             setIsSubmittingEvent(false);
             return;
           }
@@ -453,12 +501,16 @@ export default function AdminPage() {
         return;
       }
     } else if (eventType === "video") {
-      const maxVideoBytes = 100 * 1024 * 1024; // 100 MB Cloudinary Free Tier limit
+      const maxVideoBytes = 100 * 1024 * 1024; // 100 MB Cloudinary Free Account hard limit
       if (file.size > maxVideoBytes) {
-        toast.error(`Video size exceeds Cloudinary Free Tier's 100 MB limit. Selected: ${(file.size / (1024 * 1024)).toFixed(1)} MB`);
+        toast.error(
+          `Selected video (${(file.size / (1024 * 1024)).toFixed(1)} MB) exceeds Cloudinary Free Account limit (100 MB). Switched to 'External URL' tab for pasting YouTube/Drive link.`
+        );
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
+        setEventFile(null);
+        setEventMediaSource("url");
         return;
       }
     }
@@ -806,7 +858,7 @@ export default function AdminPage() {
                             <div className="flex items-center justify-between text-[11px] font-semibold text-white/60 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
                               <span>Allowed Format: {eventType === "image" ? "Images (JPG, PNG, WebP)" : "Videos (MP4, MOV, WebM)"}</span>
                               <span className="text-accent-yellow font-bold">
-                                {eventType === "image" ? "Max: 5 MB" : "Max: 100 MB"}
+                                {eventType === "image" ? "Max: 5 MB" : "Max: 100 MB (Direct)"}
                               </span>
                             </div>
 
@@ -857,8 +909,9 @@ export default function AdminPage() {
                                         />
                                       ) : (
                                         <video
-                                          src={eventPreviewUrl}
+                                          src={`${eventPreviewUrl}#t=0.1`}
                                           controls
+                                          preload="metadata"
                                           className="object-cover w-full h-full"
                                         />
                                       )}
@@ -876,7 +929,7 @@ export default function AdminPage() {
                                     Drag & drop or <span className="text-accent-yellow">browse</span>
                                   </div>
                                   <div className="text-[10px] text-white/40">
-                                    {eventType === "image" ? "Up to 5 MB per image" : "Up to 100 MB per video (Cloudinary Free Plan Limit)"}
+                                    {eventType === "image" ? "Up to 5 MB per image" : "Up to 100 MB (Direct) | Use 'External URL' for >100 MB"}
                                   </div>
                                 </>
                               )}
