@@ -6,7 +6,7 @@ import crypto from "crypto";
 // Helper to verify admin token
 function verifyAdmin(request: Request): boolean {
   try {
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "event@@2026";
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "stryper@@2002";
     const expectedToken = crypto
       .createHmac("sha256", ADMIN_PASSWORD)
       .update("stryper-admin-session")
