@@ -8,12 +8,19 @@ import Image from "next/image";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { COMPANY_CONTACT } from "@/constants";
+import { optimizeCloudinaryUrl } from "@/lib/utils";
 
 const Gallery = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [galleryItems, setGalleryItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Reset active photo index when selected event item changes
+  useEffect(() => {
+    setActiveImageIdx(0);
+  }, [selectedIdx]);
 
   const categories = [
     { id: "all", label: "All" },
@@ -301,14 +308,22 @@ const Gallery = () => {
                 >
                   {/* Actual Media */}
                   {item.type === "image" ? (
-                    <Image
-                      src={item.image || "/images/placeholder.jpg"}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      loading="lazy"
-                    />
+                    <>
+                      <Image
+                        src={optimizeCloudinaryUrl((item.images && item.images[0]) || item.image || "/images/placeholder.jpg", 600)}
+                        alt={item.title}
+                        fill
+                        unoptimized
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        loading="lazy"
+                      />
+                      {item.images && item.images.length > 1 && (
+                        <div className="absolute top-3 left-3 z-10 bg-black/75 backdrop-blur-md text-accent-yellow text-[10px] font-black uppercase px-2.5 py-1 rounded-full border border-white/10 flex items-center gap-1 shadow-lg">
+                          <span>📷</span> {item.images.length} Photos
+                        </div>
+                      )}
+                    </>
                   ) : item.type === "video" ? (
                     <video
                       src={item.video}
@@ -425,15 +440,87 @@ const Gallery = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 {filteredItems[selectedIdx].type === "image" ? (
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={filteredItems[selectedIdx].image!}
-                      alt={filteredItems[selectedIdx].title}
-                      fill
-                      className="object-contain"
-                      sizes="95vw"
-                      priority
-                    />
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    {(() => {
+                      const itemImages =
+                        filteredItems[selectedIdx].images && filteredItems[selectedIdx].images.length > 0
+                          ? filteredItems[selectedIdx].images
+                          : [filteredItems[selectedIdx].image || "/images/placeholder.jpg"];
+                      const currentRawSrc = itemImages[activeImageIdx] || itemImages[0];
+                      const optimizedSrc = optimizeCloudinaryUrl(currentRawSrc, 1200);
+
+                      return (
+                        <>
+                          {/* Preload all images of this event post in advance for 0ms instant sliding! */}
+                          <div className="hidden" aria-hidden="true">
+                            {itemImages.map((imgUrl: string, idx: number) => (
+                              <img
+                                key={idx}
+                                src={optimizeCloudinaryUrl(imgUrl, 1200)}
+                                alt="preload"
+                                loading="eager"
+                              />
+                            ))}
+                          </div>
+
+                          <img
+                            key={currentRawSrc}
+                            src={optimizedSrc}
+                            alt={filteredItems[selectedIdx].title}
+                            className="object-contain max-w-full max-h-full w-auto h-auto rounded-xl shadow-2xl transition-opacity duration-200"
+                            loading="eager"
+                          />
+
+                          {/* Multi-Photo Sub-Navigation & Dot Indicators */}
+                          {itemImages.length > 1 && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveImageIdx((prev) => (prev - 1 + itemImages.length) % itemImages.length);
+                                }}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-black/70 hover:bg-black/90 text-white rounded-full flex items-center justify-center border border-white/20 backdrop-blur-md transition-transform active:scale-95 shadow-xl"
+                                title="Previous Photo"
+                              >
+                                <ChevronLeft size={24} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveImageIdx((prev) => (prev + 1) % itemImages.length);
+                                }}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-black/70 hover:bg-black/90 text-white rounded-full flex items-center justify-center border border-white/20 backdrop-blur-md transition-transform active:scale-95 shadow-xl"
+                                title="Next Photo"
+                              >
+                                <ChevronRight size={24} />
+                              </button>
+
+                              {/* Dot Indicators */}
+                              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-black/75 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-2xl">
+                                {itemImages.map((_: any, imgIdx: number) => (
+                                  <button
+                                    key={imgIdx}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setActiveImageIdx(imgIdx);
+                                    }}
+                                    className={`w-2.5 h-2.5 rounded-full transition-all ${
+                                      activeImageIdx === imgIdx
+                                        ? "bg-accent-yellow scale-125"
+                                        : "bg-white/40 hover:bg-white/70"
+                                    }`}
+                                    title={`Photo ${imgIdx + 1}`}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 ) : (
                   <video

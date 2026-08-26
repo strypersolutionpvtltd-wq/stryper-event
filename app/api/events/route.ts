@@ -60,33 +60,44 @@ export async function POST(request: Request) {
     const mediaSource = formData.get("mediaSource")?.toString(); // "upload" | "url"
     const externalUrl = formData.get("externalUrl")?.toString();
 
+    let mediaUrls: string[] = [];
+    const directMediaUrlsJson = formData.get("directMediaUrlsJson")?.toString();
+    const rawDirectUrls = formData.getAll("directMediaUrls").map((v) => v.toString()).filter(Boolean);
     const directMediaUrl = formData.get("directMediaUrl")?.toString();
 
-    if (!title || !category || !type) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (directMediaUrlsJson) {
+      try {
+        mediaUrls = JSON.parse(directMediaUrlsJson);
+      } catch (e) {
+        mediaUrls = [];
+      }
+    } else if (rawDirectUrls.length > 0) {
+      mediaUrls = rawDirectUrls;
+    } else if (directMediaUrl) {
+      mediaUrls = [directMediaUrl];
     }
 
-    let mediaUrl = "";
+    if (type !== "coming-soon" && mediaUrls.length === 0) {
+      if (mediaSource === "upload") {
+        const files = formData.getAll("file") as File[];
+        const singleFile = formData.get("file") as File;
+        const uploadFiles = files.length > 0 ? files : singleFile ? [singleFile] : [];
 
-    if (type !== "coming-soon") {
-      if (directMediaUrl) {
-        mediaUrl = directMediaUrl;
-      } else if (mediaSource === "upload") {
-        const file = formData.get("file") as File;
-        if (!file || file.size === 0) {
+        if (uploadFiles.length === 0 || uploadFiles[0].size === 0) {
           return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
         }
 
-        // Convert file to Base64 data URI fallback
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const base64String = buffer.toString("base64");
-        mediaUrl = `data:${file.type};base64,${base64String}`;
+        for (const file of uploadFiles) {
+          const arrayBuffer = await file.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          const base64String = buffer.toString("base64");
+          mediaUrls.push(`data:${file.type};base64,${base64String}`);
+        }
       } else if (mediaSource === "url") {
         if (!externalUrl) {
           return NextResponse.json({ error: "External URL is required" }, { status: 400 });
         }
-        mediaUrl = externalUrl;
+        mediaUrls = [externalUrl];
       }
     }
 
@@ -98,9 +109,10 @@ export async function POST(request: Request) {
     };
 
     if (type === "image") {
-      newEventData.image = mediaUrl;
+      newEventData.images = mediaUrls;
+      newEventData.image = mediaUrls[0] || "";
     } else if (type === "video") {
-      newEventData.video = mediaUrl;
+      newEventData.video = mediaUrls[0] || "";
     }
 
     const newEvent = new Event(newEventData);

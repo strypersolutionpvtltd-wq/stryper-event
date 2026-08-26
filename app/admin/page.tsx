@@ -17,7 +17,9 @@ import {
   AlertCircle, 
   FileText,
   LayoutDashboard,
-  X
+  X,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -44,8 +46,9 @@ export default function AdminPage() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [sessionToken, setSessionToken] = useState("");
 
-  // Media preview lightbox state
-  const [previewMedia, setPreviewMedia] = useState<{ url: string; type: "image" | "video"; title: string } | null>(null);
+  // Media  // Preview modal state for items list
+  const [previewMedia, setPreviewMedia] = useState<{ url: string; images?: string[]; type: "image" | "video"; title: string } | null>(null);
+  const [previewImgIdx, setPreviewImgIdx] = useState(0);
 
   // Tab states: overview, portfolio, inquiries
   const [activeTab, setActiveTab] = useState<"overview" | "portfolio" | "inquiries">("overview");
@@ -62,10 +65,10 @@ export default function AdminPage() {
   const [customCategory, setCustomCategory] = useState("");
   const [eventType, setEventType] = useState<"image" | "video" | "coming-soon">("image");
   const [eventMediaSource, setEventMediaSource] = useState<"upload" | "url">("upload");
-  const [eventFile, setEventFile] = useState<File | null>(null);
+  const [eventFiles, setEventFiles] = useState<File[]>([]);
+  const [eventPreviewUrls, setEventPreviewUrls] = useState<string[]>([]);
   const [eventExternalUrl, setEventExternalUrl] = useState("");
   const [isSubmittingEvent, setIsSubmittingEvent] = useState(false);
-  const [eventPreviewUrl, setEventPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Upload Progress States
@@ -74,18 +77,17 @@ export default function AdminPage() {
   const [totalMb, setTotalMb] = useState("0.0");
   const [uploadStatus, setUploadStatus] = useState("");
 
-  // Fix Preview Bug: Reset file selection & preview URL when eventType toggles if file doesn't match
+  // Reset files & preview URLs when eventType toggles if type mismatch
   useEffect(() => {
-    if (eventFile) {
-      const isFileVideo = eventFile.type.startsWith("video/");
-      const isFileImage = eventFile.type.startsWith("image/");
+    if (eventFiles.length > 0) {
+      const firstFile = eventFiles[0];
+      const isFileVideo = firstFile.type.startsWith("video/");
+      const isFileImage = firstFile.type.startsWith("image/");
 
       if ((eventType === "image" && isFileVideo) || (eventType === "video" && isFileImage)) {
-        setEventFile(null);
-        if (eventPreviewUrl) {
-          URL.revokeObjectURL(eventPreviewUrl);
-          setEventPreviewUrl(null);
-        }
+        setEventFiles([]);
+        eventPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+        setEventPreviewUrls([]);
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
@@ -366,34 +368,42 @@ export default function AdminPage() {
     setTotalMb("0.0");
     setUploadStatus("Initializing upload...");
 
-    let directMediaUrl = "";
+    let directMediaUrls: string[] = [];
 
     try {
       if (eventType !== "coming-soon") {
         if (eventMediaSource === "upload") {
-          if (!eventFile) {
-            toast.error("Please select a file to upload");
+          if (eventFiles.length === 0) {
+            toast.error("Please select at least one file to upload");
             setIsSubmittingEvent(false);
             return;
           }
 
-          // Validate file size before upload
-          if (eventType === "image" && eventFile.size > 5 * 1024 * 1024) {
-            toast.error("Image file size exceeds 5 MB limit");
-            setIsSubmittingEvent(false);
-            return;
-          }
-          if (eventType === "video" && eventFile.size > 100 * 1024 * 1024) {
-            toast.error("Video file size exceeds Cloudinary Free Account limit (100 MB). Use 'External URL' for larger videos.");
-            setIsSubmittingEvent(false);
-            return;
+          // Validate file sizes before upload
+          for (const file of eventFiles) {
+            if (eventType === "image" && file.size > 5 * 1024 * 1024) {
+              toast.error(`Image "${file.name}" exceeds 5 MB limit.`);
+              setIsSubmittingEvent(false);
+              return;
+            }
+            if (eventType === "video" && file.size > 100 * 1024 * 1024) {
+              toast.error("Video file size exceeds Cloudinary Free Account limit (100 MB). Use 'External URL' for larger videos.");
+              setIsSubmittingEvent(false);
+              return;
+            }
           }
 
-          // Upload via chunk proxy
-          directMediaUrl = await uploadToCloudinaryWithProgress(
-            eventFile,
-            eventType === "video" ? "video" : "image"
-          );
+          // Upload files (up to 4 images or 1 video)
+          for (let i = 0; i < eventFiles.length; i++) {
+            if (eventFiles.length > 1) {
+              setUploadStatus(`Uploading ${eventType} ${i + 1} of ${eventFiles.length}...`);
+            }
+            const url = await uploadToCloudinaryWithProgress(
+              eventFiles[i],
+              eventType === "video" ? "video" : "image"
+            );
+            directMediaUrls.push(url);
+          }
         } else {
           if (!eventExternalUrl.trim()) {
             toast.error("Please enter a media URL");
@@ -403,15 +413,16 @@ export default function AdminPage() {
         }
       }
 
-      // Step 3: Save Event metadata + Cloudinary URL in MongoDB
+      // Step 3: Save Event metadata + Cloudinary URLs in MongoDB
       const formData = new FormData();
       formData.append("title", eventTitle);
       formData.append("category", finalCategory);
       formData.append("type", eventType);
       formData.append("mediaSource", eventMediaSource);
 
-      if (directMediaUrl) {
-        formData.append("directMediaUrl", directMediaUrl);
+      if (directMediaUrls.length > 0) {
+        formData.append("directMediaUrlsJson", JSON.stringify(directMediaUrls));
+        formData.append("directMediaUrl", directMediaUrls[0]);
       } else if (eventExternalUrl) {
         formData.append("externalUrl", eventExternalUrl);
       }
@@ -430,12 +441,10 @@ export default function AdminPage() {
         toast.success("Event post added successfully!");
         // Reset form
         setEventTitle("");
-        setEventFile(null);
+        setEventFiles([]);
         setEventExternalUrl("");
-        if (eventPreviewUrl) {
-          URL.revokeObjectURL(eventPreviewUrl);
-        }
-        setEventPreviewUrl(null);
+        eventPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+        setEventPreviewUrls([]);
         setEventCategory("corporate");
         setCustomCategory("");
         setUploadProgress(0);
@@ -484,23 +493,58 @@ export default function AdminPage() {
     }
   };
 
-  // File selection handler with size validation & preview
+  // Remove specific image at index (Cross X button handler)
+  const removeImageAt = (indexToRemove: number) => {
+    if (eventPreviewUrls[indexToRemove]) {
+      URL.revokeObjectURL(eventPreviewUrls[indexToRemove]);
+    }
+    const updatedFiles = eventFiles.filter((_, idx) => idx !== indexToRemove);
+    const updatedUrls = eventPreviewUrls.filter((_, idx) => idx !== indexToRemove);
+    setEventFiles(updatedFiles);
+    setEventPreviewUrls(updatedUrls);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // File selection handler with size validation & multiple preview (Up to 4 images)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) {
+    const selected = e.target.files;
+    if (!selected || selected.length === 0) {
       return;
     }
 
     if (eventType === "image") {
-      const maxImageBytes = 5 * 1024 * 1024; // 5 MB limit
-      if (file.size > maxImageBytes) {
-        toast.error(`Image size exceeds 5 MB limit. Selected: ${(file.size / (1024 * 1024)).toFixed(2)} MB`);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
+      const newFilesArray = Array.from(selected);
+      const validNewFiles: File[] = [];
+
+      for (const file of newFilesArray) {
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`Image "${file.name}" exceeds 5 MB limit.`);
+        } else {
+          validNewFiles.push(file);
         }
+      }
+
+      if (validNewFiles.length === 0) {
         return;
       }
+
+      const combined = [...eventFiles, ...validNewFiles];
+      if (combined.length > 4) {
+        toast.error("Maximum 4 images allowed per event post. Kept first 4 images.");
+      }
+      const finalFiles = combined.slice(0, 4);
+
+      // Clean previous previews
+      eventPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+
+      // Create object URLs
+      const newUrls = finalFiles.map((f) => URL.createObjectURL(f));
+      setEventFiles(finalFiles);
+      setEventPreviewUrls(newUrls);
     } else if (eventType === "video") {
+      const file = selected[0];
       const maxVideoBytes = 100 * 1024 * 1024; // 100 MB Cloudinary Free Account hard limit
       if (file.size > maxVideoBytes) {
         toast.error(
@@ -509,19 +553,17 @@ export default function AdminPage() {
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
-        setEventFile(null);
+        setEventFiles([]);
+        eventPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+        setEventPreviewUrls([]);
         setEventMediaSource("url");
         return;
       }
-    }
 
-    if (eventPreviewUrl) {
-      URL.revokeObjectURL(eventPreviewUrl);
+      eventPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+      setEventFiles([file]);
+      setEventPreviewUrls([URL.createObjectURL(file)]);
     }
-
-    setEventFile(file);
-    const url = URL.createObjectURL(file);
-    setEventPreviewUrl(url);
   };
 
   // Render stats counters
@@ -858,80 +900,99 @@ export default function AdminPage() {
                             <div className="flex items-center justify-between text-[11px] font-semibold text-white/60 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
                               <span>Allowed Format: {eventType === "image" ? "Images (JPG, PNG, WebP)" : "Videos (MP4, MOV, WebM)"}</span>
                               <span className="text-accent-yellow font-bold">
-                                {eventType === "image" ? "Max: 5 MB" : "Max: 100 MB (Direct)"}
+                                {eventType === "image"
+                                  ? `Selected: ${eventFiles.length}/4 Photos`
+                                  : "Max: 100 MB (Direct)"}
                               </span>
                             </div>
 
-                            <div
-                              onClick={() => fileInputRef.current?.click()}
-                              className="border-2 border-dashed border-white/10 hover:border-accent-yellow/50 rounded-2xl p-6 text-center cursor-pointer hover:bg-white/5 transition-all space-y-2 group"
-                            >
+                            <div className="border-2 border-dashed border-white/10 hover:border-accent-yellow/50 rounded-2xl p-4 text-center cursor-pointer hover:bg-white/5 transition-all space-y-3 group">
                               <input
                                 type="file"
                                 ref={fileInputRef}
                                 onChange={handleFileChange}
                                 accept={eventType === "image" ? "image/*" : "video/*"}
+                                multiple={eventType === "image"}
                                 className="hidden"
                               />
-                              {eventFile ? (
-                                <div className="space-y-3 p-3 bg-white/5 border border-accent-yellow/30 rounded-xl relative group-hover:border-accent-yellow transition-all">
-                                  <div className="flex items-center justify-between gap-3">
-                                    <div className="flex items-center gap-3 min-w-0 text-left">
-                                      <div className="w-10 h-10 rounded-lg bg-accent-yellow/10 border border-accent-yellow/20 flex items-center justify-center shrink-0">
-                                        {eventType === "video" ? (
-                                          <VideoIcon size={20} className="text-accent-yellow" />
-                                        ) : (
-                                          <UploadCloud size={20} className="text-accent-yellow" />
-                                        )}
-                                      </div>
-                                      <div className="min-w-0">
-                                        <div className="text-xs font-bold text-white truncate max-w-[180px]" title={eventFile.name}>
-                                          {eventFile.name}
+
+                              {eventFiles.length > 0 ? (
+                                <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
+                                  {/* Grid of Selected Image / Video Previews */}
+                                  <div
+                                    className={`grid gap-3 ${
+                                      eventFiles.length === 1 ? "grid-cols-1" : "grid-cols-2"
+                                    }`}
+                                  >
+                                    {eventFiles.map((file, idx) => (
+                                      <div
+                                        key={idx}
+                                        className="relative p-2 bg-white/5 border border-accent-yellow/30 rounded-xl group/item hover:border-accent-yellow transition-all"
+                                      >
+                                        {/* Individual Delete / Cross (X) Button */}
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            removeImageAt(idx);
+                                          }}
+                                          className="absolute -top-2 -right-2 z-20 w-6 h-6 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-lg transition-transform hover:scale-110"
+                                          title="Remove this photo"
+                                        >
+                                          <X size={14} />
+                                        </button>
+
+                                        {/* Thumbnail Preview */}
+                                        <div className="relative aspect-[16/9] rounded-lg overflow-hidden w-full border border-white/10 bg-black/60 mb-2">
+                                          {eventType === "image" ? (
+                                            <img
+                                              src={eventPreviewUrls[idx]}
+                                              alt={`Preview ${idx + 1}`}
+                                              className="object-cover w-full h-full"
+                                            />
+                                          ) : (
+                                            <video
+                                              src={`${eventPreviewUrls[idx]}#t=0.1`}
+                                              controls
+                                              preload="metadata"
+                                              className="object-cover w-full h-full"
+                                            />
+                                          )}
                                         </div>
-                                        <div className="text-[10px] text-white/50 font-mono">
-                                          {(eventFile.size / (1024 * 1024)).toFixed(1)} MB
+
+                                        <div className="flex items-center justify-between text-[10px] text-white/70 px-1">
+                                          <span className="truncate max-w-[100px] font-bold" title={file.name}>
+                                            {file.name}
+                                          </span>
+                                          <span className="font-mono text-white/40">
+                                            {(file.size / (1024 * 1024)).toFixed(1)} MB
+                                          </span>
                                         </div>
                                       </div>
-                                    </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent-yellow bg-accent-yellow/10 px-2 py-1 rounded border border-accent-yellow/20 shrink-0">
-                                      File Ready
-                                    </span>
+                                    ))}
                                   </div>
 
-                                  {/* Optional Media Preview */}
-                                  {eventPreviewUrl && (
-                                    <div className="relative aspect-[16/9] rounded-lg overflow-hidden w-full max-w-[260px] mx-auto border border-white/10 bg-black/60">
-                                      {eventType === "image" ? (
-                                        <img
-                                          src={eventPreviewUrl}
-                                          alt="Preview"
-                                          className="object-cover w-full h-full"
-                                        />
-                                      ) : (
-                                        <video
-                                          src={`${eventPreviewUrl}#t=0.1`}
-                                          controls
-                                          preload="metadata"
-                                          className="object-cover w-full h-full"
-                                        />
-                                      )}
-                                    </div>
+                                  {/* Add More Photos Button if < 4 */}
+                                  {eventType === "image" && eventFiles.length < 4 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => fileInputRef.current?.click()}
+                                      className="w-full py-2.5 px-3 bg-white/5 hover:bg-white/10 border border-dashed border-accent-yellow/40 rounded-xl text-xs font-bold text-accent-yellow flex items-center justify-center gap-2 transition-all"
+                                    >
+                                      <Plus size={16} /> Add More Photos ({eventFiles.length}/4)
+                                    </button>
                                   )}
-
-                                  <div className="text-[10px] text-white/40 italic">
-                                    Click box to change file
-                                  </div>
                                 </div>
                               ) : (
-                                <>
+                                <div onClick={() => fileInputRef.current?.click()}>
                                   <UploadCloud className="mx-auto text-white/30 group-hover:text-accent-yellow transition-colors" size={32} />
                                   <div className="text-xs font-bold text-white/60">
                                     Drag & drop or <span className="text-accent-yellow">browse</span>
                                   </div>
                                   <div className="text-[10px] text-white/40">
-                                    {eventType === "image" ? "Up to 5 MB per image" : "Up to 100 MB (Direct) | Use 'External URL' for >100 MB"}
+                                    {eventType === "image" ? "Select up to 4 photos (Max 5 MB each)" : "Up to 100 MB (Direct) | Use 'External URL' for >100 MB"}
                                   </div>
-                                </>
+                                </div>
                               )}
                             </div>
 
@@ -949,7 +1010,7 @@ export default function AdminPage() {
                                   />
                                 </div>
                                 <div className="text-[11px] text-right font-mono text-white/70 font-semibold">
-                                  {uploadedMb} MB / {totalMb !== "0.0" ? totalMb : eventFile ? (eventFile.size / (1024 * 1024)).toFixed(1) : "0.0"} MB
+                                  {uploadedMb} MB / {totalMb !== "0.0" ? totalMb : eventFiles[0] ? (eventFiles[0].size / (1024 * 1024)).toFixed(1) : "0.0"} MB
                                 </div>
                               </div>
                             )}
@@ -1023,25 +1084,34 @@ export default function AdminPage() {
                               {/* Media Thumbnail */}
                               <div 
                                 onClick={() => {
-                                  if (item.type !== "coming-soon" && (item.image || item.video)) {
+                                  if (item.type !== "coming-soon" && (item.image || item.video || (item.images && item.images.length > 0))) {
                                     setPreviewMedia({
-                                      url: item.image || item.video || "",
+                                      url: (item.images && item.images[0]) || item.image || item.video || "",
+                                      images: item.images || [],
                                       type: item.type as any,
                                       title: item.title
                                     });
+                                    setPreviewImgIdx(0);
                                   }
                                 }}
                                 title="Click to preview"
                                 className="relative w-16 h-12 rounded-lg overflow-hidden bg-black shrink-0 border border-white/10 flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 duration-200 transition-all hover:border-accent-yellow/50"
                               >
-                                {item.type === "image" && item.image ? (
-                                  <Image
-                                    src={item.image}
-                                    alt={item.title}
-                                    fill
-                                    className="object-cover"
-                                    sizes="64px"
-                                  />
+                                {item.type === "image" && (item.image || (item.images && item.images.length > 0)) ? (
+                                  <div className="relative w-full h-full">
+                                    <Image
+                                      src={(item.images && item.images[0]) || item.image}
+                                      alt={item.title}
+                                      fill
+                                      className="object-cover"
+                                      sizes="64px"
+                                    />
+                                    {item.images && item.images.length > 1 && (
+                                      <span className="absolute bottom-0.5 right-0.5 bg-black/85 text-accent-yellow font-black text-[8px] px-1 py-0.5 rounded border border-white/20">
+                                        {item.images.length}P
+                                      </span>
+                                    )}
+                                  </div>
                                 ) : item.type === "video" && item.video ? (
                                   <div className="relative w-full h-full flex items-center justify-center">
                                     <video src={item.video} className="w-full h-full object-cover" muted />
@@ -1060,7 +1130,9 @@ export default function AdminPage() {
                                   </span>
                                   <span className="w-1 h-1 bg-white/20 rounded-full" />
                                   <span className="text-[9px] text-white/50 font-bold uppercase">
-                                    {item.type}
+                                    {item.type === "image" && item.images && item.images.length > 1
+                                      ? `IMAGE (${item.images.length} PHOTOS)`
+                                      : item.type}
                                   </span>
                                 </div>
                               </div>
@@ -1270,11 +1342,64 @@ export default function AdminPage() {
                 {/* Media Container */}
                 <div className="relative w-full flex items-center justify-center flex-1 overflow-hidden rounded-2xl bg-black min-h-[300px] max-h-[60vh]">
                   {previewMedia.type === "image" ? (
-                    <img
-                      src={previewMedia.url}
-                      alt={previewMedia.title}
-                      className="object-contain max-w-full max-h-[60vh] w-auto h-auto rounded-xl"
-                    />
+                    (() => {
+                      const modalImages =
+                        previewMedia.images && previewMedia.images.length > 0
+                          ? previewMedia.images
+                          : [previewMedia.url];
+                      const currentSrc = modalImages[previewImgIdx] || modalImages[0];
+
+                      return (
+                        <div className="relative w-full h-full flex items-center justify-center">
+                          <img
+                            src={currentSrc}
+                            alt={previewMedia.title}
+                            className="object-contain max-w-full max-h-[60vh] w-auto h-auto rounded-xl"
+                          />
+
+                          {modalImages.length > 1 && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPreviewImgIdx((prev) => (prev - 1 + modalImages.length) % modalImages.length);
+                                }}
+                                className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 bg-black/70 hover:bg-black text-white rounded-full flex items-center justify-center border border-white/20 shadow-lg"
+                              >
+                                <ChevronLeft size={20} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPreviewImgIdx((prev) => (prev + 1) % modalImages.length);
+                                }}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 bg-black/70 hover:bg-black text-white rounded-full flex items-center justify-center border border-white/20 shadow-lg"
+                              >
+                                <ChevronRight size={20} />
+                              </button>
+
+                              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-black/80 px-3 py-1 rounded-full border border-white/10">
+                                {modalImages.map((_, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setPreviewImgIdx(idx);
+                                    }}
+                                    className={`w-2 h-2 rounded-full transition-all ${
+                                      previewImgIdx === idx ? "bg-accent-yellow scale-125" : "bg-white/40"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      );
+                    })()
                   ) : (
                     <video
                       src={previewMedia.url}

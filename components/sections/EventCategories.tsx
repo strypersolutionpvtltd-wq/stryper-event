@@ -8,6 +8,7 @@ import Image from "next/image";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { COMPANY_CONTACT } from "@/constants";
+import { optimizeCloudinaryUrl } from "@/lib/utils";
 
 interface EventItem {
   id: string | number;
@@ -182,9 +183,10 @@ const EventCategories = () => {
                   <div className="absolute inset-0">
                     {hasImage ? (
                       <Image
-                        src={eventItem.image!}
+                        src={optimizeCloudinaryUrl(eventItem.image!, 600)}
                         alt={eventItem.title}
                         fill
+                        unoptimized
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
