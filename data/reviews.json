@@ -1,0 +1,103 @@
+[
+  {
+    "id": "rev-1788772154094-5aiaj",
+    "name": "Sunil Verma",
+    "company": "",
+    "role": "Groom",
+    "eventName": "Destination Wedding Jaipur",
+    "rating": 5,
+    "text": "Unbelievable experience! Stryper Events managed our wedding seamlessly.",
+    "status": "approved",
+    "created_at": "2026-09-07T09:09:14.094Z"
+  },
+  {
+    "name": "Rajesh Kumar",
+    "company": "Tech Solutions Pvt Ltd",
+    "role": "CEO",
+    "eventName": "Annual Corporate Conference",
+    "rating": 5,
+    "text": "Stryper made our annual conference a huge success. Everything was perfect from start to finish. Highly professional team with meticulous attention to detail!",
+    "status": "approved"
+  },
+  {
+    "name": "Priya Sharma",
+    "company": "Fashion Brand India",
+    "role": "Marketing Head",
+    "eventName": "Product Launch Gala",
+    "rating": 5,
+    "text": "Our product launch event was amazing! The team handled everything smoothly. Great stage production, lighting, and prompt coordination throughout.",
+    "status": "approved"
+  },
+  {
+    "name": "Amit Patel",
+    "company": "Sports Academy Rajasthan",
+    "role": "Director",
+    "eventName": "National Sports Tournament",
+    "rating": 5,
+    "text": "They organized our sports tournament perfectly. On-time setup, great crowd coordination, and excellent management throughout all 3 days.",
+    "status": "approved"
+  },
+  {
+    "name": "Ananya & Siddharth Singhania",
+    "company": "Singhania Group",
+    "role": "Bride & Groom",
+    "eventName": "Royal Destination Wedding @ Fairmont Jaipur",
+    "rating": 5,
+    "text": "Stryper Events turned our dream royal wedding into reality at Fairmont! From the grand baraat entry to the ethereal mandap decor, every guest was in awe. Kartikey and his team worked tirelessly to ensure perfection.",
+    "status": "approved"
+  },
+  {
+    "name": "Vikram Rathore",
+    "company": "Heritage Hospitality",
+    "role": "Managing Director",
+    "eventName": "Heritage Food & Cultural Festival",
+    "rating": 5,
+    "text": "Unmatched hospitality and event planning. Their vendor connections and on-ground management in Jaipur are truly second to none. We had over 3,000 attendees with zero hiccups.",
+    "status": "approved"
+  },
+  {
+    "name": "Rohan Mehra",
+    "company": "Swiggy Regional Events",
+    "role": "Brand Operations Lead",
+    "eventName": "Partner Recognition Meet 2024",
+    "rating": 5,
+    "text": "Working with Stryper Events was seamless. They understood our corporate branding guidelines thoroughly and executed the AV, sound, and stage flawlessly.",
+    "status": "approved"
+  },
+  {
+    "name": "Dr. Neha Kapoor",
+    "company": "Apollo Health Network",
+    "role": "Organizing Secretary",
+    "eventName": "National Doctors Conclave @ Taj Amer",
+    "rating": 5,
+    "text": "Superb management for our 2-day medical conclave. The stage setup, delegate registration desk, and gala dinner entertainment exceeded all our expectations.",
+    "status": "approved"
+  },
+  {
+    "name": "Kavita & Aditya Joshi",
+    "company": "Family Wedding",
+    "role": "Hosts",
+    "eventName": "3-Day Destination Wedding @ Taj Rambagh Palace",
+    "rating": 5,
+    "text": "The attention to detail Stryper brought to our sangeet and wedding was phenomenal. Their floral decor, lighting transitions, and hospitality team made our guests feel like royalty!",
+    "status": "approved"
+  },
+  {
+    "name": "Gaurav Sen",
+    "company": "Magicpin Events",
+    "role": "Marketing Manager",
+    "eventName": "Youth Fest & Concert Night",
+    "rating": 4,
+    "text": "Great energy and high-powered concert sound setup! Stryper managed the artist hospitality and security with utmost professionalism. Look forward to our next collaboration.",
+    "status": "approved"
+  },
+  {
+    "name": "Sunita Aggarwal",
+    "company": "Aggarwal Jewels",
+    "role": "Director",
+    "eventName": "Luxury Jewelry Exhibition @ Jai Mahal Palace",
+    "rating": 5,
+    "text": "High-end luxury aesthetic and security were our top priorities, and Stryper delivered 100%. The VIP lounge, lighting for jewelry showcases, and visitor flow were world-class.",
+    "status": "approved"
+  }
+]

@@ -102,6 +102,14 @@ const Footer = () => {
                     </Link>
                     </li>
                 ))}
+                    <li>
+                    <Link
+                        href="/review"
+                        className="text-sm text-accent-yellow/90 hover:text-accent-yellow transition-colors font-medium flex items-center gap-1.5"
+                    >
+                        ★ Leave a Review
+                    </Link>
+                    </li>
                 </ul>
             </div>
 

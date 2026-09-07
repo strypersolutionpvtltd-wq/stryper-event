@@ -21,6 +21,7 @@ import {
   ExternalLink,
   Search,
   Globe,
+  Star,
   X
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -51,17 +52,20 @@ export default function AdminPage() {
   // Media preview lightbox state
   const [previewMedia, setPreviewMedia] = useState<{ url: string; type: "image" | "video"; title: string } | null>(null);
 
-  // Tab states: overview, portfolio, clients, inquiries
-  const [activeTab, setActiveTab] = useState<"overview" | "portfolio" | "clients" | "inquiries">("overview");
+  // Tab states: overview, portfolio, clients, inquiries, reviews
+  const [activeTab, setActiveTab] = useState<"overview" | "portfolio" | "clients" | "inquiries" | "reviews">("overview");
 
   // Data states
   const [events, setEvents] = useState<any[]>([]);
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [clients, setClients] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const [isLoadingInquiries, setIsLoadingInquiries] = useState(true);
   const [isLoadingClients, setIsLoadingClients] = useState(true);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
   const [clientSearchQuery, setClientSearchQuery] = useState("");
+  const [reviewSearchQuery, setReviewSearchQuery] = useState("");
 
   // Form states for Event Post
   const [eventTitle, setEventTitle] = useState("");
@@ -126,6 +130,7 @@ export default function AdminPage() {
       fetchEvents();
       fetchInquiries();
       fetchClients();
+      fetchReviews();
     }
   }, [isAuthenticated]);
 
@@ -184,6 +189,81 @@ export default function AdminPage() {
       toast.error("Network error loading companies");
     } finally {
       setIsLoadingClients(false);
+    }
+  };
+
+  const fetchReviews = async () => {
+    setIsLoadingReviews(true);
+    try {
+      const res = await fetch("/api/reviews?admin=true", {
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setReviews(data);
+      } else {
+        toast.error("Failed to load reviews");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Network error loading reviews");
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  };
+
+  const handleDeleteReview = async (id: any, clientName: string) => {
+    if (!confirm(`Are you sure you want to delete review from "${clientName}"?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/reviews?id=${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        toast.success("Review deleted successfully!");
+        fetchReviews();
+      } else {
+        toast.error(data.error || "Failed to delete review");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred while deleting the review");
+    }
+  };
+
+  const handleToggleReviewStatus = async (id: any, currentStatus: string) => {
+    const nextStatus = currentStatus === "approved" ? "pending" : "approved";
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+        body: JSON.stringify({ id, status: nextStatus }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        toast.success(`Review ${nextStatus === "approved" ? "approved & made live" : "hidden"}!`);
+        fetchReviews();
+      } else {
+        toast.error(data.error || "Failed to update review status");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update status");
     }
   };
 
@@ -769,6 +849,7 @@ export default function AdminPage() {
             { id: "portfolio", label: "Event Portfolio", icon: ImageIcon, badge: 0 },
             { id: "clients", label: "Trusted Companies", icon: Building2, badge: clients.length },
             { id: "inquiries", label: "Client Inquiries", icon: FileText, badge: inquiries.length },
+            { id: "reviews", label: "Client Reviews", icon: Star, badge: reviews.length },
           ].map((tab) => {
             const Icon = tab.icon;
             return (
@@ -806,13 +887,14 @@ export default function AdminPage() {
               className="space-y-8"
             >
               {/* Stat Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 {[
                   { title: "Total Events", value: totalEvents, icon: ImageIcon, desc: "Live in gallery", tab: "portfolio" },
                   { title: "Image Posts", value: imageEventsCount, icon: ImageIcon, desc: "Event photographs", tab: "portfolio" },
                   { title: "Video Posts", value: videoEventsCount, icon: VideoIcon, desc: "Event recordings", tab: "portfolio" },
                   { title: "Trusted Brands", value: clients.length, icon: Building2, desc: "Companies we work with", tab: "clients" },
                   { title: "Client Inquiries", value: inquiries.length, icon: FileText, desc: "Awaiting response", tab: "inquiries" },
+                  { title: "Client Reviews", value: reviews.length, icon: Star, desc: "Feedback & ratings", tab: "reviews" },
                 ].map((stat, i) => {
                   const Icon = stat.icon;
                   return (
@@ -1730,6 +1812,185 @@ export default function AdminPage() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === "reviews" && (
+            <motion.div
+              key="reviews"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              className="space-y-6"
+            >
+              <div className="glass glow-border p-6 rounded-3xl">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                  <div>
+                    <h3 className="text-xl font-bold uppercase tracking-tight">Client Reviews ({reviews.length})</h3>
+                    <p className="text-[10px] text-white/40 mt-1 uppercase tracking-wider">
+                      Feedback and ratings from your event clients
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <a
+                      href="/review"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-4 py-2 bg-accent-yellow/10 hover:bg-accent-yellow border border-accent-yellow/30 text-accent-yellow hover:text-primary-black rounded-full text-xs font-bold transition-all"
+                    >
+                      <ExternalLink size={12} />
+                      Open Client Review Form
+                    </a>
+                    <button 
+                      onClick={fetchReviews}
+                      className="text-xs font-bold text-accent-yellow hover:underline"
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                </div>
+
+                {/* Search Box */}
+                <div className="relative mb-6">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                  <input
+                    type="text"
+                    placeholder="Search by client name, event, or company..."
+                    value={reviewSearchQuery}
+                    onChange={(e) => setReviewSearchQuery(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:border-accent-yellow transition-colors"
+                  />
+                </div>
+
+                {isLoadingReviews ? (
+                  <div className="space-y-4 py-12 text-center text-white/40">
+                    <div className="w-8 h-8 rounded-full border border-white/10 border-t-accent-yellow animate-spin mx-auto mb-4" />
+                    Loading reviews...
+                  </div>
+                ) : reviews.length === 0 ? (
+                  <div className="text-center py-16 border border-white/5 rounded-2xl bg-white/5 text-white/40">
+                    <AlertCircle className="mx-auto mb-3" size={32} />
+                    No client reviews submitted yet.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[70vh] overflow-y-auto pr-2 no-scrollbar">
+                    {reviews
+                      .filter((r) => {
+                        const q = reviewSearchQuery.toLowerCase();
+                        return (
+                          !q ||
+                          (r.name && r.name.toLowerCase().includes(q)) ||
+                          (r.eventName && r.eventName.toLowerCase().includes(q)) ||
+                          (r.company && r.company.toLowerCase().includes(q)) ||
+                          (r.text && r.text.toLowerCase().includes(q))
+                        );
+                      })
+                      .map((review) => {
+                        const revId = review.id || review._id;
+                        const isApproved = review.status === "approved";
+                        return (
+                          <div
+                            key={revId}
+                            className="flex flex-col border border-white/10 hover:border-white/20 rounded-2xl bg-white/5 p-6 justify-between gap-4 transition-all relative overflow-hidden group"
+                          >
+                            {/* Decorative Accent Line */}
+                            <div
+                              className={`absolute top-0 left-0 right-0 h-1 ${
+                                isApproved ? "bg-accent-yellow" : "bg-amber-600"
+                              }`}
+                            />
+
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-start gap-2">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-accent-yellow/20 border border-accent-yellow/30 flex items-center justify-center font-bold text-accent-yellow">
+                                    {review.name ? review.name.charAt(0).toUpperCase() : "C"}
+                                  </div>
+                                  <div>
+                                    <h4 className="text-base font-bold text-white">{review.name}</h4>
+                                    <p className="text-xs text-white/50">
+                                      {[review.role, review.company].filter(Boolean).join(" • ") || "Client"}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <span className="text-[10px] text-white/40 font-bold whitespace-nowrap">
+                                  {review.created_at
+                                    ? new Date(review.created_at).toLocaleDateString("en-US", {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                      })
+                                    : "Recent"}
+                                </span>
+                              </div>
+
+                              {/* Event Name Tag */}
+                              {review.eventName && (
+                                <div>
+                                  <span className="px-3 py-1 bg-accent-yellow/10 border border-accent-yellow/20 text-accent-yellow text-[10px] font-black uppercase tracking-wider rounded-full inline-block">
+                                    Event: {review.eventName}
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Star Rating */}
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`w-4 h-4 ${
+                                      i < (review.rating || 5)
+                                        ? "text-accent-yellow fill-accent-yellow"
+                                        : "text-white/20"
+                                    }`}
+                                  />
+                                ))}
+                                <span className="ml-2 text-xs font-bold text-white/70">
+                                  {review.rating || 5}.0 / 5
+                                </span>
+                              </div>
+
+                              {/* Review Text */}
+                              <div className="bg-white/5 border border-white/5 rounded-xl p-3 text-xs text-white/80 leading-relaxed italic">
+                                &quot;{review.text}&quot;
+                              </div>
+                            </div>
+
+                            {/* Actions Bar */}
+                            <div className="flex items-center justify-between pt-3 border-t border-white/5 gap-2">
+                              {/* Status Toggle Button */}
+                              <button
+                                onClick={() => handleToggleReviewStatus(revId, review.status || "approved")}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition-all ${
+                                  isApproved
+                                    ? "bg-green-500/10 text-green-400 border-green-500/30 hover:bg-green-500/20"
+                                    : "bg-amber-500/10 text-amber-400 border-amber-500/30 hover:bg-amber-500/20"
+                                }`}
+                                title="Click to toggle approval status"
+                              >
+                                <span className={`w-2 h-2 rounded-full ${isApproved ? "bg-green-400" : "bg-amber-400"}`} />
+                                {isApproved ? "Live on Website" : "Hidden (Click to Show)"}
+                              </button>
+
+                              {/* Delete Button */}
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => handleDeleteReview(revId, review.name)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:border-red-500 rounded-xl text-xs font-bold text-red-400 hover:text-white transition-all"
+                                title="Delete Review"
+                              >
+                                <Trash2 size={13} />
+                                Delete
+                              </motion.button>
+                            </div>
+                          </div>
+                        );
+                      })}
                   </div>
                 )}
               </div>
