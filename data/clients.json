@@ -1,73 +1,43 @@
 [
   {
     "id": "client-1",
-    "name": "Haus",
+    "name": "One 8",
     "logo": "",
     "website": ""
   },
   {
     "id": "client-2",
-    "name": "Luxurient",
+    "name": "No broker",
     "logo": "",
     "website": ""
   },
   {
     "id": "client-3",
-    "name": "Fru Bon",
+    "name": "Bookmyshow",
     "logo": "",
     "website": ""
   },
   {
     "id": "client-4",
-    "name": "Yashoda Craft",
+    "name": "District",
     "logo": "",
     "website": ""
   },
   {
     "id": "client-5",
-    "name": "Puno",
+    "name": "Swiggi",
     "logo": "",
     "website": ""
   },
   {
     "id": "client-6",
-    "name": "Rufile",
+    "name": "Mankind",
     "logo": "",
     "website": ""
   },
   {
     "id": "client-7",
-    "name": "NO BROKER",
-    "logo": "",
-    "website": ""
-  },
-  {
-    "id": "client-8",
-    "name": "MANKIND",
-    "logo": "",
-    "website": ""
-  },
-  {
-    "id": "client-9",
-    "name": "MAGICPIN",
-    "logo": "",
-    "website": ""
-  },
-  {
-    "id": "client-10",
-    "name": "SWIGGI",
-    "logo": "",
-    "website": ""
-  },
-  {
-    "id": "client-11",
-    "name": "Health Decode",
-    "logo": "",
-    "website": ""
-  },
-  {
-    "id": "client-12",
-    "name": "IT Pay",
+    "name": "Team innovation",
     "logo": "",
     "website": ""
   }

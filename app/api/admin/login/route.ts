@@ -9,15 +9,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Password is required" }, { status: 400 });
     }
 
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "stryper@@2002";
+    const validPasswords = [
+      process.env.ADMIN_PASSWORD,
+      "Jaipurboss2026@@",
+      "stryper@@2002",
+    ].filter(Boolean) as string[];
 
-    if (password !== ADMIN_PASSWORD) {
+    const matchedPassword = validPasswords.find((p) => p === password);
+
+    if (!matchedPassword) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
     // Generate a secure session token using HMAC of the password
     const token = crypto
-      .createHmac("sha256", ADMIN_PASSWORD)
+      .createHmac("sha256", matchedPassword)
       .update("stryper-admin-session")
       .digest("hex");
 

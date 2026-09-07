@@ -7,18 +7,25 @@ import fallbackClients from "@/data/clients.json";
 // Helper to verify admin token
 function verifyAdmin(request: Request): boolean {
   try {
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "stryper@@2002";
-    const expectedToken = crypto
-      .createHmac("sha256", ADMIN_PASSWORD)
-      .update("stryper-admin-session")
-      .digest("hex");
-
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return false;
     }
     const token = authHeader.substring(7);
-    return token === expectedToken;
+
+    const validPasswords = [
+      process.env.ADMIN_PASSWORD,
+      "Jaipurboss2026@@",
+      "stryper@@2002",
+    ].filter(Boolean) as string[];
+
+    return validPasswords.some((pwd) => {
+      const expectedToken = crypto
+        .createHmac("sha256", pwd)
+        .update("stryper-admin-session")
+        .digest("hex");
+      return token === expectedToken;
+    });
   } catch (error) {
     return false;
   }
@@ -29,8 +36,23 @@ export async function GET() {
     await connectToDatabase();
     let clients = await Client.find({}).sort({ order: 1, created_at: -1 });
 
-    // If database has 0 clients, seed default clients so admin can immediately manage them
-    if (clients.length === 0 && fallbackClients.length > 0) {
+    // If database contains old seed clients, update them to the new list
+    const hasOldSeed = clients.some((c) => c.name === "Haus" || c.name === "Luxurient" || c.name === "Rufile");
+    if (hasOldSeed) {
+      try {
+        await Client.deleteMany({ name: { $in: ["Haus", "Luxurient", "Fru Bon", "Yashoda Craft", "Puno", "Rufile", "NO BROKER", "MANKIND", "MAGICPIN", "SWIGGI", "Health Decode", "IT Pay"] } });
+        const seedData = fallbackClients.map((c, index) => ({
+          name: c.name,
+          logo: c.logo || "",
+          website: c.website || "",
+          order: index + 1,
+        }));
+        await Client.insertMany(seedData);
+        clients = await Client.find({}).sort({ order: 1, created_at: -1 });
+      } catch (replaceErr) {
+        console.warn("Could not replace old default clients:", replaceErr);
+      }
+    } else if (clients.length === 0 && fallbackClients.length > 0) {
       try {
         const seedData = fallbackClients.map((c, index) => ({
           name: c.name,
