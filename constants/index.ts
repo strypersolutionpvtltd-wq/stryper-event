@@ -5,6 +5,7 @@ export const NAV_ITEMS = [
   { name: "Venue", href: "/venue", isDropdown: true },
   { name: "Tourism", href: "/tourism" },
   { name: "Events", href: "/events" },
+  { name: "Clients", href: "/clients" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ] as const;
