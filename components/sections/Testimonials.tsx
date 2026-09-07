@@ -165,9 +165,9 @@ const Testimonials = () => {
           subtitle="TESTIMONIALS"
           title="What Our Clients Say"
           align="center"
-          className="mb-6"
+          className="mb-3"
         />
-        <p className="text-center text-white/50 text-xs md:text-sm max-w-xl mx-auto -mt-10">
+        <p className="text-center text-white/60 text-xs md:text-sm max-w-xl mx-auto mt-2">
           Read real stories from our clients across India. Hover over any card to pause and read.
         </p>
       </Container>
