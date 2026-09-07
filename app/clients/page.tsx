@@ -40,18 +40,13 @@ interface ClientCompany {
 }
 
 const defaultClientsList: ClientCompany[] = [
-  { name: "Haus" },
-  { name: "Luxurient" },
-  { name: "Fru Bon" },
-  { name: "Yashoda Craft" },
-  { name: "Puno" },
-  { name: "Rufile" },
-  { name: "NO BROKER" },
-  { name: "MANKIND" },
-  { name: "MAGICPIN" },
-  { name: "SWIGGI" },
-  { name: "Health Decode" },
-  { name: "IT Pay" },
+  { name: "One 8" },
+  { name: "No broker" },
+  { name: "Bookmyshow" },
+  { name: "District" },
+  { name: "Swiggi" },
+  { name: "Mankind" },
+  { name: "Team innovation" },
 ];
 
 export default function ClientsPage() {

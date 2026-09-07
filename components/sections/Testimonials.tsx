@@ -131,7 +131,10 @@ const Testimonials = () => {
   useEffect(() => {
     async function loadReviews() {
       try {
-        const res = await fetch("/api/reviews");
+        const res = await fetch("/api/reviews", {
+          cache: "no-store",
+          headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+        });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
