@@ -36,10 +36,10 @@ const Contact = () => {
     },
     {
       icon: <MapPin className="h-5 w-5 md:h-6 md:w-6" />,
-      title: "Jaipur Office",
+      title: "Jaipur & Delhi Offices",
       details: COMPANY_CONTACT.address,
       href: "https://maps.google.com",
-      subtitle: "Visit us",
+      subtitle: "Visit Us",
       color: "bg-white/10",
     },
   ];

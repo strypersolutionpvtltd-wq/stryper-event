@@ -139,7 +139,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <a
-              href={`https://wa.me/${COMPANY_CONTACT.whatsapp}?text=Hi, I am looking for ${encodeURIComponent(service.title)} planning in Jaipur.`}
+              href={`https://wa.me/${COMPANY_CONTACT.whatsapp}?text=Hi, I am looking for ${encodeURIComponent(service.title)} planning in Jaipur / Delhi.`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 px-8 py-4 bg-accent-yellow text-primary-black font-black uppercase text-xs tracking-widest rounded-full hover:bg-accent-gold shadow-2xl transition-all"
@@ -184,12 +184,12 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
             <div className="space-y-6">
               <SectionHeading
                 subtitle="STRYPER EXPERTISE"
-                title={`Premier ${service.title} in Jaipur & Rajasthan`}
+                title={`Premier ${service.title} in Jaipur, Delhi & Pan-India`}
                 className="mb-6"
               />
               <div className="space-y-5 text-white/70 text-base sm:text-lg leading-relaxed">
                 <p>
-                  Stryper Event Management is your trusted partner for <strong className="text-white">{service.title}</strong> across Jaipur, Rajasthan, and nationwide. With over 5+ years of hands-on industry expertise, our dedicated production teams, decor artists, and event directors bring your vision to life.
+                  Stryper Event Management is your trusted partner for <strong className="text-white">{service.title}</strong> across Jaipur, Delhi NCR, and nationwide. With over 5+ years of hands-on industry expertise, our dedicated production teams, decor artists, and event directors bring your vision to life.
                 </p>
                 <p>
                   From concept creation, royal palace booking, and 3D set fabrication to on-ground technical coordination, we manage every detail so you experience absolute peace of mind.
