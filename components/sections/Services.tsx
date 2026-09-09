@@ -21,10 +21,10 @@ const Services = () => {
       <Container className="relative z-10">
         {/* Section Heading */}
         <SectionHeading
-          subtitle="OUR SERVICES"
-          title="What We Do"
+          subtitle="STRYPER EVENT SERVICES"
+          title="Event Planning & Production in Jaipur"
           align="center"
-          className="mb-10 md:mb-16"
+          className="mb-8 md:mb-12"
         />
 
         {/* Description */}
@@ -32,11 +32,9 @@ const Services = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center text-white/70 text-sm md:text-lg max-w-3xl mx-auto mb-10 md:mb-16 px-4"
+          className="text-center text-white/80 text-sm md:text-lg max-w-3xl mx-auto mb-10 md:mb-16 px-4 font-normal leading-relaxed"
         >
-          From corporate events to weddings, we handle everything. Our team
-          takes care of planning, setup, and management so you can focus on
-          enjoying your event.
+          Specialized destination wedding planning, corporate conferences, product launches, and full-scale technical stage production delivered with flawless precision across Jaipur, Rajasthan, and India.
         </motion.p>
 
         {/* Services Grid - Highly Responsive */}
