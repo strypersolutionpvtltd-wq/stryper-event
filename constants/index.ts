@@ -202,71 +202,196 @@ export const ABOUT_STATS = [
   { value: "150+", label: "Venues" },
 ] as const;
 
-// Services
+// Services - Enriched with High-Intent SEO Keywords & Vertical Sub-Services
 export const SERVICES = [
-  {
-    title: "Corporate Events",
-    slug: "corporate-events",
-    description:
-      "We handle your business events, conferences, and meetings. Everything runs on time and looks professional.",
-    icon: "briefcase",
-    image: "/images/corporate-new.jpg",
-  },
   {
     title: "Wedding Events",
     slug: "wedding-events",
+    metaTitle: "Destination Wedding Planner in Jaipur | Royal & Palace Weddings | Stryper Events",
+    metaDescription:
+      "Premier destination wedding planner in Jaipur. Specializing in royal palace weddings, luxury wedding decor, guest hospitality, baraat management, and venue coordination across Rajasthan.",
     description:
-      "Your special day deserves special care. We plan weddings that you and your guests will remember.",
+      "Your dream destination wedding in Jaipur. We curate royal palace weddings, luxury decor & production, hospitality, baraat management, and flawless logistics.",
     icon: "heart",
     image: "/images/family.jpg",
+    subServices: [
+      "Destination Wedding Planner in Jaipur",
+      "Royal Wedding Planner",
+      "Palace Wedding Planner",
+      "Wedding Decor & Production",
+      "Guest Management & Hospitality Management",
+      "Baraat Management & Wedding Logistics",
+      "Venue Coordination & Wedding Entertainment",
+    ],
+    features: [
+      "Royal Palace & Heritage Venue Booking (Fairmont, Rambagh, Leela, Taj Amer)",
+      "Theme Concept Design & 3D Floral Decor Production",
+      "End-to-End Guest RSVP, Airport Transfers & Royal Hospitality",
+      "Celebrity Artist, Live Band & Wedding Entertainment Curation",
+      "Flawless Baraat, Varmala & Mandap Ceremony Execution",
+    ],
+  },
+  {
+    title: "Corporate Events",
+    slug: "corporate-events",
+    metaTitle: "Corporate Event Planner Jaipur | Conference & Product Launch Management",
+    metaDescription:
+      "Top corporate event planner in Jaipur. Expert conference management, annual corporate meets, product launches, dealer meets, and business summits.",
+    description:
+      "Leading corporate event planner in Jaipur handling business summits, conferences, product launches, dealer meets, and corporate galas with punctual execution.",
+    icon: "briefcase",
+    image: "/images/corporate-new.jpg",
+    subServices: [
+      "Conference Management",
+      "Corporate Event Planner Jaipur",
+      "Product Launch Events",
+      "Annual Corporate Events & Dealer Meets",
+      "Executive Hospitality & Delegate Coordination",
+    ],
+    features: [
+      "High-Impact Keynote Stage & LED Audio-Visual Setup",
+      "Seamless Delegate Registration, Badging & Logistics",
+      "Custom Brand Booth Fabrication & Breakout Zones",
+      "Corporate Gala Dinners & Award Ceremonies",
+    ],
   },
   {
     title: "Event Production",
     slug: "event-production",
+    metaTitle: "Stage Production, Sound & Lighting, AV Setup Jaipur | Stryper Events",
+    metaDescription:
+      "Full-scale event production in Jaipur. Stage production, concert sound & intelligent lighting, AV LED screens, and custom structural fabrication.",
     description:
-      "From planning to setup, we take care of everything. You get a complete event solution.",
+      "End-to-end technical event production. Custom stage design, concert sound systems, intelligent lighting, 4K LED screens, and structural fabrication.",
     icon: "video",
     image: "/images/production-new.jpg",
+    subServices: [
+      "Stage Production",
+      "Sound & Lighting Setup",
+      "AV Production & LED Wall Systems",
+      "Event Fabrication & Structural Engineering",
+    ],
+    features: [
+      "Line Array Concert Sound & Digital Audio Consoles",
+      "Beam, Spot & Wash Moving Head Intelligent Lighting",
+      "High-Resolution P2/P3 Indoor & Outdoor LED Displays",
+      "Heavy Trussing, German Hanger & Custom Stage Rigging",
+    ],
   },
   {
     title: "Sports Management",
     slug: "sports-management",
+    metaTitle: "Sports Event Management Jaipur | Tournaments, Marathons & Leagues",
+    metaDescription:
+      "Professional sports management in Jaipur. Executing city marathons, cricket tournaments, corporate sports days, and athlete hospitality.",
     description:
-      "Tournaments, marathons, or sports days — we manage all types of sports events smoothly.",
+      "Tournaments, marathons, or corporate sports days — we manage stadium logistics, referee coordination, branding, and athlete management seamlessly.",
     icon: "trophy",
     image: "/images/sports-new.jpg",
+    subServices: [
+      "Tournament Management",
+      "Marathon & Race Coordination",
+      "Corporate Sports Day",
+      "Sports Arena Branding & Sound",
+    ],
+    features: [
+      "Full Ground & Stadium Stage Setup",
+      "Referee, Timing & Official Coordination",
+      "Athlete Hospitality & First-Aid Management",
+      "Branded Winner Podiums, Medals & Trophies",
+    ],
   },
   {
     title: "Award Shows",
     slug: "award-shows",
+    metaTitle: "Award Show Management Jaipur | Gala Nights & Felicitation Ceremonies",
+    metaDescription:
+      "Creating prestigious award ceremonies and gala nights in Jaipur. Red carpet arrivals, celebrity hosting, stage dynamics, and trophies.",
     description:
-      "Make your award ceremony special. We create events that honor achievements in style.",
+      "Make your felicitation ceremony legendary. We curate grand red carpet entries, custom trophies, celebrity hosts, and high-energy stage moments.",
     icon: "award",
     image: "/images/awards-new.jpg",
+    subServices: [
+      "Red Carpet & Media Wall Management",
+      "Celebrity Host & Emcee Curation",
+      "Custom Trophy & Memento Production",
+      "Synchronized Stage Lighting & Special FX",
+    ],
+    features: [
+      "VIP Red Carpet Photo Zones",
+      "DMX Stage Effects & Cold Pyros",
+      "Celebrity Artist Booking & Logistics",
+      "Live Streaming & Multi-Camera Recording",
+    ],
   },
   {
     title: "Brand Promotion",
     slug: "brand-promotion",
+    metaTitle: "Brand Promotion & Activation Agency Jaipur | Product Launches",
+    metaDescription:
+      "BTL brand activations, mall roadshows, promotional campaigns, and experiential pop-ups in Jaipur that generate high customer engagement.",
     description:
-      "Launch your brand or product with events that get people talking and create real impact.",
+      "Launch your brand or product with events that captivate audiences, drive footfall, and generate viral social media impressions.",
     icon: "target",
     image: "/images/brand.jpg",
+    subServices: [
+      "BTL Brand Activations & Roadshows",
+      "Experiential Mall Pop-Ups",
+      "Interactive Product Launch Events",
+      "Influencer & PR Engagement",
+    ],
+    features: [
+      "Interactive AR/VR Selfie Pods & Photo Booths",
+      "High-Footfall Mall Activation Booths",
+      "Promoter & Brand Ambassador Staffing",
+      "Audience Engagement Games & Sampling Desks",
+    ],
   },
   {
     title: "Exhibition Setup",
     slug: "exhibition-setup",
+    metaTitle: "Exhibition Stall Design & Booth Setup Jaipur | Trade Shows",
+    metaDescription:
+      "Custom exhibition stall design, 3D booth fabrication, and trade show management in Jaipur (JECC and premium exhibition grounds).",
     description:
-      "Trade shows and exhibitions need great setups. We design booths that attract attention.",
+      "Trade shows and expos need attention-grabbing stalls. We design and fabricate custom modular booths at JECC and major exhibition grounds.",
     icon: "layout",
     image: "/images/product.jpg",
+    subServices: [
+      "Custom 3D Exhibition Stall Design",
+      "JECC Trade Show Booth Fabrication",
+      "Fascia Branding & Display Lighting",
+      "Exhibitor Logistics & Hostess Staffing",
+    ],
+    features: [
+      "Custom Wooden & Modular Octanorm Stalls",
+      "High-Brightness Product Spotlighting",
+      "Backlit Graphics & 3D Logo Fabrication",
+      "On-Site Technical Maintenance Throughout Expo",
+    ],
   },
   {
     title: "Event Fabrication",
     slug: "event-fabrication",
+    metaTitle: "Event Fabrication & Custom Set Construction Jaipur | Stryper Events",
+    metaDescription:
+      "In-house event fabrication in Jaipur. Custom stages, thematic entry gates, selfie points, German hanger tents, and wood/metal structures.",
     description:
-      "Need custom stages, structures, or setups? We build exactly what your event needs.",
+      "Need custom sets, entry gates, or German hangers? Our in-house workshop builds heavy-duty, beautiful event structures tailored to your theme.",
     icon: "box",
     image: "/images/fabrication-new.jpg",
+    subServices: [
+      "Custom Stage & Thematic Set Construction",
+      "Royal Entry Gates & Photo Backdrops",
+      "German Hanger & Pagoda Tent Setups",
+      "Signage, 3D Lettering & CNC Cut Displays",
+    ],
+    features: [
+      "In-House Carpentry, Metalwork & Acrylic CNC Workshop",
+      "All-Weather Waterproof German Hangers & Pagodas",
+      "Thematic Royal Palace Cutout Sets & Mandaps",
+      "Rapid Overnight Setup & Safe Dismantling",
+    ],
     portfolio: [
       {
         title: "Setup Process",
@@ -289,10 +414,25 @@ export const SERVICES = [
   {
     title: "Event Staff",
     slug: "event-staff",
+    metaTitle: "Event Staffing & Hospitality Crew Jaipur | Hostesses & Bouncers",
+    metaDescription:
+      "Professional event crew, hospitality hostesses, security bouncers, and technical coordinators for luxury weddings and corporate events in Jaipur.",
     description:
-      "Our trained team makes sure your event runs smoothly and your guests are well taken care of.",
+      "Our trained hospitality team, hostesses, and security crew make sure your event runs smoothly and every guest is treated like royalty.",
     icon: "users",
     image: "/images/staff-new.jpg",
+    subServices: [
+      "Guest Hospitality & Welcome Hostesses",
+      "Shadow Managers for Bride & Groom",
+      "Professional Event Security & Bouncers",
+      "On-Ground Technical & Stage Runners",
+    ],
+    features: [
+      "Uniformed, Well-Groomed Multilingual Hospitality Crew",
+      "Experienced VIP & Celebrity Escort Bouncers",
+      "Dedicated Helpdesk & Transport Coordinators",
+      "Pre-Event Protocol & Etiquette Briefing",
+    ],
   },
 ] as const;
 
