@@ -9,13 +9,13 @@ import Contact from "@/components/sections/Contact";
 import { Sparkles, CheckCircle2, ArrowRight, MapPin, PhoneCall } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const service = SERVICES.find((s) => s.slug === params.slug);
+  const service = SERVICES.find((s) => s.slug === params.slug) as any;
   if (!service) {
     return { title: "Service Not Found | Stryper Events" };
   }
 
-  const metaTitle = "metaTitle" in service && service.metaTitle ? service.metaTitle : `${service.title} | Stryper Event Management`;
-  const metaDesc = "metaDescription" in service && service.metaDescription ? service.metaDescription : service.description;
+  const metaTitle: string = service.metaTitle || `${service.title} | Stryper Event Management`;
+  const metaDesc: string = service.metaDescription || service.description;
 
   return {
     title: metaTitle,
@@ -46,14 +46,14 @@ export async function generateStaticParams() {
 }
 
 export default function ServicePage({ params }: { params: { slug: string } }) {
-  const service = SERVICES.find((s) => s.slug === params.slug);
+  const service = SERVICES.find((s) => s.slug === params.slug) as any;
 
   if (!service) {
     notFound();
   }
 
-  const subServices = "subServices" in service ? (service.subServices as readonly string[]) : [];
-  const features = "features" in service ? (service.features as readonly string[]) : [];
+  const subServices: string[] = service.subServices ? Array.from(service.subServices) : [];
+  const features: string[] = service.features ? Array.from(service.features) : [];
 
   // Schema.org Structured Data
   const serviceJsonLd = {
