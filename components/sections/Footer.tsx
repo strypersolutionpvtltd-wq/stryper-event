@@ -138,13 +138,27 @@ const Footer = () => {
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/5 text-accent-yellow">
                    <Phone size={16} />
                 </div>
-                <span className="truncate">{COMPANY_CONTACT.phone}</span>
+                <div className="flex flex-col gap-0.5 text-xs sm:text-sm">
+                  <a href={`tel:${COMPANY_CONTACT.phoneRaw}`} className="hover:text-accent-yellow transition-colors truncate">
+                    {COMPANY_CONTACT.phone}
+                  </a>
+                  <a href={`tel:${COMPANY_CONTACT.secondaryPhoneRaw}`} className="hover:text-accent-yellow transition-colors truncate">
+                    {COMPANY_CONTACT.secondaryPhone}
+                  </a>
+                </div>
               </li>
               <li className="flex flex-col md:flex-row items-center gap-3 text-sm text-white/40">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/5 text-accent-yellow">
                    <Mail size={16} />
                 </div>
-                <span className="truncate">{COMPANY_CONTACT.email}</span>
+                <div className="flex flex-col gap-0.5 text-xs sm:text-sm">
+                  <a href={`mailto:${COMPANY_CONTACT.email}`} className="hover:text-accent-yellow transition-colors truncate">
+                    {COMPANY_CONTACT.email}
+                  </a>
+                  <a href={`mailto:${COMPANY_CONTACT.secondaryEmail}`} className="hover:text-accent-yellow transition-colors truncate">
+                    {COMPANY_CONTACT.secondaryEmail}
+                  </a>
+                </div>
               </li>
               <li className="flex flex-col md:flex-row items-center gap-3 text-sm text-white/40">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/5 text-accent-yellow">

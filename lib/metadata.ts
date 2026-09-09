@@ -1,11 +1,13 @@
 import { Metadata } from "next";
 
 export const siteMetadata = {
-  title: "Event Management Company in Jaipur | Stryper Events",
+  title: "Event Management Company in Jaipur & Delhi | Stryper Events",
   description:
-    "Premier event management company in Jaipur specializing in destination wedding planning, royal palace weddings, corporate conferences, sports events, and stage production across India.",
+    "Premier event management company in Jaipur & Delhi specializing in destination wedding planning, royal palace weddings, corporate conferences, sports events, and stage production across India.",
   keywords: [
     "Event Management Company in Jaipur",
+    "Event Management Company in Delhi",
+    "Corporate Event Planner Delhi",
     "Destination Wedding Planner in Jaipur",
     "Royal Wedding Planner",
     "Palace Wedding Planner",

@@ -21,7 +21,7 @@ const Contact = () => {
     {
       icon: <Phone className="h-5 w-5 md:h-6 md:w-6" />,
       title: "Call Us",
-      details: COMPANY_CONTACT.phone,
+      details: `${COMPANY_CONTACT.phone} | ${COMPANY_CONTACT.secondaryPhone}`,
       href: `tel:${COMPANY_CONTACT.phoneRaw}`,
       subtitle: "10am-7pm Support",
       color: "bg-accent-yellow",
@@ -29,7 +29,7 @@ const Contact = () => {
     {
       icon: <Mail className="h-5 w-5 md:h-6 md:w-6" />,
       title: "Email Us",
-      details: COMPANY_CONTACT.email,
+      details: `${COMPANY_CONTACT.email} | ${COMPANY_CONTACT.secondaryEmail}`,
       href: `mailto:${COMPANY_CONTACT.email}`,
       subtitle: "Official Enquiries",
       color: "bg-white/10",

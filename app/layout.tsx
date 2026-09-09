@@ -17,11 +17,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Event Management Company in Jaipur | Stryper Events",
+  title: "Event Management Company in Jaipur & Delhi | Stryper Events",
   description:
-    "Leading event management company in Jaipur specializing in destination wedding planning, royal palace weddings, corporate conferences, sports events, and stage production across India.",
+    "Leading event management company in Jaipur & Delhi specializing in destination wedding planning, royal palace weddings, corporate conferences, sports events, and stage production across India.",
   keywords: [
     "Event Management Company in Jaipur",
+    "Event Management Company in Delhi",
+    "Corporate Event Planner Delhi",
     "Destination Wedding Planner in Jaipur",
     "Royal Wedding Planner",
     "Palace Wedding Planner",
@@ -57,9 +59,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: "https://www.stryperevent.com",
-    title: "Event Management Company in Jaipur | Stryper Events",
+    title: "Event Management Company in Jaipur & Delhi | Stryper Events",
     description:
-      "Wedding, corporate, sports, and production event management across Jaipur and India. 500+ successful events delivered.",
+      "Corporate & Social Events, MICE & Incentive Travel, Branding & Promotions, Exhibition & Fabrication across Jaipur, Delhi & Pan-India.",
     siteName: "Stryper Event Management",
     images: [
       {
@@ -133,6 +135,7 @@ const jsonLd = {
   priceRange: "$$",
   areaServed: [
     { "@type": "City", "name": "Jaipur" },
+    { "@type": "City", "name": "Delhi" },
     { "@type": "State", "name": "Rajasthan" },
     { "@type": "Country", "name": "India" },
   ],

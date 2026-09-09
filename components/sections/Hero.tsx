@@ -73,12 +73,12 @@ const Hero = () => {
             {/* Primary SEO H1 Heading */}
             <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight text-white tracking-[0.03em] sm:tracking-[0.08em] uppercase leading-tight drop-shadow-2xl">
               Event Management Company <br className="hidden sm:inline" />
-              <span className="font-bold text-accent-yellow">in Jaipur</span>
+              <span className="font-bold text-accent-yellow">in Jaipur & Delhi</span>
             </h1>
 
             {/* Value Proposition Subheading */}
-            <p className="text-xs sm:text-base md:text-lg text-white/80 font-medium max-w-2xl mx-auto leading-relaxed drop-shadow-md">
-              Wedding, corporate, sports, and production event management across Jaipur and India.
+            <p className="text-xs sm:text-base md:text-lg text-white/80 font-medium max-w-3xl mx-auto leading-relaxed drop-shadow-md">
+              We deal in Corporate &amp; Social Events, MICE &amp; Incentive Travel, Branding &amp; Promotions, Exhibition &amp; Fabrication.
             </p>
           </div>
 
