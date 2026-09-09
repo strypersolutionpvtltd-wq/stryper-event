@@ -656,8 +656,15 @@ export const ANIMATION_DURATION = {
 export const COMPANY_CONTACT = {
   phone: "+91 90767 73330",
   phoneRaw: "9076773330",
+  secondaryPhone: "+91 91402 41348",
+  secondaryPhoneRaw: "9140241348",
   whatsapp: "919076773330",
   email: "deepak.shah@stryperevent.com",
+  secondaryEmail: "siddharth.tiwari@stryperevents.com",
+  emails: [
+    "deepak.shah@stryperevent.com",
+    "siddharth.tiwari@stryperevents.com",
+  ] as const,
   address: "Jaipur, Rajasthan, India",
   instagram: "https://www.instagram.com/stryperevent",
   linkedin: "https://www.linkedin.com/company/stryper-solution-pvt-ltd/",
