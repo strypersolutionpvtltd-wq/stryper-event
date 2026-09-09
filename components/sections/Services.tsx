@@ -22,7 +22,7 @@ const Services = () => {
         {/* Section Heading */}
         <SectionHeading
           subtitle="STRYPER EVENT SERVICES"
-          title="Event Planning & Production in Jaipur"
+          title="Event Planning & Production in Jaipur & Delhi"
           align="center"
           className="mb-8 md:mb-12"
         />

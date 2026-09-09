@@ -665,7 +665,7 @@ export const COMPANY_CONTACT = {
     "deepak.shah@stryperevent.com",
     "siddharth.tiwari@stryperevents.com",
   ] as const,
-  address: "Jaipur, Rajasthan, India",
+  address: "Jaipur & Delhi NCR, India",
   instagram: "https://www.instagram.com/stryperevent",
   linkedin: "https://www.linkedin.com/company/stryper-solution-pvt-ltd/",
   facebook: "https://facebook.com/stryperevent",

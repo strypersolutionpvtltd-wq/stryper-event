@@ -12,7 +12,7 @@ const About = () => {
   const highlights = [
     "Over 100+ successful events completed",
     "Professional team that manages every small detail",
-    "5+ years of experience in Jaipur and all over India",
+    "5+ years of experience in Jaipur, Delhi and all over India",
     "Quality service that fits perfectly in your budget",
   ];
 
@@ -66,11 +66,11 @@ const About = () => {
             </h3>
 
             <p className="text-body text-white/70">
-              Stryper Event Management is a professional event planning team based in Jaipur. We have been creating beautiful events for over 5 years. Our goal is simple: to take the stress away from you and make your event perfect.
+              Stryper Event Management is a premier event planning company with operational hubs in Jaipur and Delhi NCR. We have been creating extraordinary, seamless celebrations and corporate summits for over 5+ years across India.
             </p>
 
             <p className="text-body text-white/70">
-              From grand weddings in Jaipur to corporate meetings and sports events across India, we handle everything. We take care of the venue, the decor, the music, and the staff so you can just focus on your guests.
+              From royal destination weddings in Jaipur to corporate conferences in Delhi and large-scale sports events nationwide, we handle everything from production, stage fabrication, decor, and artists to guest hospitality.
             </p>
 
             {/* Highlights */}

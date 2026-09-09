@@ -6,7 +6,7 @@ import GetStartedForm from "@/components/ui/GetStartedForm";
 
 export const metadata: Metadata = {
   title: "Contact Us | Stryper Event Management",
-  description: "Get in touch with us via WhatsApp or Phone to plan your next event in Jaipur.",
+  description: "Get in touch with us via WhatsApp or Phone to plan your next event in Jaipur & Delhi NCR.",
 };
 
 export default function ContactPage() {
