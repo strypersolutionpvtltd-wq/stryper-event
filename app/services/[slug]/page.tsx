@@ -6,7 +6,7 @@ import { SERVICES, VENUES, COMPANY_CONTACT } from "@/constants";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Contact from "@/components/sections/Contact";
-import { Sparkles, CheckCircle2, ArrowRight, MapPin, Building, PhoneCall } from "lucide-react";
+import { Sparkles, CheckCircle2, ArrowRight, MapPin, PhoneCall } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const service = SERVICES.find((s) => s.slug === params.slug);
