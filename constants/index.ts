@@ -581,21 +581,7 @@ export const TEAM_MEMBERS = [
     role: "Chairman",
     experience: "8 Years",
     image: "/images/chairman_final.png",
-    bio: "8 Years of Experience in leadership and strategic vision.",
-  },
-  {
-    name: "Deepak Shah",
-    role: "Business Developer",
-    experience: "1 Year",
-    image: "/images/logo.png",
-    bio: "1 Year of Experience in driving business growth and client relations.",
-  },
-  {
-    name: "Lokesh Nagar",
-    role: "HR (Human Resources)",
-    experience: "3 Years",
-    image: "/images/logo.png",
-    bio: "3 Years of Experience in talent acquisition and team management.",
+    bio: "8 Years of Experience in leadership, strategic vision, and luxury event production.",
   },
 ] as const;
 
