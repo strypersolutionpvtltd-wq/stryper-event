@@ -2,32 +2,20 @@ import React from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import BlogDetailClient from "@/components/blog/BlogDetailClient";
+import { getBlogDataBySlug } from "@/lib/blogUtils";
+
+export const dynamic = "force-dynamic";
 
 interface BlogPageProps {
-  params: { slug: string };
-  searchParams: { admin?: string };
+  params: Promise<{ slug: string }> | { slug: string };
+  searchParams?: Promise<{ admin?: string }> | { admin?: string };
 }
 
-// Helper to fetch blog data for metadata & page
-async function getBlogBySlug(slug: string, isAdmin = false) {
-  try {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    const res = await fetch(`${siteUrl}/api/blogs/${slug}${isAdmin ? "?admin=true" : ""}`, {
-      cache: "no-store",
-    });
-
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch (err) {
-    console.error("Fetch blog for metadata error:", err);
-  }
-  return null;
-}
-
-export async function generateMetadata({ params, searchParams }: BlogPageProps): Promise<Metadata> {
-  const isAdmin = searchParams.admin === "true";
-  const blog = await getBlogBySlug(params.slug, isAdmin);
+export async function generateMetadata(props: BlogPageProps): Promise<Metadata> {
+  const resolvedParams = await props.params;
+  const resolvedSearchParams = props.searchParams ? await props.searchParams : {};
+  const isAdmin = resolvedSearchParams.admin === "true";
+  const blog = await getBlogDataBySlug(resolvedParams.slug, isAdmin);
 
   if (!blog) {
     return {
@@ -75,9 +63,11 @@ export async function generateMetadata({ params, searchParams }: BlogPageProps):
   };
 }
 
-export default async function BlogDetailPage({ params, searchParams }: BlogPageProps) {
-  const isAdmin = searchParams.admin === "true";
-  const blog = await getBlogBySlug(params.slug, isAdmin);
+export default async function BlogDetailPage(props: BlogPageProps) {
+  const resolvedParams = await props.params;
+  const resolvedSearchParams = props.searchParams ? await props.searchParams : {};
+  const isAdmin = resolvedSearchParams.admin === "true";
+  const blog = await getBlogDataBySlug(resolvedParams.slug, isAdmin);
 
   if (!blog) {
     notFound();
