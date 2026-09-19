@@ -1,0 +1,44 @@
+[
+  {
+    "id": "client-1",
+    "name": "One 8",
+    "logo": "",
+    "website": ""
+  },
+  {
+    "id": "client-2",
+    "name": "No broker",
+    "logo": "",
+    "website": ""
+  },
+  {
+    "id": "client-3",
+    "name": "Bookmyshow",
+    "logo": "",
+    "website": ""
+  },
+  {
+    "id": "client-4",
+    "name": "District",
+    "logo": "",
+    "website": ""
+  },
+  {
+    "id": "client-5",
+    "name": "Swiggi",
+    "logo": "",
+    "website": ""
+  },
+  {
+    "id": "client-6",
+    "name": "Mankind",
+    "logo": "",
+    "website": ""
+  },
+  {
+    "id": "client-7",
+    "name": "Team innovation",
+    "logo": "",
+    "website": ""
+  }
+]

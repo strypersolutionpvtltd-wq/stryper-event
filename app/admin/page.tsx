@@ -11,7 +11,6 @@ import {
   Play, 
   PlusCircle, 
   LogOut, 
-  BarChart2, 
   UploadCloud, 
   Check, 
   AlertCircle, 
@@ -30,6 +29,7 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 
 import Container from "@/components/ui/Container";
+import AdminBlogManager from "@/components/admin/AdminBlogManager";
 
 const getWhatsAppLink = (phone: string, fullName: string, type: string) => {
   let cleanPhone = phone.replace(/\D/g, "");
@@ -55,8 +55,8 @@ export default function AdminPage() {
   const [previewMedia, setPreviewMedia] = useState<{ url: string; images?: string[]; type: "image" | "video"; title: string } | null>(null);
   const [previewImgIdx, setPreviewImgIdx] = useState(0);
 
-  // Tab states: overview, portfolio, clients, inquiries, reviews
-  const [activeTab, setActiveTab] = useState<"overview" | "portfolio" | "clients" | "inquiries" | "reviews">("overview");
+  // Tab states: overview, portfolio, clients, inquiries, reviews, blogs
+  const [activeTab, setActiveTab] = useState<"overview" | "portfolio" | "clients" | "inquiries" | "reviews" | "blogs">("overview");
 
   // Data states
   const [events, setEvents] = useState<any[]>([]);
@@ -888,6 +888,7 @@ export default function AdminPage() {
         <div className="flex overflow-x-auto gap-2 border-b border-white/5 pb-4 mb-8 no-scrollbar">
           {[
             { id: "overview", label: "Overview", icon: LayoutDashboard, badge: 0 },
+            { id: "blogs", label: "Blog Management", icon: FileText, badge: 0 },
             { id: "portfolio", label: "Event Portfolio", icon: ImageIcon, badge: 0 },
             { id: "clients", label: "Trusted Companies", icon: Building2, badge: clients.length },
             { id: "inquiries", label: "Client Inquiries", icon: FileText, badge: inquiries.length },
@@ -994,7 +995,7 @@ export default function AdminPage() {
                       Quick Setup Shortcut
                     </h3>
                     <p className="text-sm text-white/60 leading-relaxed">
-                      You can navigate directly to **Event Portfolio**, **Trusted Companies**, or **Client Inquiries** using the tab bar above to quickly manage event details, companies or view leads.
+                      You can navigate directly to **Event Portfolio**, **Trusted Companies**, **Client Inquiries**, or **Blog Management** using the tab bar above to quickly manage content and view leads.
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-3 mt-6">
@@ -1011,14 +1012,31 @@ export default function AdminPage() {
                       Manage Companies
                     </button>
                     <button
-                      onClick={() => setActiveTab("inquiries")}
+                      onClick={() => setActiveTab("blogs")}
                       className="px-5 py-2.5 bg-white/10 border border-white/10 text-white text-xs font-black uppercase tracking-wider rounded-full hover:bg-white/20 transition-all"
+                    >
+                      Manage Blogs
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("inquiries")}
+                      className="px-5 py-2.5 bg-white/10 border border-white/10 text-white/70 text-xs font-black uppercase tracking-wider rounded-full hover:bg-white/20 transition-all"
                     >
                       View Inquiries
                     </button>
                   </div>
                 </div>
               </div>
+            </motion.div>
+          )}
+
+          {activeTab === "blogs" && (
+            <motion.div
+              key="blogs"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+            >
+              <AdminBlogManager sessionToken={sessionToken} />
             </motion.div>
           )}
 

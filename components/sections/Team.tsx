@@ -73,8 +73,8 @@ const Team = () => {
 
                 {/* Chairman Vision Message */}
                 <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.03] border border-white/5 relative">
-                  <p className="text-white/80 text-sm sm:text-base leading-relaxed italic">
-                    &ldquo;At Stryper Events, our mission is to transform celebrations into unforgettable milestones and execute corporate summits with flawless precision. With operational hubs in Jaipur and Delhi NCR, our passion is delivering world-class event experiences with uncompromising quality.&rdquo;
+                  <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+                    At Stryper Events, our mission is to transform celebrations into unforgettable milestones and execute corporate summits with flawless precision. With operational hubs in Jaipur and Delhi NCR, our passion is delivering world-class event experiences with uncompromising quality.
                   </p>
                 </div>
 

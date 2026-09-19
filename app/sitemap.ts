@@ -1,5 +1,25 @@
 import { MetadataRoute } from "next";
 import { SERVICES, VENUES, CASE_STUDIES } from "@/constants";
+import fs from "fs";
+import path from "path";
+
+function getPublishedBlogSlugs(): { slug: string; date: string }[] {
+  try {
+    const filePath = path.join(process.cwd(), "data", "blogs.json");
+    if (fs.existsSync(filePath)) {
+      const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+      return data
+        .filter((b: any) => b.status === "published")
+        .map((b: any) => ({
+          slug: b.slug,
+          date: b.date || new Date().toISOString(),
+        }));
+    }
+  } catch (err) {
+    console.error("Sitemap blog read error:", err);
+  }
+  return [];
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const envUrl = process.env.NEXT_PUBLIC_SITE_URL;
@@ -26,6 +46,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}/events/case-studies/${study.id}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  // Published Blog Pages
+  const publishedBlogs = getPublishedBlogSlugs();
+  const blogUrls: MetadataRoute.Sitemap = publishedBlogs.map((b) => ({
+    url: `${baseUrl}/blog/${b.slug}`,
+    lastModified: new Date(b.date),
+    changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
 
@@ -85,7 +114,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.85,
     },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.9,
+    },
   ];
 
-  return [...corePages, ...serviceUrls, ...venueUrls, ...caseStudyUrls];
+  return [...corePages, ...serviceUrls, ...venueUrls, ...caseStudyUrls, ...blogUrls];
 }
