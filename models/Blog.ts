@@ -12,6 +12,7 @@ export interface IBlog extends Document {
   author: string;
   readTime?: string;
   date: string;
+  order?: number;
   status: "draft" | "published" | "archived";
   ctaText?: string;
   ctaUrl?: string;
@@ -39,6 +40,7 @@ const BlogSchema = new Schema<IBlog>(
     author: { type: String, default: "Stryper Editorial" },
     readTime: { type: String, default: "5 min read" },
     date: { type: String, default: () => new Date().toISOString().split("T")[0] },
+    order: { type: Number, default: 0, index: true },
     status: {
       type: String,
       enum: ["draft", "published", "archived"],

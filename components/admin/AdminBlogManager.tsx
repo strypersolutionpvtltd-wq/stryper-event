@@ -68,6 +68,7 @@ const DEFAULT_CATEGORIES = [
 
 export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps) {
   const [blogs, setBlogs] = useState<BlogItem[]>([]);
+  const [allBlogs, setAllBlogs] = useState<BlogItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -111,8 +112,26 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    fetchAllBlogs();
+  }, []);
+
+  useEffect(() => {
     fetchBlogs();
   }, [statusFilter, categoryFilter]);
+
+  const fetchAllBlogs = async () => {
+    try {
+      const res = await fetch(`/api/blogs?admin=true`, {
+        headers: { Authorization: `Bearer ${sessionToken}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAllBlogs(data.blogs || []);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchBlogs = async () => {
     setIsLoading(true);
@@ -127,7 +146,11 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
 
       if (res.ok) {
         const data = await res.json();
-        setBlogs(data.blogs || []);
+        const list = data.blogs || [];
+        setBlogs(list);
+        if (statusFilter === "all" && categoryFilter === "all") {
+          setAllBlogs(list);
+        }
       } else {
         toast.error("Failed to fetch blogs list");
       }
@@ -409,9 +432,11 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
     return matchesSearch;
   });
 
-  const publishedCount = blogs.filter((b) => b.status === "published").length;
-  const draftCount = blogs.filter((b) => b.status === "draft").length;
-  const archivedCount = blogs.filter((b) => b.status === "archived").length;
+  const metricsSource = allBlogs.length > 0 ? allBlogs : blogs;
+  const totalCount = metricsSource.length;
+  const publishedCount = metricsSource.filter((b) => b.status === "published").length;
+  const draftCount = metricsSource.filter((b) => b.status === "draft").length;
+  const archivedCount = metricsSource.filter((b) => b.status === "archived").length;
 
   // IN-PAGE EDITOR VIEW
   if (isEditingInPage) {
@@ -930,7 +955,7 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
           }`}
         >
           <div className="text-xs font-semibold text-slate-400 uppercase">Total Articles</div>
-          <div className="text-2xl font-bold mt-1 text-white">{blogs.length}</div>
+          <div className="text-2xl font-bold mt-1 text-white">{totalCount}</div>
         </div>
 
         <div
@@ -1036,10 +1061,13 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
-                {filteredBlogs.map((b) => (
+                {filteredBlogs.map((b, idx) => (
                   <tr key={b.id || b._id} className="hover:bg-slate-800/40 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
+                        <span className="text-amber-400 font-mono font-bold text-xs shrink-0 w-8">
+                          #{String((b as any).order || idx + 1).padStart(2, "0")}
+                        </span>
                         <img
                           src={b.coverImage || "/images/corporate-new.jpg"}
                           alt={b.title}

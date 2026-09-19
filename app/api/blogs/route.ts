@@ -80,7 +80,7 @@ export async function GET(request: Request) {
 
       const total = await Blog.countDocuments(query);
       const blogs = await Blog.find(query)
-        .sort({ created_at: -1 })
+        .sort({ order: 1, created_at: 1 })
         .skip((page - 1) * limit)
         .limit(limit);
 
@@ -133,6 +133,8 @@ export async function GET(request: Request) {
             (b.subtitle || "").toLowerCase().includes(q)
         );
       }
+
+      filtered.sort((a: any, b: any) => (a.order || 99) - (b.order || 99));
 
       return NextResponse.json({
         blogs: filtered,
