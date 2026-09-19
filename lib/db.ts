@@ -2,15 +2,13 @@ import mongoose from "mongoose";
 import dns from "dns";
 
 // Fix querySrv ECONNREFUSED issues on local Windows / ISP DNS systems
-if (process.platform === "win32" && !process.env.VERCEL) {
-  try {
-    dns.setServers(["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
-    if (dns.setDefaultResultOrder) {
-      dns.setDefaultResultOrder("ipv4first");
-    }
-  } catch (e) {
-    console.warn("Could not set custom DNS servers:", e);
+try {
+  dns.setServers(["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
+  if (typeof (dns as any).setDefaultResultOrder === "function") {
+    (dns as any).setDefaultResultOrder("ipv4first");
   }
+} catch (e) {
+  console.warn("Could not set custom DNS servers:", e);
 }
 
 const MONGODB_URI = process.env.MONGODB_URI || "";
@@ -31,9 +29,13 @@ export async function connectToDatabase() {
   }
 
   if (!cached.promise) {
+    try {
+      dns.setServers(["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
+    } catch (_) {}
+
     const opts = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 8000,
       socketTimeoutMS: 45000,
       family: 4,
     };

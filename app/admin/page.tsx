@@ -23,7 +23,10 @@ import {
   Star,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Database,
+  Loader2,
+  BarChart2
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -191,6 +194,29 @@ export default function AdminPage() {
       toast.error("Network error loading companies");
     } finally {
       setIsLoadingClients(false);
+    }
+  };
+
+  const [isSyncingData, setIsSyncingData] = useState(false);
+
+  const handleSyncAllData = async () => {
+    setIsSyncingData(true);
+    try {
+      const res = await fetch("/api/admin/login?sync=true");
+      const data = await res.json();
+      if (data.databaseStatus === "CONNECTED") {
+        toast.success("All data (Blogs, Events, Clients, Reviews) pushed & synced to MongoDB!");
+        fetchEvents();
+        fetchClients();
+        fetchReviews();
+        fetchInquiries();
+      } else {
+        toast.error(data.error || "Failed to sync with database");
+      }
+    } catch (err: any) {
+      toast.error("Error connecting to database");
+    } finally {
+      setIsSyncingData(false);
     }
   };
 
@@ -1022,6 +1048,21 @@ export default function AdminPage() {
                       className="px-5 py-2.5 bg-white/10 border border-white/10 text-white/70 text-xs font-black uppercase tracking-wider rounded-full hover:bg-white/20 transition-all"
                     >
                       View Inquiries
+                    </button>
+                    <button
+                      onClick={handleSyncAllData}
+                      disabled={isSyncingData}
+                      className="px-5 py-2.5 bg-green-500/20 border border-green-500/40 text-green-400 text-xs font-black uppercase tracking-wider rounded-full hover:bg-green-500/30 transition-all flex items-center gap-1.5"
+                    >
+                      {isSyncingData ? (
+                        <>
+                          <Loader2 size={13} className="animate-spin" /> Pushing Data...
+                        </>
+                      ) : (
+                        <>
+                          <Database size={13} /> Push All Data to MongoDB
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
