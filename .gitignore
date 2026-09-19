@@ -29,7 +29,11 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+.env.local
 .env.production
+
+# scratch folder
+scratch/
 
 # vercel
 .vercel
