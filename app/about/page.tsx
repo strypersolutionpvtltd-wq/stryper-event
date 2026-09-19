@@ -6,7 +6,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About Us | Stryper Event Management",
-  description: "Learn more about Stryper Event Management, our team, and why we are the leading event planners in Jaipur.",
+  description: "Learn more about Stryper Event Management, our team, and why we are the leading event planners in Jaipur & Delhi NCR.",
 };
 
 export default function AboutPage() {

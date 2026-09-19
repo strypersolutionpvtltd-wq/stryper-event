@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { SERVICES } from "@/constants";
+import { SERVICES, VENUES, CASE_STUDIES } from "@/constants";
 import fs from "fs";
 import path from "path";
 
@@ -15,66 +15,112 @@ function getPublishedBlogSlugs(): { slug: string; date: string }[] {
           date: b.date || new Date().toISOString(),
         }));
     }
-  } catch (err) {}
+  } catch (err) {
+    console.error("Sitemap blog read error:", err);
+  }
   return [];
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.stryperevent.com";
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const baseUrl = envUrl && !envUrl.includes("localhost") ? envUrl : "https://www.stryperevent.com";
 
-  const serviceUrls = SERVICES.map((service) => ({
+  // Individual Service Pages
+  const serviceUrls: MetadataRoute.Sitemap = SERVICES.map((service) => ({
     url: `${baseUrl}/services/${service.slug}`,
     lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
+    changeFrequency: "weekly" as const,
+    priority: 0.9,
   }));
 
+  // Individual Venue Pages
+  const venueUrls: MetadataRoute.Sitemap = VENUES.map((venue) => ({
+    url: `${baseUrl}/venue/${venue.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.9,
+  }));
+
+  // Individual Case Study Pages
+  const caseStudyUrls: MetadataRoute.Sitemap = CASE_STUDIES.map((study) => ({
+    url: `${baseUrl}/events/case-studies/${study.id}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  // Published Blog Pages
   const publishedBlogs = getPublishedBlogSlugs();
-  const blogUrls = publishedBlogs.map((b) => ({
+  const blogUrls: MetadataRoute.Sitemap = publishedBlogs.map((b) => ({
     url: `${baseUrl}/blog/${b.slug}`,
     lastModified: new Date(b.date),
     changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
 
-  return [
+  // Static Core Route Pages
+  const corePages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 1,
+      changeFrequency: "daily" as const,
+      priority: 1.0,
     },
     {
-      url: `${baseUrl}/blog`,
+      url: `${baseUrl}/services`,
       lastModified: new Date(),
-      changeFrequency: "daily",
+      changeFrequency: "weekly" as const,
       priority: 0.9,
     },
-    ...serviceUrls,
-    ...blogUrls,
     {
-      url: `${baseUrl}/about`,
+      url: `${baseUrl}/venue`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/events`,
       lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
+      changeFrequency: "daily" as const,
+      priority: 0.85,
     },
     {
       url: `${baseUrl}/clients`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/review`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/tourism`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/contact`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
+      changeFrequency: "monthly" as const,
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
       priority: 0.9,
     },
   ];
+
+  return [...corePages, ...serviceUrls, ...venueUrls, ...caseStudyUrls, ...blogUrls];
 }

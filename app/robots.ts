@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.stryperevent.com";
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const baseUrl = envUrl && !envUrl.includes("localhost") ? envUrl : "https://www.stryperevent.com";
 
   return {
     rules: [
