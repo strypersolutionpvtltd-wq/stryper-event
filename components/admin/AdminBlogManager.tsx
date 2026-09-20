@@ -370,7 +370,12 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
           "Content-Type": "application/json",
           Authorization: `Bearer ${sessionToken}`,
         },
-        body: JSON.stringify({ id: b.id || b._id, status: newStatus }),
+        body: JSON.stringify({
+          id: b.id || b._id,
+          slug: b.slug,
+          title: b.title,
+          status: newStatus,
+        }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -389,7 +394,11 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
     if (!confirm(`Are you sure you want to delete "${b.title}"?`)) return;
 
     try {
-      const res = await fetch(`/api/blogs?id=${b.id || b._id}`, {
+      const queryParams = new URLSearchParams();
+      if (b.id || b._id) queryParams.set("id", b.id || b._id || "");
+      if (b.slug) queryParams.set("slug", b.slug);
+
+      const res = await fetch(`/api/blogs?${queryParams.toString()}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${sessionToken}` },
       });
