@@ -9,7 +9,6 @@ import {
   Trash2,
   Eye,
   CheckCircle,
-  Archive,
   Globe,
   UploadCloud,
   Bold,
@@ -351,6 +350,7 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
         toast.success(`Blog post ${editingBlogId ? "updated" : "created"} as ${finalStatus}!`);
         setIsEditingInPage(false);
         fetchBlogs();
+        fetchAllBlogs();
       } else {
         toast.error(data.error || "Failed to save blog post");
       }
@@ -374,8 +374,9 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        toast.success(`Blog status updated to ${newStatus}`);
+        toast.success(newStatus === "published" ? "Blog published live!" : "Blog unpublished (moved to Draft)");
         fetchBlogs();
+        fetchAllBlogs();
       } else {
         toast.error(data.error || "Failed to update status");
       }
@@ -396,6 +397,7 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
       if (res.ok && data.success) {
         toast.success("Blog post deleted successfully");
         fetchBlogs();
+        fetchAllBlogs();
       } else {
         toast.error(data.error || "Failed to delete blog post");
       }
@@ -436,7 +438,6 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
   const totalCount = metricsSource.length;
   const publishedCount = metricsSource.filter((b) => b.status === "published").length;
   const draftCount = metricsSource.filter((b) => b.status === "draft").length;
-  const archivedCount = metricsSource.filter((b) => b.status === "archived").length;
 
   // IN-PAGE EDITOR VIEW
   if (isEditingInPage) {
@@ -460,18 +461,18 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
               type="button"
               disabled={isSubmitting || isUploadingImage}
               onClick={() => handleSave("draft")}
-              className="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-sm font-semibold"
+              className="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold transition-all flex items-center gap-1.5"
             >
-              {isSubmitting ? "Saving..." : "Save Draft"}
+              {isSubmitting ? "Saving..." : status === "published" ? "Unpublish to Draft" : "Save as Draft"}
             </button>
 
             <button
               type="button"
               disabled={isSubmitting || isUploadingImage}
               onClick={() => handleSave("published")}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20"
+              className="px-5 py-2 rounded-xl bg-accent-yellow text-primary-black text-xs font-black uppercase tracking-wider hover:bg-accent-yellow/90 transition-all shadow-md active:scale-95 flex items-center gap-1.5"
             >
-              {isSubmitting ? "Publishing..." : "Publish Article"}
+              {isSubmitting ? "Publishing..." : "Publish Live"}
             </button>
           </div>
         </div>
@@ -922,108 +923,64 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
 
   // DEFAULT BLOG LIST VIEW
   return (
-    <div className="space-y-6">
-      {/* Top Bar */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-slate-900/80 p-6 rounded-2xl border border-slate-800">
-        <div>
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <FileText className="w-6 h-6 text-amber-400" />
-            Blog Management
-          </h2>
-          <p className="text-slate-400 text-sm mt-1">
-            Manage articles, draft publications, and editorial content for STRYPER EVENTS.
-          </p>
+    <div className="space-y-4">
+      {/* Top Action Bar */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        {/* Left: Title + Quick Status Filter Pills */}
+        <div className="flex flex-wrap items-center gap-3">
+          <h3 className="text-xl font-bold uppercase tracking-tight text-white flex items-center gap-2">
+            <FileText className="w-5 h-5 text-accent-yellow" />
+            Blog Articles
+            <span className="text-xs bg-white/10 text-accent-yellow px-2 py-0.5 rounded-full font-mono">
+              {totalCount}
+            </span>
+          </h3>
+
+          <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 p-1 rounded-xl">
+            {[
+              { id: "all", label: "All", count: totalCount },
+              { id: "published", label: "Published", count: publishedCount },
+              { id: "draft", label: "Drafts", count: draftCount },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setStatusFilter(tab.id)}
+                className={`px-3 py-1 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+                  statusFilter === tab.id
+                    ? "bg-accent-yellow text-primary-black shadow-sm"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span
+                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full ${
+                    statusFilter === tab.id ? "bg-black/20 text-black font-black" : "bg-white/10 text-white/70"
+                  }`}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <button
-          onClick={openNewEditor}
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-semibold shadow-lg shadow-amber-500/10 transition-all hover:scale-105"
-        >
-          <Plus className="w-5 h-5" />
-          Add New Blog Article
-        </button>
-      </div>
-
-      {/* Metrics Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div
-          onClick={() => setStatusFilter("all")}
-          className={`p-4 rounded-xl border cursor-pointer transition-all ${
-            statusFilter === "all"
-              ? "bg-amber-500/10 border-amber-500/40 text-amber-400"
-              : "bg-slate-900/50 border-slate-800 text-slate-300 hover:border-slate-700"
-          }`}
-        >
-          <div className="text-xs font-semibold text-slate-400 uppercase">Total Articles</div>
-          <div className="text-2xl font-bold mt-1 text-white">{totalCount}</div>
-        </div>
-
-        <div
-          onClick={() => setStatusFilter("published")}
-          className={`p-4 rounded-xl border cursor-pointer transition-all ${
-            statusFilter === "published"
-              ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400"
-              : "bg-slate-900/50 border-slate-800 text-slate-300 hover:border-slate-700"
-          }`}
-        >
-          <div className="text-xs font-semibold text-slate-400 uppercase">Published</div>
-          <div className="text-2xl font-bold mt-1 text-emerald-400">{publishedCount}</div>
-        </div>
-
-        <div
-          onClick={() => setStatusFilter("draft")}
-          className={`p-4 rounded-xl border cursor-pointer transition-all ${
-            statusFilter === "draft"
-              ? "bg-amber-500/10 border-amber-500/40 text-amber-400"
-              : "bg-slate-900/50 border-slate-800 text-slate-300 hover:border-slate-700"
-          }`}
-        >
-          <div className="text-xs font-semibold text-slate-400 uppercase">Drafts</div>
-          <div className="text-2xl font-bold mt-1 text-amber-400">{draftCount}</div>
-        </div>
-
-        <div
-          onClick={() => setStatusFilter("archived")}
-          className={`p-4 rounded-xl border cursor-pointer transition-all ${
-            statusFilter === "archived"
-              ? "bg-purple-500/10 border-purple-500/40 text-purple-400"
-              : "bg-slate-900/50 border-slate-800 text-slate-300 hover:border-slate-700"
-          }`}
-        >
-          <div className="text-xs font-semibold text-slate-400 uppercase">Archived</div>
-          <div className="text-2xl font-bold mt-1 text-purple-400">{archivedCount}</div>
-        </div>
-      </div>
-
-      {/* Filter & Search Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-        <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search articles by title, category, or author..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500/50"
-          />
-        </div>
-
-        <div className="flex gap-3">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
-          >
-            <option value="all">All Statuses</option>
-            <option value="draft">Drafts Only</option>
-            <option value="published">Published Only</option>
-            <option value="archived">Archived Only</option>
-          </select>
+        {/* Right: Search + Category + Add Button */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative min-w-[200px] flex-1 sm:flex-initial">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+            <input
+              type="text"
+              placeholder="Search title, author..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder-white/40 focus:outline-none focus:border-accent-yellow transition-all"
+            />
+          </div>
 
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
+            className="bg-[#111] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-accent-yellow transition-all"
           >
             <option value="all">All Categories</option>
             {DEFAULT_CATEGORIES.map((c) => (
@@ -1032,138 +989,131 @@ export default function AdminBlogManager({ sessionToken }: AdminBlogManagerProps
               </option>
             ))}
           </select>
+
+          <button
+            onClick={openNewEditor}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent-yellow text-primary-black text-xs font-black uppercase tracking-wider hover:bg-accent-yellow/90 transition-all shadow-md active:scale-95"
+          >
+            <Plus className="w-4 h-4" />
+            Add Article
+          </button>
         </div>
       </div>
 
-      {/* Blogs Table */}
-      <div className="bg-slate-900/80 rounded-2xl border border-slate-800 overflow-hidden">
+      {/* Blogs List */}
+      <div className="space-y-2.5">
         {isLoading ? (
-          <div className="p-12 text-center text-slate-400">Loading blog articles...</div>
+          <div className="py-16 text-center text-white/40">
+            <div className="w-8 h-8 rounded-full border border-white/10 border-t-accent-yellow animate-spin mx-auto mb-4" />
+            Loading blog articles...
+          </div>
         ) : filteredBlogs.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 space-y-3">
-            <FileText className="w-12 h-12 text-slate-600 mx-auto" />
-            <p className="text-lg font-medium text-slate-300">No blog articles found</p>
-            <p className="text-sm text-slate-500">
-              Try adjusting search filters or click &quot;Add New Blog Article&quot; to write an article.
-            </p>
+          <div className="text-center py-16 border border-white/5 rounded-2xl bg-white/5 text-white/40 space-y-2">
+            <FileText className="w-10 h-10 text-white/20 mx-auto" />
+            <p className="text-sm font-semibold text-white/70">No blog articles found</p>
+            <p className="text-xs text-white/40">Try adjusting search filters or click &quot;Add Article&quot;.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-950 text-xs uppercase text-slate-400 border-b border-slate-800">
-                <tr>
-                  <th className="px-6 py-4">Article Title</th>
-                  <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4">Author</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Date</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {filteredBlogs.map((b, idx) => (
-                  <tr key={b.id || b._id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-amber-400 font-mono font-bold text-xs shrink-0 w-8">
-                          #{String((b as any).order || idx + 1).padStart(2, "0")}
-                        </span>
-                        <img
-                          src={b.coverImage || "/images/corporate-new.jpg"}
-                          alt={b.title}
-                          className="w-14 h-10 object-cover rounded-lg border border-slate-700 bg-slate-800 shrink-0"
-                        />
-                        <div className="min-w-0">
-                          <div className="font-semibold text-white truncate max-w-xs sm:max-w-md">
-                            {b.title}
-                          </div>
-                          <div className="text-xs text-amber-400/80 truncate max-w-xs font-mono">
-                            /blog/{b.slug}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
+          filteredBlogs.map((b, idx) => (
+            <div
+              key={b.id || b._id}
+              className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3.5 bg-white/5 border border-white/10 hover:border-accent-yellow/40 rounded-2xl transition-all hover:bg-white/[0.07]"
+            >
+              {/* Left: Index + Image + Title + Slug */}
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <span className="text-accent-yellow font-mono font-bold text-xs shrink-0 w-7 text-center">
+                  #{String((b as any).order || idx + 1).padStart(2, "0")}
+                </span>
+                <img
+                  src={b.coverImage || "/images/corporate-new.jpg"}
+                  alt={b.title}
+                  className="w-14 h-11 object-cover rounded-lg border border-white/10 bg-black/40 shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-bold text-white text-sm truncate" title={b.title}>
+                    {b.title}
+                  </h4>
+                  <div className="flex items-center gap-2 mt-0.5 text-[11px] text-white/50">
+                    <span className="text-accent-yellow/80 font-mono truncate max-w-[200px] sm:max-w-xs">
+                      /blog/{b.slug}
+                    </span>
+                    <span className="w-1 h-1 bg-white/20 rounded-full shrink-0" />
+                    <span className="shrink-0 text-white/40">{b.date}</span>
+                  </div>
+                </div>
+              </div>
 
-                    <td className="px-6 py-4">
-                      <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 border border-slate-700 text-slate-300">
-                        {b.category}
-                      </span>
-                    </td>
+              {/* Middle: Category + Author + Status */}
+              <div className="flex items-center gap-2.5 shrink-0 flex-wrap md:flex-nowrap">
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/5 border border-white/10 text-white/80 shrink-0">
+                  {b.category}
+                </span>
 
-                    <td className="px-6 py-4 text-slate-300">{b.author}</td>
+                <span className="text-[11px] text-white/50 truncate max-w-[110px] hidden lg:inline">
+                  {b.author}
+                </span>
 
-                    <td className="px-6 py-4">
-                      {b.status === "published" && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                          <CheckCircle className="w-3 h-3" /> Published
-                        </span>
-                      )}
-                      {b.status === "draft" && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-400">
-                          <AlertCircle className="w-3 h-3" /> Draft
-                        </span>
-                      )}
-                      {b.status === "archived" && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/10 border border-purple-500/30 text-purple-400">
-                          <Archive className="w-3 h-3" /> Archived
-                        </span>
-                      )}
-                    </td>
+                {b.status === "published" ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shrink-0">
+                    <CheckCircle className="w-3 h-3" /> Published
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 shrink-0">
+                    <AlertCircle className="w-3 h-3" /> Draft
+                  </span>
+                )}
+              </div>
 
-                    <td className="px-6 py-4 text-xs text-slate-400">{b.date}</td>
+              {/* Right: Actions */}
+              <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+                <a
+                  href={`/blog/${b.slug}?admin=true`}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="Preview Article"
+                  className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-all"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                </a>
 
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <a
-                          href={`/blog/${b.slug}?admin=true`}
-                          target="_blank"
-                          rel="noreferrer"
-                          title="Preview Article"
-                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </a>
+                <button
+                  onClick={() => openEditEditor(b)}
+                  title="Edit Article"
+                  className="w-8 h-8 rounded-lg bg-accent-yellow/10 hover:bg-accent-yellow/20 border border-accent-yellow/30 text-accent-yellow flex items-center justify-center transition-all"
+                >
+                  <Edit className="w-3.5 h-3.5" />
+                </button>
 
-                        <button
-                          onClick={() => openEditEditor(b)}
-                          title="Edit Article"
-                          className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-colors"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
+                {b.status !== "published" ? (
+                  <button
+                    onClick={() => handleStatusToggle(b, "published")}
+                    title="Publish article live"
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all flex items-center gap-1 active:scale-95"
+                  >
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    Publish
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleStatusToggle(b, "draft")}
+                    title="Unpublish article (move to draft)"
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 transition-all flex items-center gap-1 active:scale-95"
+                  >
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    Unpublish
+                  </button>
+                )}
 
-                        {b.status !== "published" ? (
-                          <button
-                            onClick={() => handleStatusToggle(b, "published")}
-                            title="Publish"
-                            className="px-2 py-1 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30"
-                          >
-                            Publish
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleStatusToggle(b, "draft")}
-                            title="Unpublish to Draft"
-                            className="px-2 py-1 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30"
-                          >
-                            Unpublish
-                          </button>
-                        )}
-
-                        <button
-                          onClick={() => handleDelete(b)}
-                          title="Delete Article"
-                          className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                <button
+                  onClick={() => handleDelete(b)}
+                  title="Delete Article"
+                  className="w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 flex items-center justify-center transition-all"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))
         )}
       </div>
     </div>

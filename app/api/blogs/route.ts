@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/db";
 import { Blog } from "@/models/Blog";
 import { verifyAdminToken, generateSlug } from "@/lib/blogUtils";
@@ -229,6 +230,11 @@ export async function POST(request: Request) {
       await newBlog.save();
       createdBlog = newBlog.toObject();
       createdBlog.id = createdBlog._id.toString();
+
+      // Always sync local JSON file as well
+      const localBlogs = getLocalBlogs();
+      localBlogs.unshift(createdBlog);
+      saveLocalBlogs(localBlogs);
     } catch (dbErr) {
       console.warn("MongoDB save failed, saving to local JSON fallback:", dbErr);
       const localBlogs = getLocalBlogs();
@@ -254,8 +260,8 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { id, title, slug: customSlug, ...updateFields } = body;
 
-    if (!id) {
-      return NextResponse.json({ error: "Blog ID is required for update" }, { status: 400 });
+    if (!id && !customSlug) {
+      return NextResponse.json({ error: "Blog ID or slug is required for update" }, { status: 400 });
     }
 
     if (title) {
@@ -271,25 +277,62 @@ export async function PUT(request: Request) {
 
     updateFields.updated_at = new Date();
 
+    let updatedBlogObj: any = null;
+
     try {
       await connectToDatabase();
-      const updated = await Blog.findByIdAndUpdate(id, { $set: { ...updateFields, ...(title ? { title } : {}) } }, { new: true });
+
+      const targetSlug = updateFields.slug || (customSlug ? generateSlug(customSlug) : undefined);
+      const queryConditions: any[] = [];
+
+      if (id) {
+        if (mongoose.Types.ObjectId.isValid(id)) {
+          queryConditions.push({ _id: id });
+        }
+        queryConditions.push({ id: id });
+      }
+      if (targetSlug) {
+        queryConditions.push({ slug: targetSlug });
+      }
+      if (title) {
+        queryConditions.push({ title: title });
+      }
+
+      const updated = await Blog.findOneAndUpdate(
+        { $or: queryConditions },
+        { $set: { ...updateFields, ...(title ? { title } : {}) } },
+        { new: true }
+      );
+
       if (updated) {
         const resObj = updated.toObject();
         resObj.id = resObj._id.toString();
-        return NextResponse.json({ success: true, blog: resObj });
+        updatedBlogObj = resObj;
       }
     } catch (dbErr) {
       console.warn("MongoDB update failed, fallback to local JSON:", dbErr);
     }
 
-    // Local fallback update
+    // Always update local JSON file as well to keep in sync
     const localBlogs = getLocalBlogs();
-    const index = localBlogs.findIndex((b: any) => b.id === id || b._id === id);
+    const targetSlug = updateFields.slug || (customSlug ? generateSlug(customSlug) : undefined);
+    const index = localBlogs.findIndex(
+      (b: any) =>
+        (id && (b.id === id || b._id === id)) ||
+        (targetSlug && b.slug === targetSlug) ||
+        (title && b.title === title)
+    );
+
     if (index !== -1) {
       localBlogs[index] = { ...localBlogs[index], ...updateFields, ...(title ? { title } : {}) };
       saveLocalBlogs(localBlogs);
-      return NextResponse.json({ success: true, blog: localBlogs[index] });
+      if (!updatedBlogObj) {
+        updatedBlogObj = localBlogs[index];
+      }
+    }
+
+    if (updatedBlogObj) {
+      return NextResponse.json({ success: true, blog: updatedBlogObj });
     }
 
     return NextResponse.json({ error: "Blog post not found" }, { status: 404 });
@@ -307,20 +350,31 @@ export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
+    const slug = searchParams.get("slug");
 
-    if (!id) {
-      return NextResponse.json({ error: "Missing blog ID" }, { status: 400 });
+    if (!id && !slug) {
+      return NextResponse.json({ error: "Missing blog ID or slug" }, { status: 400 });
     }
 
     try {
       await connectToDatabase();
-      await Blog.findByIdAndDelete(id);
+      const queryConditions: any[] = [];
+      if (id) {
+        if (mongoose.Types.ObjectId.isValid(id)) {
+          queryConditions.push({ _id: id });
+        }
+        queryConditions.push({ id: id });
+      }
+      if (slug) {
+        queryConditions.push({ slug });
+      }
+      await Blog.findOneAndDelete({ $or: queryConditions });
     } catch (dbErr) {
       console.warn("MongoDB delete failed, fallback to local JSON:", dbErr);
     }
 
     const localBlogs = getLocalBlogs();
-    const filtered = localBlogs.filter((b: any) => b.id !== id && b._id !== id);
+    const filtered = localBlogs.filter((b: any) => b.id !== id && b._id !== id && b.slug !== slug);
     saveLocalBlogs(filtered);
 
     return NextResponse.json({ success: true, message: "Blog post deleted successfully" });
